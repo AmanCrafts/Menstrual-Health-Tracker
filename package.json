@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "firebase": "^11.5.0",
+    "firebase": "^11.6.0",
     "gapi-script": "^1.2.0",
     "react": "^19.0.0",
     "react-calendar": "^5.1.0",

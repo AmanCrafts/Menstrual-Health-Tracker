@@ -1,0 +1,150 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    padding: 2rem;
+    background: #f0f2f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+.split-form {
+    display: flex;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+    height: 550px;
+}
+
+.split-form .image-side {
+    flex: 1;
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    position: relative;
+}
+
+.split-form .image-side h2 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.split-form .image-side p {
+    font-size: 1.1rem;
+    max-width: 80%;
+    opacity: 0.9;
+}
+
+.split-form .form-side {
+    flex: 1;
+    padding: 3.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.split-form .form-side h2 {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    color: #333;
+    position: relative;
+}
+
+.split-form .form-side h2::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 50px;
+    height: 3px;
+    background: #ff6b6b;
+}
+
+.split-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.split-form input {
+    width: 100%;
+    padding: 1rem 0.5rem;
+    font-size: 1rem;
+    border: none;
+    border-bottom: 2px solid #eee;
+    outline: none;
+    transition: all 0.3s;
+    background: transparent;
+}
+
+.split-form input::placeholder {
+    color: #aaa;
+    transition: color 0.3s;
+}
+
+.split-form input:focus {
+    border-bottom-color: #ff6b6b;
+}
+
+.split-form input:focus::placeholder {
+    color: #ff6b6b;
+    opacity: 0.7;
+}
+
+.split-form button {
+    width: 100%;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(255, 107, 107, 0.2);
+}
+
+.split-form button:hover {
+    transform: translateY(-2px);
+    background: #ff5252;
+    box-shadow: 0 6px 10px rgba(255, 107, 107, 0.3);
+}
+
+.split-form button:active {
+    transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .split-form {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .split-form .image-side,
+    .split-form .form-side {
+        padding: 2rem;
+    }
+}
