@@ -34,7 +34,7 @@ export default function Signup() {
             await signup(emailRef.current.value, passwordRef.current.value)
             setSuccess("Account created successfully! Redirecting...")
             setTimeout(() => {
-                navigate("/")
+                navigate("/profile")
             }, 1500)
         } catch (error) {
             // Handle specific Firebase errors with user-friendly messages
@@ -62,7 +62,7 @@ export default function Signup() {
         try {
             setLoading(true)
             await signInWithGoogle()
-            navigate("/signin")
+            navigate("/profile")
         } catch (error) {
             if (error.code === 'auth/popup-closed-by-user') {
                 setError("Sign-up cancelled by user")

@@ -27,7 +27,13 @@ export function AuthProvider({ children }) {
   }
 
   function signInWithGoogle() {
+    // Create a Google provider with additional scopes for Drive access
     const provider = new GoogleAuthProvider()
+
+    // Add scopes needed for Drive access
+    provider.addScope('https://www.googleapis.com/auth/drive.file')
+    provider.addScope('https://www.googleapis.com/auth/drive.appdata')
+
     return signInWithPopup(auth, provider)
   }
 

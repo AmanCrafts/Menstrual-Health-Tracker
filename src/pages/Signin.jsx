@@ -24,7 +24,7 @@ const Signin = () => {
       await login(emailRef.current.value, passwordRef.current.value)
       setSuccess("Login successful! Redirecting...")
       setTimeout(() => {
-        navigate("/")
+        navigate("/profile")
       }, 1500)
     } catch (error) {
 
@@ -54,7 +54,7 @@ const Signin = () => {
     try {
       setLoading(true)
       await signInWithGoogle()
-      navigate("/signup")
+      navigate("/profile")
     } catch (error) {
       if (error.code === 'auth/popup-closed-by-user') {
         setError("Sign-in cancelled by user")
