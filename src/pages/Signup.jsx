@@ -2,12 +2,14 @@ import React, { useRef, useState } from "react"
 import { useAuth } from "../contexts/useAuth.jsx"
 import { useNavigate } from "react-router-dom"
 import Alert from "../components/Alert.jsx"
+import GoogleButton from "../components/GoogleButton.jsx"
+import "../styles/signup.css"
 
 export default function Signup() {
     const emailRef = useRef()
     const passwordRef = useRef()
     const confirmpassRef = useRef()
-    const { signup } = useAuth()
+    const { signup, signInWithGoogle } = useAuth()
     const [error, setError] = useState("")
     const [success, setSuccess] = useState("")
     const [loading, setLoading] = useState(false)
@@ -53,6 +55,28 @@ export default function Signup() {
         }
     }
 
+    async function handleGoogleSignUp() {
+        setError("")
+        setSuccess("")
+
+        try {
+            setLoading(true)
+            await signInWithGoogle()
+            navigate("/signin")
+        } catch (error) {
+            if (error.code === 'auth/popup-closed-by-user') {
+                setError("Sign-up cancelled by user")
+            } else if (error.code === 'auth/network-request-failed') {
+                setError("Network error. Please check your internet connection")
+            } else {
+                setError("Failed to sign up with Google. Please try again")
+                console.error("Google sign-up error:", error.code, error.message)
+            }
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
         <>
             <div className="split-form">
@@ -72,6 +96,11 @@ export default function Signup() {
                         <button type="submit" disabled={loading}>
                             {loading ? "Creating Account..." : "Sign Up"}
                         </button>
+                        <div className="divider">OR</div>
+                        <GoogleButton
+                            onClick={handleGoogleSignUp}
+                            text="Sign up with Google"
+                        />
                         <p>Already have an account? <a href="/signin">Login</a></p>
                     </form>
                 </div>

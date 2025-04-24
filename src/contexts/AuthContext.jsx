@@ -6,7 +6,9 @@ import {
   sendPasswordResetEmail,
   updateEmail as firebaseUpdateEmail,
   updatePassword as firebaseUpdatePassword,
-  onAuthStateChanged
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup
 } from "firebase/auth"
 import { auth } from "../configs/firebase.jsx"
 
@@ -22,6 +24,11 @@ export function AuthProvider({ children }) {
 
   function login(email, password) {
     return signInWithEmailAndPassword(auth, email, password)
+  }
+
+  function signInWithGoogle() {
+    const provider = new GoogleAuthProvider()
+    return signInWithPopup(auth, provider)
   }
 
   function logout() {
@@ -53,6 +60,7 @@ export function AuthProvider({ children }) {
     currentUser,
     login,
     signup,
+    signInWithGoogle,
     logout,
     resetPassword,
     updateEmail,

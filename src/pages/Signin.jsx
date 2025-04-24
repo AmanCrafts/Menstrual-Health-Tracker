@@ -2,12 +2,13 @@ import React, { useRef, useState } from 'react'
 import { useAuth } from '../contexts/useAuth.jsx'
 import { useNavigate } from 'react-router-dom'
 import Alert from '../components/Alert.jsx'
+import GoogleButton from '../components/GoogleButton.jsx'
 import '../styles/signin.css'
 
 const Signin = () => {
   const emailRef = useRef()
   const passwordRef = useRef()
-  const { login } = useAuth()
+  const { login, signInWithGoogle } = useAuth()
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [loading, setLoading] = useState(false)
@@ -26,7 +27,7 @@ const Signin = () => {
         navigate("/")
       }, 1500)
     } catch (error) {
-      // Handle specific Firebase errors with user-friendly messages
+
       if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
         setError("Incorrect email or password")
       } else if (error.code === 'auth/invalid-email') {
@@ -41,6 +42,28 @@ const Signin = () => {
         setError("Failed to sign in. Please try again")
       }
       console.error("Login error:", error.code, error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setError("")
+    setSuccess("")
+
+    try {
+      setLoading(true)
+      await signInWithGoogle()
+      navigate("/signup")
+    } catch (error) {
+      if (error.code === 'auth/popup-closed-by-user') {
+        setError("Sign-in cancelled by user")
+      } else if (error.code === 'auth/network-request-failed') {
+        setError("Network error. Please check your internet connection")
+      } else {
+        setError("Failed to sign in with Google. Please try again")
+        console.error("Google sign-in error:", error.code, error.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -62,6 +85,11 @@ const Signin = () => {
           <button type="submit" disabled={loading}>
             {loading ? "Signing In..." : "Login"}
           </button>
+          <div className="divider">OR</div>
+          <GoogleButton
+            onClick={handleGoogleSignIn}
+            text="Sign in with Google"
+          />
           <p>Don't have an account? <a href="/signup">Sign Up</a></p>
         </form>
       </div>
