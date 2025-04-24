@@ -5,16 +5,13 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flow Sync</title>
-
-    <!-- Load the Google API client library -->
-    <script src="https://apis.google.com/js/api.js"></script>
-    <!-- Load Google client library for auth -->
-    <script type="module" src="/src/main.jsx"></script>
-    <script src="https://accounts.google.com/gsi/client"></script>
+    <!-- Google API libraries -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <!-- New Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
   </head>
   <body>
     <div id="root"></div>
-    
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

@@ -6,15 +6,21 @@ import Alert from '../components/Alert.jsx';
 import '../styles/profile.css';
 
 export default function Profile() {
+    // these are from our auth and data contexts
+    // they give us user info and saving functions
     const { currentUser, logout } = useAuth();
     const {
         userProfile,
         updateUserProfile,
         loading,
         error,
-        clearError
+        clearError,
+        isInitialized,
+        usingLocalStorage
     } = useData();
 
+    // these are state variables to store form values
+    // I use useState for everything!
     const [displayName, setDisplayName] = useState('');
     const [birthDate, setBirthDate] = useState('');
     const [cycleLength, setCycleLength] = useState('28');
@@ -23,8 +29,10 @@ export default function Profile() {
     const [successMessage, setSuccessMessage] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const navigate = useNavigate();
+    const [, setLoading] = useState(false); // to avoid using the loading state from context
 
-    // Load user profile data when component mounts
+    // this runs when component loads or user changes
+    // it fills in the form with existing profile data
     useEffect(() => {
         if (!currentUser) {
             navigate('/signin');
@@ -43,7 +51,8 @@ export default function Profile() {
         }
     }, [currentUser, userProfile, navigate]);
 
-    // Handle form submission
+    // this runs when the form is submitted
+    // it saves all the profile data to google drive or local storage
     const handleSaveProfile = async (e) => {
         e.preventDefault();
 
@@ -68,13 +77,28 @@ export default function Profile() {
         }
     };
 
-    // Handle logout
+    // this handles logout button click
+    // it logs out and sends user to login page
     const handleLogout = async () => {
         try {
             await logout();
             navigate('/signin');
         } catch (error) {
             console.error("Failed to log out:", error);
+        }
+    };
+
+    // this handles reconnecting to google
+    // it logs out and sends back to login page to reconnect
+    const handleReconnectGoogle = async () => {
+        try {
+            setLoading(true);
+            await logout();
+            setTimeout(() => {
+                navigate('/signin');
+            }, 500);
+        } catch (err) {
+            console.error("Failed to logout:", err);
         }
     };
 
@@ -85,7 +109,16 @@ export default function Profile() {
                 <button className="logout-button" onClick={handleLogout}>Logout</button>
             </div>
 
-            {error && <Alert type="error" message={error} onClose={clearError} />}
+            {error && (
+                <div className="error-card">
+                    <Alert type="error" message={error} onClose={clearError} />
+                    {error.includes("Google Drive") && (
+                        <button className="reconnect-button" onClick={handleReconnectGoogle}>
+                            Reconnect Google Account
+                        </button>
+                    )}
+                </div>
+            )}
             {successMessage && <Alert type="success" message={successMessage} />}
 
             <div className="profile-card">
@@ -194,6 +227,34 @@ export default function Profile() {
                         </form>
                     )}
                 </div>
+            </div>
+
+            {/* Add this at the bottom of the profile card if using Google auth */}
+            {currentUser && currentUser.providerData.some(provider => provider.providerId === 'google.com') && (
+                <div className="google-status">
+                    <p>
+                        <span className={isInitialized ? "status-connected" : "status-disconnected"}>●</span>
+                        Google Drive: {isInitialized ? "Connected" : "Disconnected"}
+                    </p>
+                    {!isInitialized && (
+                        <button className="reconnect-button" onClick={handleReconnectGoogle}>
+                            Reconnect
+                        </button>
+                    )}
+                </div>
+            )}
+
+            {/* Storage status indicator */}
+            <div className="storage-status">
+                <p>
+                    <span className={usingLocalStorage ? "status-local" : "status-cloud"}>●</span>
+                    Data Storage: {usingLocalStorage ? "Local Browser Storage" : "Google Drive"}
+                </p>
+                {usingLocalStorage && currentUser.providerData.some(provider => provider.providerId === 'google.com') && (
+                    <button className="reconnect-button" onClick={handleReconnectGoogle}>
+                        Connect Google Drive
+                    </button>
+                )}
             </div>
         </div>
     );
