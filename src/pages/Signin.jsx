@@ -70,28 +70,43 @@ const Signin = () => {
   }
 
   return (
-    <div className="split-form">
-      <div className="image-side">
-        <h2>Welcome Back!</h2>
-        <p>Enter your details to access your account</p>
-      </div>
-      <div className="form-side">
-        <h2>Sign In</h2>
-        <Alert type="error" message={error} />
-        <Alert type="success" message={success} />
-        <form onSubmit={handleSubmit}>
-          <input type="email" placeholder="Email" ref={emailRef} required />
-          <input type="password" placeholder="Password" ref={passwordRef} required />
-          <button type="submit" disabled={loading}>
-            {loading ? "Signing In..." : "Login"}
-          </button>
-          <div className="divider">OR</div>
-          <GoogleButton
-            onClick={handleGoogleSignIn}
-            text="Sign in with Google"
-          />
-          <p>Don't have an account? <a href="/signup">Sign Up</a></p>
-        </form>
+    <div className="signin-container">
+      <div className="split-form">
+        <div className="image-side">
+          <h2>Welcome Back!</h2>
+          <p>Track your cycle and feel empowered with every insight</p>
+        </div>
+        <div className="form-side">
+          <h2>Sign In</h2>
+          <Alert type="error" message={error} />
+          <Alert type="success" message={success} />
+          <form onSubmit={handleSubmit}>
+            <input
+              type="email"
+              placeholder="Email"
+              ref={emailRef}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              ref={passwordRef}
+              required
+            />
+            <div className="forgot-password">
+              <a href="/reset-password">Forgot Password?</a>
+            </div>
+            <button type="submit" disabled={loading}>
+              {loading ? "Signing In..." : "Login"}
+            </button>
+            <div className="divider">OR</div>
+            <GoogleButton
+              onClick={handleGoogleSignIn}
+              text="Sign in with Google"
+            />
+            <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+          </form>
+        </div>
       </div>
     </div>
   )

@@ -229,7 +229,20 @@ export default function Profile() {
                 </div>
             </div>
 
-            {/* Add this at the bottom of the profile card if using Google auth */}
+            {/* Storage indicators */}
+            <div className="storage-status">
+                <p>
+                    <span className={usingLocalStorage ? "status-local" : "status-cloud"}>●</span>
+                    Data Storage: {usingLocalStorage ? "Local Browser Storage" : "Google Drive"}
+                </p>
+                {usingLocalStorage && currentUser.providerData.some(provider => provider.providerId === 'google.com') && (
+                    <button className="reconnect-button" onClick={handleReconnectGoogle}>
+                        Connect Google Drive
+                    </button>
+                )}
+            </div>
+
+            {/* Google connection status (only show if using Google auth) */}
             {currentUser && currentUser.providerData.some(provider => provider.providerId === 'google.com') && (
                 <div className="google-status">
                     <p>
@@ -243,19 +256,6 @@ export default function Profile() {
                     )}
                 </div>
             )}
-
-            {/* Storage status indicator */}
-            <div className="storage-status">
-                <p>
-                    <span className={usingLocalStorage ? "status-local" : "status-cloud"}>●</span>
-                    Data Storage: {usingLocalStorage ? "Local Browser Storage" : "Google Drive"}
-                </p>
-                {usingLocalStorage && currentUser.providerData.some(provider => provider.providerId === 'google.com') && (
-                    <button className="reconnect-button" onClick={handleReconnectGoogle}>
-                        Connect Google Drive
-                    </button>
-                )}
-            </div>
         </div>
     );
 }

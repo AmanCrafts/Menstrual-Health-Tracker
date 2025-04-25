@@ -78,21 +78,31 @@ export default function Signup() {
     }
 
     return (
-        <>
+        <div className="signup-container">
             <div className="split-form">
                 <div className="image-side">
-                    <h2>Welcome Back!</h2>
-                    <p>Enter your details to access your account</p>
+                    <h2>Track Your Cycle</h2>
+                    <p>Join our community to track, understand, and take control of your menstrual health</p>
                 </div>
                 <div className="form-side">
-                    <h2>Sign Up</h2>
+                    <h2>Create an Account</h2>
                     <Alert type="error" message={error} />
                     <Alert type="success" message={success} />
 
                     <form onSubmit={handleSubmit}>
                         <input type="email" placeholder="Email" ref={emailRef} required />
-                        <input type="password" placeholder="Password" ref={passwordRef} required />
-                        <input type="password" placeholder='Confirm Password' ref={confirmpassRef} required />
+                        <input
+                            type="password"
+                            placeholder="Password (min. 6 characters)"
+                            ref={passwordRef}
+                            required
+                        />
+                        <input
+                            type="password"
+                            placeholder="Confirm Password"
+                            ref={confirmpassRef}
+                            required
+                        />
                         <button type="submit" disabled={loading}>
                             {loading ? "Creating Account..." : "Sign Up"}
                         </button>
@@ -105,6 +115,6 @@ export default function Signup() {
                     </form>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
