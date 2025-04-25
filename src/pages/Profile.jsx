@@ -113,8 +113,8 @@ export default function Profile() {
                 <div className="error-card">
                     <Alert type="error" message={error} onClose={clearError} />
                     {error.includes("Google Drive") && (
-                        <button className="reconnect-button" onClick={handleReconnectGoogle}>
-                            Reconnect Google Account
+                        <button className="reconnect-button" onClick={() => window.location.reload()}> // Reconnect to Google Drive
+                            Reconnect to Google Drive
                         </button>
                     )}
                 </div>
@@ -245,29 +245,29 @@ export default function Profile() {
                         </span>
                     )}
                 </p>
-                {usingLocalStorage && currentUser && currentUser.providerData && 
-                  currentUser.providerData.some(provider => provider.providerId === 'google.com') && (
-                    <button className="reconnect-button" onClick={handleReconnectGoogle}>
-                        Connect Google Drive
-                    </button>
-                )}
+                {usingLocalStorage && currentUser && currentUser.providerData &&
+                    currentUser.providerData.some(provider => provider.providerId === 'google.com') && (
+                        <button className="reconnect-button" onClick={handleReconnectGoogle}>
+                            Connect Google Drive
+                        </button>
+                    )}
             </div>
 
             {/* Google connection status (only show if using Google auth) */}
-            {currentUser && currentUser.providerData && 
-              currentUser.providerData.some(provider => provider.providerId === 'google.com') && (
-                <div className="google-status">
-                    <p>
-                        <span className={isInitialized ? "status-connected" : "status-disconnected"}>●</span>
-                        Google Drive: {isInitialized ? "Connected" : "Disconnected"}
-                    </p>
-                    {!isInitialized && (
-                        <button className="reconnect-button" onClick={handleReconnectGoogle}>
-                            Reconnect
-                        </button>
-                    )}
-                </div>
-            )}
+            {currentUser && currentUser.providerData &&
+                currentUser.providerData.some(provider => provider.providerId === 'google.com') && (
+                    <div className="google-status">
+                        <p>
+                            <span className={isInitialized ? "status-connected" : "status-disconnected"}>●</span>
+                            Google Drive: {isInitialized ? "Connected" : "Disconnected"}
+                        </p>
+                        {!isInitialized && (
+                            <button className="reconnect-button" onClick={handleReconnectGoogle}>
+                                Reconnect
+                            </button>
+                        )}
+                    </div>
+                )}
         </div>
     );
 }
