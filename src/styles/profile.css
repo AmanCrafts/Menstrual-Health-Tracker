@@ -374,3 +374,17 @@ input:focus {
   font-size: 1.2rem;
   margin-right: 0.5rem;
 }
+
+.status-note {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.3rem;
+}
+
+@media (min-width: 768px) {
+  .status-note {
+    display: inline;
+    margin-left: 0.5rem;
+  }
+}

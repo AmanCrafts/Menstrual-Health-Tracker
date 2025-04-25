@@ -229,13 +229,24 @@ export default function Profile() {
                 </div>
             </div>
 
-            {/* Storage indicators */}
+            {/* Storage indicators with better explanations */}
             <div className="storage-status">
                 <p>
                     <span className={usingLocalStorage ? "status-local" : "status-cloud"}>●</span>
                     Data Storage: {usingLocalStorage ? "Local Browser Storage" : "Google Drive"}
+                    {usingLocalStorage && (
+                        <span className="status-note">
+                            (Your data is only stored in this browser)
+                        </span>
+                    )}
+                    {!usingLocalStorage && (
+                        <span className="status-note">
+                            (Your data is securely saved to your Google Drive)
+                        </span>
+                    )}
                 </p>
-                {usingLocalStorage && currentUser.providerData.some(provider => provider.providerId === 'google.com') && (
+                {usingLocalStorage && currentUser && currentUser.providerData && 
+                  currentUser.providerData.some(provider => provider.providerId === 'google.com') && (
                     <button className="reconnect-button" onClick={handleReconnectGoogle}>
                         Connect Google Drive
                     </button>
@@ -243,7 +254,8 @@ export default function Profile() {
             </div>
 
             {/* Google connection status (only show if using Google auth) */}
-            {currentUser && currentUser.providerData.some(provider => provider.providerId === 'google.com') && (
+            {currentUser && currentUser.providerData && 
+              currentUser.providerData.some(provider => provider.providerId === 'google.com') && (
                 <div className="google-status">
                     <p>
                         <span className={isInitialized ? "status-connected" : "status-disconnected"}>●</span>

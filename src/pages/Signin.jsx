@@ -53,16 +53,27 @@ const Signin = () => {
 
     try {
       setLoading(true)
+      console.log("Starting Google sign-in process...")
       await signInWithGoogle()
-      navigate("/profile")
+      setSuccess("Google login successful! Redirecting...")
+
+      // Add a short delay to ensure token is properly stored before navigation
+      setTimeout(() => {
+        navigate("/profile")
+      }, 500)
     } catch (error) {
+      console.error("Full Google sign-in error:", error)
+
       if (error.code === 'auth/popup-closed-by-user') {
         setError("Sign-in cancelled by user")
       } else if (error.code === 'auth/network-request-failed') {
         setError("Network error. Please check your internet connection")
+      } else if (error.code === 'auth/internal-error') {
+        setError("An internal error occurred. Please try again")
+      } else if (error.code === 'auth/popup-blocked') {
+        setError("Popup was blocked by your browser. Please enable popups for this site")
       } else {
         setError("Failed to sign in with Google. Please try again")
-        console.error("Google sign-in error:", error.code, error.message)
       }
     } finally {
       setLoading(false)

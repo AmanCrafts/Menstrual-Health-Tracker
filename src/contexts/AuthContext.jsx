@@ -13,15 +13,44 @@ import {
 import { auth } from "../configs/firebase.jsx"
 import { setAccessToken } from "../services/googleDriveService"
 
+// Token storage key in localStorage
+const TOKEN_STORAGE_KEY = "flowsync_google_token";
+
 // this is the context for authentication
-// i learned about contexts recently, they're cool!
 export const AuthContext = createContext()
 
 export function AuthProvider({ children }) {
   // these are state variables that keep track of things
   const [currentUser, setCurrentUser] = useState()
   const [loading, setLoading] = useState(true)
-  const [googleAuthToken, setGoogleAuthToken] = useState(null)
+
+  // Initialize token from localStorage if available
+  const [googleAuthToken, setGoogleAuthToken] = useState(() => {
+    try {
+      const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+      return savedToken || null;
+    } catch (error) {
+      console.error("Error reading token from localStorage:", error);
+      return null;
+    }
+  })
+
+  // Save token to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      if (googleAuthToken) {
+        console.log("Saving token to localStorage:", googleAuthToken.substring(0, 10) + '...');
+        localStorage.setItem(TOKEN_STORAGE_KEY, googleAuthToken);
+        // Also set it in the service
+        setAccessToken(googleAuthToken);
+      } else {
+        console.log("Removing token from localStorage");
+        localStorage.removeItem(TOKEN_STORAGE_KEY);
+      }
+    } catch (error) {
+      console.error("Error saving token to localStorage:", error);
+    }
+  }, [googleAuthToken]);
 
   // this creates a new user with email and password
   // it uses firebase which is a google service
@@ -36,7 +65,6 @@ export function AuthProvider({ children }) {
   }
 
   // this does google login, which is complicated
-  // i had to look up how to do this!!
   async function signInWithGoogle() {
     // Create a Google provider with additional scopes for Drive access
     const provider = new GoogleAuthProvider()
@@ -52,17 +80,31 @@ export function AuthProvider({ children }) {
     })
 
     try {
+      console.log("Initiating Google auth popup...")
       const result = await signInWithPopup(auth, provider)
 
       // This gives you a Google Access Token
       const credential = GoogleAuthProvider.credentialFromResult(result)
       const token = credential.accessToken
 
+      if (!token) {
+        console.error('Google sign-in succeeded but no access token was returned');
+        return result;
+      }
+
+      console.log('Google sign-in successful with access token:', token.substring(0, 10) + '...');
+
       // Store the token in state and for Drive operations
       setGoogleAuthToken(token)
       setAccessToken(token)
 
-      console.log('Google sign-in successful with access token')
+      // Force save to localStorage for immediate persistence
+      localStorage.setItem(TOKEN_STORAGE_KEY, token);
+      console.log('Token saved to localStorage and provided to Drive service');
+
+      // Wait a moment to ensure token is properly processed
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       return result
     } catch (error) {
       console.error('Google sign-in error:', error)
@@ -73,7 +115,9 @@ export function AuthProvider({ children }) {
   // this logs the user out
   // and clears the token so they can't use drive anymore
   function logout() {
+    // Clear the token when logging out
     setGoogleAuthToken(null)
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
     return signOut(auth)
   }
 
@@ -99,20 +143,34 @@ export function AuthProvider({ children }) {
   // it sets up an event listener for auth changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, user => {
+      console.log("Auth state changed, user:", user ? "logged in" : "logged out");
       setCurrentUser(user)
-      setLoading(false)
 
-      // Check if user has signed in with Google
-      if (user && user.providerData.some(provider => provider.providerId === 'google.com')) {
-        // If we have a google token saved from sign in, use it
-        if (googleAuthToken) {
-          setAccessToken(googleAuthToken)
-        } else {
-          // User might have refreshed the page, handle token refresh here
-          // For simplicity, let's just notify that they may need to sign in again
-          console.log('User signed in with Google but no token available. Drive access may be limited.')
+      // If we have a token in localStorage, set it when auth state changes
+      if (user && user.providerData && user.providerData.some(provider => provider.providerId === 'google.com')) {
+        try {
+          const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+
+          if (savedToken) {
+            // If we already have a token in state, don't overwrite it
+            if (!googleAuthToken) {
+              console.log('Retrieved Google token from storage:', savedToken.substring(0, 10) + '...');
+              setGoogleAuthToken(savedToken);
+              setAccessToken(savedToken);
+            }
+          } else {
+            console.log('User signed in with Google but no token available in storage.');
+          }
+        } catch (error) {
+          console.error("Error retrieving token from localStorage:", error);
         }
+      } else if (!user) {
+        // User logged out, ensure token is cleared
+        setGoogleAuthToken(null);
+        localStorage.removeItem(TOKEN_STORAGE_KEY);
       }
+
+      setLoading(false)
     })
 
     return unsubscribe

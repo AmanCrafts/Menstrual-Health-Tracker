@@ -11,36 +11,21 @@ let accessToken = null;
  * so we can use google drive later :)
  */
 export const setAccessToken = (token) => {
+  if (!token) {
+    console.warn('Attempted to set null or undefined access token');
+    return;
+  }
+  
   accessToken = token;
-  console.log('Access token set for Google Drive API');
+  console.log('Access token set for Google Drive API:', token.substring(0, 10) + '...');
 };
 
 /**
- * this loads the google api stuff
- * i'm not sure how it works but i found it on stackoverflow
+ * Check if the current token appears to be valid
+ * (Note: This doesn't actually validate with Google, just checks if it looks like a token)
  */
-export const loadGoogleApi = () => {
-  return new Promise((resolve, reject) => {
-    // The gapi.load function is made available by the platform.js script
-    if (typeof gapi !== 'undefined') {
-      gapi.load('client', async () => {
-        try {
-          await gapi.client.init({
-            // Remove API key - we'll use OAuth token exclusively
-            discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
-          });
-          console.log('Google API client loaded');
-          resolve(true);
-        } catch (error) {
-          console.error('Error initializing Google API client:', error);
-          reject(error);
-        }
-      });
-    } else {
-      console.error('Google API (gapi) not available');
-      reject(new Error('Google API not available'));
-    }
-  });
+export const hasValidToken = () => {
+  return !!accessToken && typeof accessToken === 'string' && accessToken.length > 20;
 };
 
 /**
@@ -49,18 +34,33 @@ export const loadGoogleApi = () => {
  */
 export const initGoogleDriveApi = async () => {
   try {
-    // First load the Google API client
-    await loadGoogleApi();
-    
-    // Set the auth token for all requests
-    if (!accessToken) {
-      console.warn('No access token available. Drive operations may fail.');
+    // First check if we have what looks like a valid token
+    if (!hasValidToken()) {
+      console.warn('No valid access token available. Drive operations will fail. Token:', accessToken);
       return false;
     }
     
+    console.log('Initializing with token starting with:', accessToken.substring(0, 10) + '...');
+    
+    // Load the Google API client
+    await loadGoogleApi();
+    
+    // Set the auth token for all requests
     gapi.client.setToken({ access_token: accessToken });
-    console.log('Google Drive API initialized with token');
-    return true;
+    
+    // Do a simple test request to verify the token works
+    try {
+      console.log('Testing token with a simple API request...');
+      await gapi.client.drive.about.get({
+        fields: 'user'
+      });
+      console.log('Google Drive API initialized with token - token validated');
+      return true;
+    } catch (error) {
+      console.error('Token validation failed:', error);
+      accessToken = null; // Clear invalid token
+      return false;
+    }
   } catch (error) {
     console.error('Error initializing Google Drive API:', error);
     throw error;
@@ -281,4 +281,41 @@ export const deleteFile = async (fileName, folderId = null) => {
     console.error('Error deleting file:', error);
     throw error;
   }
+};
+
+/**
+ * this loads the google api stuff
+ * i'm not sure how it works but i found it on stackoverflow
+ */
+export const loadGoogleApi = () => {
+  return new Promise((resolve, reject) => {
+    const waitForGapi = (retries = 0, maxRetries = 10) => {
+      if (typeof gapi !== 'undefined') {
+        // GAPI is loaded, proceed to load the client
+        gapi.load('client', async () => {
+          try {
+            await gapi.client.init({
+              discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
+            });
+            console.log('Google API client loaded');
+            resolve(true);
+          } catch (error) {
+            console.error('Error initializing Google API client:', error);
+            reject(error);
+          }
+        });
+      } else if (retries < maxRetries) {
+        // GAPI not loaded yet, wait and retry
+        console.log(`Waiting for GAPI to load (attempt ${retries + 1}/${maxRetries})...`);
+        setTimeout(() => waitForGapi(retries + 1, maxRetries), 1000);
+      } else {
+        // Giving up after max retries
+        console.error('Google API (gapi) not available after maximum retries');
+        reject(new Error('Google API not available'));
+      }
+    };
+    
+    // Start waiting for GAPI
+    waitForGapi();
+  });
 };

@@ -61,16 +61,27 @@ export default function Signup() {
 
         try {
             setLoading(true)
+            console.log("Starting Google sign-up process...")
             await signInWithGoogle()
-            navigate("/profile")
+            setSuccess("Google account connected! Redirecting...")
+
+            // Add a short delay to ensure token is properly stored before navigation
+            setTimeout(() => {
+                navigate("/profile")
+            }, 500)
         } catch (error) {
+            console.error("Full Google sign-up error:", error)
+
             if (error.code === 'auth/popup-closed-by-user') {
                 setError("Sign-up cancelled by user")
             } else if (error.code === 'auth/network-request-failed') {
                 setError("Network error. Please check your internet connection")
+            } else if (error.code === 'auth/internal-error') {
+                setError("An internal error occurred. Please try again")
+            } else if (error.code === 'auth/popup-blocked') {
+                setError("Popup was blocked by your browser. Please enable popups for this site")
             } else {
                 setError("Failed to sign up with Google. Please try again")
-                console.error("Google sign-up error:", error.code, error.message)
             }
         } finally {
             setLoading(false)

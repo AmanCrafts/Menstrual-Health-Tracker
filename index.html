@@ -9,6 +9,25 @@
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <!-- New Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Script to verify GAPI is loaded -->
+    <script>
+      window.onGapiLoad = function () {
+        console.log("GAPI is loaded and ready");
+        window.gapiReady = true;
+      };
+
+      // Monitor if GAPI loads
+      window.gapiCheckInterval = setInterval(function () {
+        if (typeof gapi !== "undefined") {
+          console.log("GAPI detected");
+          if (!window.gapiReady) {
+            window.onGapiLoad();
+          }
+          clearInterval(window.gapiCheckInterval);
+        }
+      }, 1000);
+    </script>
   </head>
   <body>
     <div id="root"></div>

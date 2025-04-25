@@ -114,6 +114,54 @@ export function DataProvider({ children }) {
         initialize();
     }, [currentUser, googleAuthToken, isInitialized]);
 
+    // Helper function to check if user is signed in with Google
+    const isGoogleUser = () => {
+        return currentUser &&
+            currentUser.providerData &&
+            currentUser.providerData.some(provider => provider.providerId === 'google.com');
+    };
+
+    // Initialize Google Drive when token is available
+    useEffect(() => {
+        async function connectGoogleDrive() {
+            if (currentUser && googleAuthToken && !isInitialized) {
+                try {
+                    setLoading(true);
+                    console.log('Attempting to initialize Google Drive with stored token:',
+                        googleAuthToken.substring(0, 10) + '...');
+
+                    // Wait a bit longer for GAPI to be ready
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    const success = await initGoogleDriveApi();
+
+                    if (success) {
+                        console.log('Successfully reconnected to Google Drive');
+                        setIsInitialized(true);
+                        setUsingLocalStorage(false);
+                        setError(null);
+                    } else {
+                        console.log('Token available but Drive initialization failed');
+                        setError("Saved Google Drive token appears to be invalid. Using local storage instead.");
+                        setUsingLocalStorage(true);
+                        loadFromLocalStorage();
+                    }
+                } catch (err) {
+                    console.error("Failed to initialize with stored token:", err);
+                    setError("Could not reconnect to Google Drive. Using local storage instead.");
+                    setUsingLocalStorage(true);
+                    loadFromLocalStorage();
+                } finally {
+                    setLoading(false);
+                }
+            }
+        }
+
+        if (currentUser && googleAuthToken) {
+            connectGoogleDrive();
+        }
+    }, [currentUser, googleAuthToken, isInitialized]);
+
     // this loads stuff from browser storage
     // if google drive doesn't work
     const loadFromLocalStorage = () => {
@@ -425,6 +473,7 @@ export function DataProvider({ children }) {
         loading,
         error,
         clearError,
+        isGoogleUser,
 
         // User profile data and functions
         userProfile,
