@@ -113,7 +113,7 @@ export default function Profile() {
                 <div className="error-card">
                     <Alert type="error" message={error} onClose={clearError} />
                     {error.includes("Google Drive") && (
-                        <button className="reconnect-button" onClick={() => window.location.reload()}> // Reconnect to Google Drive
+                        <button className="reconnect-button" onClick={() => window.location.reload()}>
                             Reconnect to Google Drive
                         </button>
                     )}
