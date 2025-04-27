@@ -63,6 +63,11 @@ const Navbar = () => {
                                 </Link>
                             </li>
                             <li className="nav-item">
+                                <Link to="/education" className={location.pathname === '/education' ? 'nav-link active' : 'nav-link'}>
+                                    <i className="nav-icon fas fa-book"></i>Education
+                                </Link>
+                            </li>
+                            <li className="nav-item">
                                 <Link to="/profile" className={location.pathname === '/profile' ? 'nav-link active' : 'nav-link'}>
                                     <i className="nav-icon fas fa-user"></i>Profile
                                 </Link>
