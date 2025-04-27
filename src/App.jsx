@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Signup from './pages/Signup.jsx'
 import Signin from './pages/Signin.jsx'
 import Profile from './pages/Profile.jsx'
+import Navbar from './components/Navbar.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
 import { DataProvider } from './contexts/DataContext.jsx'
 
@@ -11,6 +12,7 @@ const App = () => {
     <AuthProvider>
       <DataProvider>
         <Router>
+          <Navbar />
           <Routes>
             <Route path="/signup" element={<Signup />} />
             <Route path="/signin" element={<Signin />} />
