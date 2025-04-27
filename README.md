@@ -40,8 +40,8 @@ FlowSync is a comprehensive menstrual health tracking application designed to he
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/flowsync.git
-   cd flowsync
+   git clone https://github.com/AmanCrafts/Menstrual-Health-Tracker.git
+   cd Menstrual-Health-Tracker
    ```
 
 2. Install dependencies:
@@ -121,4 +121,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-Created with ❤️ for better menstrual health tracking
+Crafted with ❤️ for better menstrual health tracking
