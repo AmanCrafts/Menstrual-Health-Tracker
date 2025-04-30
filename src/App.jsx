@@ -11,6 +11,7 @@ import Education from './pages/Education.jsx'
 import ArticleDetail from './pages/ArticleDetail.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
 import { DataProvider } from './contexts/DataContext.jsx'
+import './styles/global.css' // Import global styles
 
 const App = () => {
   return (
