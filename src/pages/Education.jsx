@@ -5,7 +5,7 @@ import '../styles/education.css';
 export default function Education() {
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [selectedCategory, setSelectedCategory] = useState(`all`);
 
     useEffect(() => {
         // In a real implementation, this would be an API call to fetch articles
@@ -15,7 +15,7 @@ export default function Education() {
                 // This simulates fetching articles from pinkishe.org
                 setArticles(pinkisheArticles);
             } catch (error) {
-                console.error("Error fetching articles:", error);
+                console.error(`Error fetching articles:`, error);
             } finally {
                 setLoading(false);
             }
@@ -25,15 +25,15 @@ export default function Education() {
     }, []);
 
     const categories = [
-        { id: 'all', name: 'All Articles' },
-        { id: 'menstrual-health', name: 'Menstrual Health' },
-        { id: 'periods', name: 'Periods' },
-        { id: 'hygiene', name: 'Hygiene' },
-        { id: 'mental-health', name: 'Mental Health' },
-        { id: 'reproductive-health', name: 'Reproductive Health' }
+        { id: `all`, name: `All Articles` },
+        { id: `menstrual-health`, name: `Menstrual Health` },
+        { id: `periods`, name: `Periods` },
+        { id: `hygiene`, name: `Hygiene` },
+        { id: `mental-health`, name: `Mental Health` },
+        { id: `reproductive-health`, name: `Reproductive Health` }
     ];
 
-    const filteredArticles = selectedCategory === 'all'
+    const filteredArticles = selectedCategory === `all`
         ? articles
         : articles.filter(article => article.category === selectedCategory);
 
@@ -48,7 +48,7 @@ export default function Education() {
                 {categories.map(category => (
                     <button
                         key={category.id}
-                        className={`category-button ${selectedCategory === category.id ? 'active' : ''}`}
+                        className={`category-button ${selectedCategory === category.id ? `active` : ``}`}
                         onClick={() => setSelectedCategory(category.id)}
                     >
                         {category.name}
@@ -79,7 +79,7 @@ export default function Education() {
                                 <div className="article-meta">
                                     <span className="article-category">{getCategoryName(article.category)}</span>
                                     <span className="read-time">
-                                        <i className="fas fa-clock"></i> {article.readTime || '5 min'} read
+                                        <i className="fas fa-clock"></i> {article.readTime || `5 min`} read
                                     </span>
                                 </div>
                             </div>
@@ -92,7 +92,7 @@ export default function Education() {
 
     function getCategoryName(categoryId) {
         const category = categories.find(cat => cat.id === categoryId);
-        return category ? category.name : 'General';
+        return category ? category.name : `General`;
     }
 }
 
