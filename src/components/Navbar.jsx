@@ -8,6 +8,7 @@ const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
     const [scrolled, setScrolled] = useState(false);
+    const [isHome, setIsHome] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -19,6 +20,7 @@ const Navbar = () => {
 
     useEffect(() => {
         setIsMenuOpen(false);
+        setIsHome(location.pathname === '/');
     }, [location]);
 
     const handleLogout = async () => {
@@ -31,7 +33,7 @@ const Navbar = () => {
     };
 
     return (
-        <nav className={`navbar ${scrolled ? `scrolled` : ``}`}>
+        <nav className={`navbar ${scrolled ? `scrolled` : ``} ${isHome ? 'home-navbar' : ''}`}>
             <div className="navbar-container">
                 <Link to="/" className="navbar-logo">
                     <span className="logo-icon">🌸</span>

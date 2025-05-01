@@ -194,6 +194,17 @@
   transform: translateY(-9px) rotate(-45deg);
 }
 
+/* Additional styles for the home page navbar */
+.home-navbar {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.home-navbar.scrolled {
+  background: rgba(255, 255, 255, 0.95);
+}
+
 @media screen and (max-width: 960px) {
   .menu-icon {
     display: flex;

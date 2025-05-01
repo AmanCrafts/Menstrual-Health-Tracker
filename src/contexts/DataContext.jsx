@@ -15,14 +15,10 @@ import {
 } from '../services/dataService';
 import { getTestUserData } from '../utils/testData';
 
-// Add this constant at the top of the file, after the imports
 const DEVELOPER_EMAIL = 'theamanmalikarts@gmail.com';
-
-// this is the context thingy that makes data available everywhere
 export const DataContext = createContext();
 
-// these are for saving stuff if google drive doesn't work
-// they store things in the browser I think
+// Constants for local storage keys
 const LS_USER_PROFILE = 'flowsync_user_profile';
 const LS_PERIOD_DATA = 'flowsync_period_data';
 const LS_SYMPTOMS_DATA = 'flowsync_symptoms_data';
@@ -30,8 +26,6 @@ const LS_NOTES_DATA = 'flowsync_notes_data';
 const LS_TEST_MODE = 'flowsync_test_mode';
 const LS_TEST_USER = 'flowsync_test_user';
 
-// these help with reading and writing to browser storage
-// i got these from a tutorial!!
 const getFromLocalStorage = (key) => {
     try {
         const item = localStorage.getItem(key);
@@ -52,8 +46,6 @@ const saveToLocalStorage = (key, data) => {
     }
 };
 
-// this is a hook to use our data context
-// i'm still learning about hooks lol
 export function useData() {
     return useContext(DataContext);
 }
@@ -74,7 +66,6 @@ export function DataProvider({ children }) {
 
     // Test mode state - only available for developer
     const [testMode, setTestMode] = useState(() => {
-        // Only load test mode preference for developer
         return isDeveloper && getFromLocalStorage(LS_TEST_MODE) || false;
     });
 
@@ -94,25 +85,22 @@ export function DataProvider({ children }) {
         }
     }, [testMode, isDeveloper]);
 
-    // this runs when the component first loads or test mode changes
-    // it starts the google drive connection
+    // Initialize data based on test mode status
     useEffect(() => {
         if (testMode) {
-            // Load test data instead of real data
             loadTestData();
         } else {
             initializeWithRealData();
         }
     }, [currentUser, googleAuthToken, testMode]);
 
-    // When test user changes, reload test data
+    // Reload test data when test user changes
     useEffect(() => {
         if (testMode) {
             loadTestData();
         }
     }, [testUser, testMode]);
 
-    // Load test data for the selected test user
     const loadTestData = () => {
         setLoading(true);
         try {
@@ -133,10 +121,8 @@ export function DataProvider({ children }) {
         }
     };
 
-    // Initialize with real user data (Google Drive or local storage)
     const initializeWithRealData = async () => {
         if (currentUser) {
-            // Check if user authenticated with Google
             const isGoogleUser = currentUser.providerData.some(provider => provider.providerId === 'google.com');
 
             if (isGoogleUser && !googleAuthToken) {
@@ -163,7 +149,6 @@ export function DataProvider({ children }) {
                             loadFromLocalStorage();
                         }
                     } else {
-                        // Not a Google user, just use local storage
                         setUsingLocalStorage(true);
                         loadFromLocalStorage();
                     }
@@ -181,8 +166,6 @@ export function DataProvider({ children }) {
         }
     };
 
-    // ... [Existing code for initializing Google Drive, loading data, etc.]
-    // Helper function to check if user is signed in with Google
     const isGoogleUser = () => {
         return currentUser &&
             currentUser.providerData &&
@@ -198,7 +181,6 @@ export function DataProvider({ children }) {
                     console.log('Attempting to initialize Google Drive with stored token:',
                         googleAuthToken.substring(0, 10) + '...');
 
-                    // Wait a bit longer for GAPI to be ready
                     await new Promise(resolve => setTimeout(resolve, 1500));
 
                     const success = await initGoogleDriveApi();
@@ -230,8 +212,6 @@ export function DataProvider({ children }) {
         }
     }, [currentUser, googleAuthToken, isInitialized, testMode]);
 
-    // this loads stuff from browser storage
-    // if google drive doesn't work
     const loadFromLocalStorage = () => {
         const storedProfile = getFromLocalStorage(LS_USER_PROFILE);
         if (storedProfile) setUserProfile(storedProfile);
@@ -246,27 +226,22 @@ export function DataProvider({ children }) {
         if (storedNotesData) setNotesData(storedNotesData);
     };
 
-    // this loads user data from google when ready
-    // it runs when isInitialized changes
+    // Load user data from Google Drive
     useEffect(() => {
         async function loadUserData() {
             if (isInitialized && currentUser && !usingLocalStorage && !testMode) {
                 try {
                     setLoading(true);
 
-                    // Load user profile
                     const profile = await getUserProfile();
                     if (profile) setUserProfile(profile);
 
-                    // Load period data
                     const periods = await getPeriodData();
                     if (periods) setPeriodData(periods);
 
-                    // Load symptoms data
                     const symptoms = await getSymptomsData();
                     if (symptoms) setSymptomsData(symptoms);
 
-                    // Load notes data
                     const notes = await getNotesData();
                     if (notes) setNotesData(notes);
 
@@ -286,20 +261,16 @@ export function DataProvider({ children }) {
         }
     }, [isInitialized, currentUser, usingLocalStorage, testMode]);
 
-    // ... existing data update functions (updateUserProfile, updatePeriodData, etc.) ...
-
-    // Modify the updateUserProfile to handle test mode
+    // Data update functions
     const updateUserProfile = async (newProfileData) => {
         try {
             setLoading(true);
             const updatedProfile = { ...userProfile, ...newProfileData };
 
             if (testMode) {
-                // In test mode, just update the state without persistence
                 setUserProfile(updatedProfile);
                 return true;
             } else if (usingLocalStorage) {
-                // Save to local storage
                 const success = saveToLocalStorage(LS_USER_PROFILE, updatedProfile);
                 if (success) {
                     setUserProfile(updatedProfile);
@@ -309,7 +280,6 @@ export function DataProvider({ children }) {
                     return false;
                 }
             } else {
-                // Save to Google Drive
                 await saveUserProfile(updatedProfile);
                 setUserProfile(updatedProfile);
                 return true;
@@ -318,7 +288,6 @@ export function DataProvider({ children }) {
             console.error("Error updating user profile:", err);
             setError("Failed to save profile. Trying local storage...");
 
-            // Fallback to local storage
             const success = saveToLocalStorage(LS_USER_PROFILE, { ...userProfile, ...newProfileData });
             if (success) {
                 setUserProfile({ ...userProfile, ...newProfileData });
@@ -333,18 +302,15 @@ export function DataProvider({ children }) {
         }
     };
 
-    // Modify the updatePeriodData to handle test mode
     const updatePeriodData = async (newPeriodData) => {
         try {
             setLoading(true);
             const updatedPeriodData = { ...periodData, ...newPeriodData };
 
             if (testMode) {
-                // In test mode, just update the state without persistence
                 setPeriodData(updatedPeriodData);
                 return true;
             } else if (usingLocalStorage) {
-                // ...existing localStorage code...
                 const success = saveToLocalStorage(LS_PERIOD_DATA, updatedPeriodData);
                 if (success) {
                     setPeriodData(updatedPeriodData);
@@ -354,17 +320,14 @@ export function DataProvider({ children }) {
                     return false;
                 }
             } else {
-                // ...existing Google Drive code...
                 await savePeriodData(updatedPeriodData);
                 setPeriodData(updatedPeriodData);
                 return true;
             }
         } catch (err) {
-            // ...existing error handling...
             console.error("Error updating period data:", err);
             setError("Failed to save period data. Using local storage.");
 
-            // Fallback to local storage
             const success = saveToLocalStorage(LS_PERIOD_DATA, { ...periodData, ...newPeriodData });
             if (success) {
                 setPeriodData({ ...periodData, ...newPeriodData });
@@ -379,18 +342,15 @@ export function DataProvider({ children }) {
         }
     };
 
-    // Modify the updateSymptomsData to handle test mode
     const updateSymptomsData = async (newSymptomsData) => {
         try {
             setLoading(true);
             const updatedSymptomsData = { ...symptomsData, ...newSymptomsData };
 
             if (testMode) {
-                // In test mode, just update the state without persistence
                 setSymptomsData(updatedSymptomsData);
                 return true;
             } else if (usingLocalStorage) {
-                // ...existing localStorage code...
                 const success = saveToLocalStorage(LS_SYMPTOMS_DATA, updatedSymptomsData);
                 if (success) {
                     setSymptomsData(updatedSymptomsData);
@@ -400,17 +360,14 @@ export function DataProvider({ children }) {
                     return false;
                 }
             } else {
-                // ...existing Google Drive code...
                 await saveSymptomsData(updatedSymptomsData);
                 setSymptomsData(updatedSymptomsData);
                 return true;
             }
         } catch (err) {
-            // ...existing error handling...
             console.error("Error updating symptoms data:", err);
             setError("Failed to save symptoms data. Using local storage.");
 
-            // Fallback to local storage
             const success = saveToLocalStorage(LS_SYMPTOMS_DATA, { ...symptomsData, ...newSymptomsData });
             if (success) {
                 setSymptomsData({ ...symptomsData, ...newSymptomsData });
@@ -425,18 +382,15 @@ export function DataProvider({ children }) {
         }
     };
 
-    // Modify the updateNotesData to handle test mode
     const updateNotesData = async (newNotesData) => {
         try {
             setLoading(true);
             const updatedNotesData = { ...notesData, ...newNotesData };
 
             if (testMode) {
-                // In test mode, just update the state without persistence
                 setNotesData(updatedNotesData);
                 return true;
             } else if (usingLocalStorage) {
-                // ...existing localStorage code...
                 const success = saveToLocalStorage(LS_NOTES_DATA, updatedNotesData);
                 if (success) {
                     setNotesData(updatedNotesData);
@@ -446,17 +400,14 @@ export function DataProvider({ children }) {
                     return false;
                 }
             } else {
-                // ...existing Google Drive code...
                 await saveNotesData(updatedNotesData);
                 setNotesData(updatedNotesData);
                 return true;
             }
         } catch (err) {
-            // ...existing error handling...
             console.error("Error updating notes data:", err);
             setError("Failed to save notes data. Using local storage.");
 
-            // Fallback to local storage
             const success = saveToLocalStorage(LS_NOTES_DATA, { ...notesData, ...newNotesData });
             if (success) {
                 setNotesData({ ...notesData, ...newNotesData });
@@ -471,13 +422,8 @@ export function DataProvider({ children }) {
         }
     };
 
-    // ...existing exportUserData and deleteUserData functions...
-
-    // this exports all user data in one big file
-    // either from google drive or locally
     const exportUserData = async () => {
         if (testMode) {
-            // In test mode, just return the current data without exporting
             const allData = {
                 profile: userProfile || {},
                 periodData: periodData || {},
@@ -488,18 +434,15 @@ export function DataProvider({ children }) {
                 testUser: testUser
             };
 
-            // Create a downloadable file
             const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
 
-            // Create and click a download link
             const a = document.createElement('a');
             a.href = url;
             a.download = `flowsync_test_export_${testUser}_${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(a);
             a.click();
 
-            // Clean up
             setTimeout(() => {
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
@@ -516,18 +459,15 @@ export function DataProvider({ children }) {
                     exportDate: new Date().toISOString()
                 };
 
-                // Create a downloadable file
                 const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
 
-                // Create and click a download link
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = `flowsync_export_${new Date().toISOString().split('T')[0]}.json`;
                 document.body.appendChild(a);
                 a.click();
 
-                // Clean up
                 setTimeout(() => {
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
@@ -554,10 +494,8 @@ export function DataProvider({ children }) {
         }
     };
 
-    // this deletes all user data 
     const deleteUserData = async () => {
         if (testMode) {
-            // In test mode, just reset to the original test data
             loadTestData();
             return true;
         }
@@ -574,7 +512,6 @@ export function DataProvider({ children }) {
                 await deleteAllData();
             }
 
-            // Clear state
             setUserProfile(null);
             setPeriodData(null);
             setSymptomsData(null);
@@ -589,12 +526,10 @@ export function DataProvider({ children }) {
         }
     };
 
-    // this clears any error messages
     const clearError = () => {
         setError(null);
     };
 
-    // this is the value we provide to components
     const value = {
         isInitialized,
         usingLocalStorage,

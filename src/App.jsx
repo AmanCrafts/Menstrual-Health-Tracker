@@ -1,5 +1,6 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home.jsx'
 import Signup from './pages/Signup.jsx'
 import Signin from './pages/Signin.jsx'
 import Profile from './pages/Profile.jsx'
@@ -17,15 +18,12 @@ import { useAuth } from './contexts/useAuth.jsx'
 import './styles/global.css'
 import './styles/testMode.css'
 
-// Developer email - only this account will see the test mode toggle
 const DEVELOPER_EMAIL = 'theamanmalikarts@gmail.com';
 
-// TestModeController component to avoid context issues
 function TestModeController() {
   const { testMode, setTestMode, testUser, setTestUser } = useData();
   const { currentUser } = useAuth();
 
-  // Only render the test mode toggle for the developer
   if (!currentUser || currentUser.email !== DEVELOPER_EMAIL) {
     return null;
   }
@@ -55,7 +53,7 @@ const App = () => {
             <Route path="/trackers" element={<Trackers />} />
             <Route path="/education" element={<Education />} />
             <Route path="/education/article/:articleId" element={<ArticleDetail />} />
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Home />} />
           </Routes>
           <TestModeController />
         </Router>
