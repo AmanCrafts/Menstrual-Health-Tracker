@@ -13,6 +13,10 @@ import {
     exportAllData,
     deleteAllData
 } from '../services/dataService';
+import { getTestUserData } from '../utils/testData';
+
+// Add this constant at the top of the file, after the imports
+const DEVELOPER_EMAIL = 'theamanmalikarts@gmail.com';
 
 // this is the context thingy that makes data available everywhere
 export const DataContext = createContext();
@@ -23,6 +27,8 @@ const LS_USER_PROFILE = 'flowsync_user_profile';
 const LS_PERIOD_DATA = 'flowsync_period_data';
 const LS_SYMPTOMS_DATA = 'flowsync_symptoms_data';
 const LS_NOTES_DATA = 'flowsync_notes_data';
+const LS_TEST_MODE = 'flowsync_test_mode';
+const LS_TEST_USER = 'flowsync_test_user';
 
 // these help with reading and writing to browser storage
 // i got these from a tutorial!!
@@ -63,57 +69,119 @@ export function DataProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // this runs when the component first loads
+    // Check if current user is developer
+    const isDeveloper = currentUser && currentUser.email === DEVELOPER_EMAIL;
+
+    // Test mode state - only available for developer
+    const [testMode, setTestMode] = useState(() => {
+        // Only load test mode preference for developer
+        return isDeveloper && getFromLocalStorage(LS_TEST_MODE) || false;
+    });
+
+    const [testUser, setTestUser] = useState(() => getFromLocalStorage(LS_TEST_USER) || 'user1');
+
+    // Ensure test mode is disabled for non-developers
+    useEffect(() => {
+        if (!isDeveloper && testMode) {
+            setTestMode(false);
+        }
+    }, [isDeveloper, testMode]);
+
+    // Save test mode preferences - only for developer
+    useEffect(() => {
+        if (isDeveloper) {
+            saveToLocalStorage(LS_TEST_MODE, testMode);
+        }
+    }, [testMode, isDeveloper]);
+
+    // this runs when the component first loads or test mode changes
     // it starts the google drive connection
     useEffect(() => {
-        async function initialize() {
-            if (currentUser) {
-                // Check if user authenticated with Google
-                const isGoogleUser = currentUser.providerData.some(provider => provider.providerId === 'google.com');
+        if (testMode) {
+            // Load test data instead of real data
+            loadTestData();
+        } else {
+            initializeWithRealData();
+        }
+    }, [currentUser, googleAuthToken, testMode]);
 
-                if (isGoogleUser && !googleAuthToken) {
-                    setError("Google Drive access requires re-authentication. Using local storage for now.");
-                    setUsingLocalStorage(true);
-                    setLoading(false);
-                    loadFromLocalStorage();
-                    return;
-                }
+    // When test user changes, reload test data
+    useEffect(() => {
+        if (testMode) {
+            loadTestData();
+        }
+    }, [testUser, testMode]);
 
-                if (!isInitialized && (googleAuthToken || !isGoogleUser)) {
-                    try {
-                        setLoading(true);
+    // Load test data for the selected test user
+    const loadTestData = () => {
+        setLoading(true);
+        try {
+            const userData = getTestUserData(testUser);
 
-                        if (isGoogleUser) {
-                            const success = await initGoogleDriveApi();
-                            if (success) {
-                                setIsInitialized(true);
-                                setUsingLocalStorage(false);
-                                setError(null);
-                            } else {
-                                setError("Could not initialize Google Drive. Using local storage instead.");
-                                setUsingLocalStorage(true);
-                                loadFromLocalStorage();
-                            }
+            setUserProfile(userData.userProfile);
+            setPeriodData(userData.periodData);
+            setSymptomsData(userData.symptomsData);
+            setNotesData(userData.notesData);
+
+            setError(null);
+            setLoading(false);
+            console.log('Test data loaded for user:', testUser);
+        } catch (err) {
+            console.error('Error loading test data:', err);
+            setError('Failed to load test data');
+            setLoading(false);
+        }
+    };
+
+    // Initialize with real user data (Google Drive or local storage)
+    const initializeWithRealData = async () => {
+        if (currentUser) {
+            // Check if user authenticated with Google
+            const isGoogleUser = currentUser.providerData.some(provider => provider.providerId === 'google.com');
+
+            if (isGoogleUser && !googleAuthToken) {
+                setError("Google Drive access requires re-authentication. Using local storage for now.");
+                setUsingLocalStorage(true);
+                setLoading(false);
+                loadFromLocalStorage();
+                return;
+            }
+
+            if (!isInitialized && (googleAuthToken || !isGoogleUser)) {
+                try {
+                    setLoading(true);
+
+                    if (isGoogleUser) {
+                        const success = await initGoogleDriveApi();
+                        if (success) {
+                            setIsInitialized(true);
+                            setUsingLocalStorage(false);
+                            setError(null);
                         } else {
-                            // Not a Google user, just use local storage
+                            setError("Could not initialize Google Drive. Using local storage instead.");
                             setUsingLocalStorage(true);
                             loadFromLocalStorage();
                         }
-                    } catch (err) {
-                        console.error("Failed to initialize data service:", err);
-                        setError("Failed to connect to Google Drive. Using local storage instead.");
+                    } else {
+                        // Not a Google user, just use local storage
                         setUsingLocalStorage(true);
                         loadFromLocalStorage();
-                    } finally {
-                        setLoading(false);
                     }
+                } catch (err) {
+                    console.error("Failed to initialize data service:", err);
+                    setError("Failed to connect to Google Drive. Using local storage instead.");
+                    setUsingLocalStorage(true);
+                    loadFromLocalStorage();
+                } finally {
+                    setLoading(false);
                 }
             }
+        } else {
+            setLoading(false);
         }
+    };
 
-        initialize();
-    }, [currentUser, googleAuthToken, isInitialized]);
-
+    // ... [Existing code for initializing Google Drive, loading data, etc.]
     // Helper function to check if user is signed in with Google
     const isGoogleUser = () => {
         return currentUser &&
@@ -124,7 +192,7 @@ export function DataProvider({ children }) {
     // Initialize Google Drive when token is available
     useEffect(() => {
         async function connectGoogleDrive() {
-            if (currentUser && googleAuthToken && !isInitialized) {
+            if (currentUser && googleAuthToken && !isInitialized && !testMode) {
                 try {
                     setLoading(true);
                     console.log('Attempting to initialize Google Drive with stored token:',
@@ -157,10 +225,10 @@ export function DataProvider({ children }) {
             }
         }
 
-        if (currentUser && googleAuthToken) {
+        if (currentUser && googleAuthToken && !testMode) {
             connectGoogleDrive();
         }
-    }, [currentUser, googleAuthToken, isInitialized]);
+    }, [currentUser, googleAuthToken, isInitialized, testMode]);
 
     // this loads stuff from browser storage
     // if google drive doesn't work
@@ -182,7 +250,7 @@ export function DataProvider({ children }) {
     // it runs when isInitialized changes
     useEffect(() => {
         async function loadUserData() {
-            if (isInitialized && currentUser && !usingLocalStorage) {
+            if (isInitialized && currentUser && !usingLocalStorage && !testMode) {
                 try {
                     setLoading(true);
 
@@ -213,17 +281,24 @@ export function DataProvider({ children }) {
             }
         }
 
-        loadUserData();
-    }, [isInitialized, currentUser, usingLocalStorage]);
+        if (!testMode) {
+            loadUserData();
+        }
+    }, [isInitialized, currentUser, usingLocalStorage, testMode]);
 
-    // this updates the user profile - calls the drive API
-    // and has a fallback to localStorage if that fails
+    // ... existing data update functions (updateUserProfile, updatePeriodData, etc.) ...
+
+    // Modify the updateUserProfile to handle test mode
     const updateUserProfile = async (newProfileData) => {
         try {
             setLoading(true);
             const updatedProfile = { ...userProfile, ...newProfileData };
 
-            if (usingLocalStorage) {
+            if (testMode) {
+                // In test mode, just update the state without persistence
+                setUserProfile(updatedProfile);
+                return true;
+            } else if (usingLocalStorage) {
                 // Save to local storage
                 const success = saveToLocalStorage(LS_USER_PROFILE, updatedProfile);
                 if (success) {
@@ -258,14 +333,18 @@ export function DataProvider({ children }) {
         }
     };
 
-    // this updates period data - works like updateUserProfile
-    // with the same fallback system
+    // Modify the updatePeriodData to handle test mode
     const updatePeriodData = async (newPeriodData) => {
         try {
             setLoading(true);
             const updatedPeriodData = { ...periodData, ...newPeriodData };
 
-            if (usingLocalStorage) {
+            if (testMode) {
+                // In test mode, just update the state without persistence
+                setPeriodData(updatedPeriodData);
+                return true;
+            } else if (usingLocalStorage) {
+                // ...existing localStorage code...
                 const success = saveToLocalStorage(LS_PERIOD_DATA, updatedPeriodData);
                 if (success) {
                     setPeriodData(updatedPeriodData);
@@ -275,11 +354,13 @@ export function DataProvider({ children }) {
                     return false;
                 }
             } else {
+                // ...existing Google Drive code...
                 await savePeriodData(updatedPeriodData);
                 setPeriodData(updatedPeriodData);
                 return true;
             }
         } catch (err) {
+            // ...existing error handling...
             console.error("Error updating period data:", err);
             setError("Failed to save period data. Using local storage.");
 
@@ -298,14 +379,18 @@ export function DataProvider({ children }) {
         }
     };
 
-    // this updates symptoms data
-    // basically same as the other update functions
+    // Modify the updateSymptomsData to handle test mode
     const updateSymptomsData = async (newSymptomsData) => {
         try {
             setLoading(true);
             const updatedSymptomsData = { ...symptomsData, ...newSymptomsData };
 
-            if (usingLocalStorage) {
+            if (testMode) {
+                // In test mode, just update the state without persistence
+                setSymptomsData(updatedSymptomsData);
+                return true;
+            } else if (usingLocalStorage) {
+                // ...existing localStorage code...
                 const success = saveToLocalStorage(LS_SYMPTOMS_DATA, updatedSymptomsData);
                 if (success) {
                     setSymptomsData(updatedSymptomsData);
@@ -315,11 +400,13 @@ export function DataProvider({ children }) {
                     return false;
                 }
             } else {
+                // ...existing Google Drive code...
                 await saveSymptomsData(updatedSymptomsData);
                 setSymptomsData(updatedSymptomsData);
                 return true;
             }
         } catch (err) {
+            // ...existing error handling...
             console.error("Error updating symptoms data:", err);
             setError("Failed to save symptoms data. Using local storage.");
 
@@ -338,14 +425,18 @@ export function DataProvider({ children }) {
         }
     };
 
-    // this updates notes data
-    // also same as the other update functions
+    // Modify the updateNotesData to handle test mode
     const updateNotesData = async (newNotesData) => {
         try {
             setLoading(true);
             const updatedNotesData = { ...notesData, ...newNotesData };
 
-            if (usingLocalStorage) {
+            if (testMode) {
+                // In test mode, just update the state without persistence
+                setNotesData(updatedNotesData);
+                return true;
+            } else if (usingLocalStorage) {
+                // ...existing localStorage code...
                 const success = saveToLocalStorage(LS_NOTES_DATA, updatedNotesData);
                 if (success) {
                     setNotesData(updatedNotesData);
@@ -355,11 +446,13 @@ export function DataProvider({ children }) {
                     return false;
                 }
             } else {
+                // ...existing Google Drive code...
                 await saveNotesData(updatedNotesData);
                 setNotesData(updatedNotesData);
                 return true;
             }
         } catch (err) {
+            // ...existing error handling...
             console.error("Error updating notes data:", err);
             setError("Failed to save notes data. Using local storage.");
 
@@ -378,10 +471,42 @@ export function DataProvider({ children }) {
         }
     };
 
+    // ...existing exportUserData and deleteUserData functions...
+
     // this exports all user data in one big file
     // either from google drive or locally
     const exportUserData = async () => {
-        if (usingLocalStorage) {
+        if (testMode) {
+            // In test mode, just return the current data without exporting
+            const allData = {
+                profile: userProfile || {},
+                periodData: periodData || {},
+                symptomsData: symptomsData || {},
+                notesData: notesData || {},
+                exportDate: new Date().toISOString(),
+                isTestData: true,
+                testUser: testUser
+            };
+
+            // Create a downloadable file
+            const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            // Create and click a download link
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `flowsync_test_export_${testUser}_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+
+            return true;
+        } else if (usingLocalStorage) {
             try {
                 const allData = {
                     profile: userProfile || {},
@@ -430,8 +555,13 @@ export function DataProvider({ children }) {
     };
 
     // this deletes all user data 
-    // be super careful with this one!!
     const deleteUserData = async () => {
+        if (testMode) {
+            // In test mode, just reset to the original test data
+            loadTestData();
+            return true;
+        }
+
         try {
             setLoading(true);
 
@@ -460,13 +590,11 @@ export function DataProvider({ children }) {
     };
 
     // this clears any error messages
-    // simple but useful!!
     const clearError = () => {
         setError(null);
     };
 
     // this is the value we provide to components
-    // it has all the data and functions they need
     const value = {
         isInitialized,
         usingLocalStorage,
@@ -474,6 +602,12 @@ export function DataProvider({ children }) {
         error,
         clearError,
         isGoogleUser,
+
+        // Test mode controls - only truly enabled for developer
+        testMode: isDeveloper && testMode,
+        setTestMode: isDeveloper ? setTestMode : () => { },
+        testUser,
+        setTestUser,
 
         // User profile data and functions
         userProfile,
