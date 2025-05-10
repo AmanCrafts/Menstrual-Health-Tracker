@@ -29,7 +29,15 @@ body {
     }
 }
 
-.split-form {
+.signin-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 100px);
+    padding: 2rem 1rem;
+}
+
+.login-card {
     display: flex;
     flex-direction: column;
     background: white;
@@ -39,351 +47,276 @@ body {
     max-width: 900px;
     margin: 0 auto;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08), 0 5px 10px rgba(0, 0, 0, 0.05);
-    min-height: 100vh;
-}
-
-@media (min-width: 576px) {
-    .split-form {
-        min-height: 600px;
-        margin: 2rem auto;
-    }
 }
 
 @media (min-width: 768px) {
-    .split-form {
+    .login-card {
         flex-direction: row;
         height: 550px;
         min-height: 550px;
-        max-height: 80vh;
     }
 }
 
-.split-form .image-side {
+.login-card .image-side {
     flex: 1;
-    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
-    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #8a6fdf, #ff8ba7);
+    padding: 2.5rem 1.5rem;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     color: white;
-    text-align: center;
     position: relative;
-    min-height: 220px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-@media (min-width: 576px) {
-    .split-form .image-side {
-        padding: 2.5rem 1.5rem;
-        min-height: 250px;
-    }
+.login-card .logo-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
 }
 
-@media (min-width: 768px) {
-    .split-form .image-side {
-        padding: 3rem 2rem;
-        min-height: auto;
-    }
+.login-card .logo-icon {
+    font-size: 2rem;
+    margin-right: 0.5rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-.split-form .image-side h2 {
+.login-card .logo-text {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    color: #ffffff; /* Solid white for better contrast */
+    background: none; /* Remove any background gradient */
+    -webkit-text-fill-color: #ffffff; /* Override any webkit text fill color */
+    position: relative;
+}
+
+/* Add a subtle glow effect to make the text stand out more */
+.login-card .logo-text::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: none;
+    filter: blur(6px);
+    opacity: 0.5;
+    z-index: -1;
+}
+
+.login-card .image-side h2 {
     font-size: 1.8rem;
-    margin-bottom: 0.8rem;
+    margin-bottom: 1rem;
     font-weight: 600;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    line-height: 1.3;
+    letter-spacing: -0.3px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-@media (min-width: 576px) {
-    .split-form .image-side h2 {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-    }
+.login-card .image-side p {
+    font-size: 1.1rem;
+    opacity: 1;
+    margin-bottom: 2rem;
+    font-weight: 400;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    max-width: 95%;
 }
 
-@media (min-width: 768px) {
-    .split-form .image-side h2 {
-        font-size: 2.2rem;
-    }
-}
-
-.split-form .image-side p {
-    font-size: 1rem;
-    max-width: 90%;
-    opacity: 0.9;
-}
-
-@media (min-width: 576px) {
-    .split-form .image-side p {
-        font-size: 1.05rem;
-    }
-}
-
-@media (min-width: 768px) {
-    .split-form .image-side p {
-        font-size: 1.1rem;
-        max-width: 80%;
-    }
-}
-
-/* Add decorative element to make the design more interesting */
-.split-form .image-side::after {
-    content: "";
-    position: absolute;
-    bottom: -50px;
-    right: -50px;
-    width: 150px;
-    height: 150px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    z-index: 1;
-}
-
-.split-form .image-side::before {
-    content: "";
-    position: absolute;
-    top: -30px;
-    left: -30px;
-    width: 100px;
-    height: 100px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    z-index: 1;
-}
-
-.split-form .form-side {
-    flex: 1;
-    padding: 2rem 1.5rem;
+.features-list {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 1rem;
+    margin-top: auto;
 }
 
-@media (min-width: 576px) {
-    .split-form .form-side {
-        padding: 2.5rem 2rem;
-    }
+.feature-item {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
-@media (min-width: 768px) {
-    .split-form .form-side {
-        padding: 3rem 2.5rem;
-    }
+.feature-item i {
+    margin-right: 12px;
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
 }
 
-@media (min-width: 992px) {
-    .split-form .form-side {
-        padding: 3.5rem;
-    }
+.login-card .form-side {
+    flex: 1;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
 }
 
-.split-form .form-side h2 {
-    font-size: 1.5rem;
+.login-card .form-side h2 {
+    font-size: 1.8rem;
     margin-bottom: 1.5rem;
-    color: #333;
+    color: #8a6fdf;
+    font-weight: 700;
     position: relative;
+    letter-spacing: -0.3px;
 }
 
-@media (min-width: 576px) {
-    .split-form .form-side h2 {
-        font-size: 1.7rem;
-        margin-bottom: 1.8rem;
-    }
-}
-
-@media (min-width: 768px) {
-    .split-form .form-side h2 {
-        font-size: 1.8rem;
-        margin-bottom: 2rem;
-    }
-}
-
-.split-form .form-side h2::after {
+.login-card .form-side h2::after {
     content: "";
     position: absolute;
     left: 0;
     bottom: -8px;
-    width: 40px;
+    width: 50px;
     height: 3px;
-    background: #ff6b6b;
+    background: #8a6fdf;
+    border-radius: 2px;
 }
 
-@media (min-width: 576px) {
-    .split-form .form-side h2::after {
-        width: 45px;
-        bottom: -10px;
-    }
-}
-
-@media (min-width: 768px) {
-    .split-form .form-side h2::after {
-        width: 50px;
-    }
-}
-
-.split-form form {
+.signin-content {
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 2rem;
+    padding: 1rem 0;
 }
 
-@media (min-width: 576px) {
-    .split-form form {
-        gap: 1.3rem;
-    }
+.signin-message {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #4a4a4a;
+    font-weight: 400;
+    line-height: 1.6;
+    max-width: 400px;
 }
 
-@media (min-width: 768px) {
-    .split-form form {
-        gap: 1.5rem;
-    }
-}
-
-.split-form input {
+.google-button {
     width: 100%;
-    padding: 0.8rem 0.5rem;
-    font-size: 0.95rem;
-    border: none;
-    border-bottom: 2px solid #eee;
-    outline: none;
-    transition: all 0.3s;
-    background: transparent;
-}
-
-@media (min-width: 576px) {
-    .split-form input {
-        padding: 0.9rem 0.5rem;
-    }
-}
-
-@media (min-width: 768px) {
-    .split-form input {
-        padding: 1rem 0.5rem;
-        font-size: 1rem;
-    }
-}
-
-.split-form input::placeholder {
-    color: #aaa;
-    transition: color 0.3s;
-}
-
-.split-form input:focus {
-    border-bottom-color: #ff6b6b;
-}
-
-.split-form input:focus::placeholder {
-    color: #ff6b6b;
-    opacity: 0.7;
-}
-
-.split-form button {
-    width: 100%;
-    padding: 0.9rem;
-    margin-top: 1rem;
-    background: #ff6b6b;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: 0.5px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(255, 107, 107, 0.2);
-}
-
-@media (min-width: 576px) {
-    .split-form button {
-        padding: 0.95rem;
-        margin-top: 1.2rem;
-    }
-}
-
-@media (min-width: 768px) {
-    .split-form button {
-        padding: 1rem;
-        margin-top: 1.5rem;
-        font-size: 1rem;
-    }
-}
-
-.split-form button:hover {
-    transform: translateY(-2px);
-    background: #ff5252;
-    box-shadow: 0 6px 10px rgba(255, 107, 107, 0.3);
-}
-
-.split-form button:active {
-    transform: translateY(0);
-}
-
-.split-form button:disabled {
-    background: #ffb1b1;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-/* Add styling for the divider */
-.divider {
+    max-width: 280px;
+    padding: 0.9rem 1rem;
     display: flex;
     align-items: center;
-    margin: 1rem 0;
-    color: #999;
-    font-size: 0.9rem;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #3c4043;
+    background: white;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.divider::before,
-.divider::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: #eee;
+.google-button:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    background: #f8f8f8;
 }
 
-.divider::before {
-    margin-right: 1rem;
+.google-button:active {
+    transform: translateY(1px);
 }
 
-.divider::after {
-    margin-left: 1rem;
+.google-button .google-icon {
+    margin-right: 10px;
+    display: flex;
 }
 
-/* Style the "Don't have an account" text */
-.split-form form > p {
-    text-align: center;
-    margin-top: 1rem;
-    font-size: 0.9rem;
+.google-button[disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.privacy-note {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     color: #666;
+    font-size: 0.95rem;
+    margin-top: 1rem;
+    background-color: rgba(138, 111, 223, 0.05);
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    max-width: 350px;
+    text-align: center;
 }
 
-.split-form form > p a {
-    color: #ff6b6b;
-    text-decoration: none;
+.privacy-note i {
+    color: #42a942;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.privacy-note p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Alert styles */
+.alert {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
     font-weight: 500;
-    transition: color 0.3s;
 }
 
-.split-form form > p a:hover {
-    color: #ff5252;
-    text-decoration: underline;
+.alert.error {
+    background-color: #ffebee;
+    color: #c62828;
+    border-left: 4px solid #ef5350;
 }
 
-/* Forgot password link */
-.forgot-password {
-    text-align: right;
-    margin-top: -0.5rem;
-    margin-bottom: 0.5rem;
+.alert.success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border-left: 4px solid #66bb6a;
 }
 
-.forgot-password a {
-    color: #777;
-    font-size: 0.85rem;
-    text-decoration: none;
-    transition: color 0.3s;
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .login-card .image-side {
+        padding: 2rem 1.5rem;
+    }
+    
+    .features-list {
+        margin-bottom: 1.5rem;
+    }
+    
+    .login-card .form-side {
+        padding: 2rem 1.5rem;
+    }
+    
+    .login-card .logo-text {
+        font-size: 2rem;
+    }
+    
+    .login-card .image-side h2 {
+        font-size: 1.6rem;
+    }
+    
+    .login-card .image-side p {
+        font-size: 1rem;
+    }
 }
 
-.forgot-password a:hover {
-    color: #ff6b6b;
-    text-decoration: underline;
+@media (max-width: 480px) {
+    .signin-container {
+        padding: 1rem 0.5rem;
+    }
+    
+    .login-card .image-side {
+        padding: 1.5rem 1.2rem;
+    }
+    
+    .login-card .form-side {
+        padding: 1.5rem 1.2rem;
+    }
+    
+    .privacy-note {
+        flex-direction: column;
+        text-align: center;
+    }
 }

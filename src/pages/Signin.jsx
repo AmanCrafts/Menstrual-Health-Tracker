@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { useAuth } from '../contexts/useAuth.jsx'
 import { useNavigate } from 'react-router-dom'
 import Alert from '../components/Alert.jsx'
@@ -6,46 +6,11 @@ import GoogleButton from '../components/GoogleButton.jsx'
 import '../styles/signin.css'
 
 const Signin = () => {
-  const emailRef = useRef()
-  const passwordRef = useRef()
-  const { login, signInWithGoogle } = useAuth()
+  const { signInWithGoogle } = useAuth()
   const [error, setError] = useState(``)
   const [success, setSuccess] = useState(``)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
-
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setError(``)
-    setSuccess(``)
-
-    try {
-      setLoading(true)
-      await login(emailRef.current.value, passwordRef.current.value)
-      setSuccess(`Login successful! Redirecting...`)
-      setTimeout(() => {
-        navigate(`/profile`)
-      }, 1500)
-    } catch (error) {
-
-      if (error.code === `auth/user-not-found` || error.code === `auth/wrong-password`) {
-        setError(`Incorrect email or password`)
-      } else if (error.code === `auth/invalid-email`) {
-        setError(`Email address is not valid`)
-      } else if (error.code === `auth/user-disabled`) {
-        setError(`This account has been disabled`)
-      } else if (error.code === `auth/too-many-requests`) {
-        setError(`Too many failed login attempts. Please try again later`)
-      } else if (error.code === `auth/network-request-failed`) {
-        setError(`Network error. Please check your internet connection`)
-      } else {
-        setError(`Failed to sign in. Please try again`)
-      }
-      console.error(`Login error:`, error.code, error.message)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   async function handleGoogleSignIn() {
     setError(``)
@@ -53,16 +18,14 @@ const Signin = () => {
 
     try {
       setLoading(true)
-      console.log(`Starting Google sign-in process...`)
       await signInWithGoogle()
       setSuccess(`Google login successful! Redirecting...`)
 
-      // Add a short delay to ensure token is properly stored before navigation
       setTimeout(() => {
         navigate(`/profile`)
       }, 500)
     } catch (error) {
-      console.error(`Full Google sign-in error:`, error)
+      console.error(`Google sign-in error:`, error)
 
       if (error.code === `auth/popup-closed-by-user`) {
         setError(`Sign-in cancelled by user`)
@@ -82,41 +45,43 @@ const Signin = () => {
 
   return (
     <div className="signin-container">
-      <div className="split-form">
+      <div className="login-card">
         <div className="image-side">
-          <h2>Welcome Back!</h2>
-          <p>Track your cycle and feel empowered with every insight</p>
+          <div className="logo-container">
+            <span className="logo-icon">🌸</span>
+            <h1 className="logo-text">FlowSync</h1>
+          </div>
+          <h2>Welcome to FlowSync</h2>
+          <p>Track, understand, and take control of your menstrual health with our comprehensive and secure platform.</p>
+          <div className="features-list">
+            <div className="feature-item"><i className="fas fa-calendar-check"></i> Accurate cycle tracking</div>
+            <div className="feature-item"><i className="fas fa-chart-line"></i> Personalized insights</div>
+            <div className="feature-item"><i className="fas fa-lock"></i> Privacy-focused design</div>
+            <div className="feature-item"><i className="fas fa-book-open"></i> Educational resources</div>
+          </div>
         </div>
         <div className="form-side">
           <h2>Sign In</h2>
           <Alert type="error" message={error} />
           <Alert type="success" message={success} />
-          <form onSubmit={handleSubmit}>
-            <input
-              type="email"
-              placeholder="Email"
-              ref={emailRef}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              ref={passwordRef}
-              required
-            />
-            <div className="forgot-password">
-              <a href="/reset-password">Forgot Password?</a>
-            </div>
-            <button type="submit" disabled={loading}>
-              {loading ? `Signing In...` : `Login`}
-            </button>
-            <div className="divider">OR</div>
+
+          <div className="signin-content">
+            <p className="signin-message">
+              FlowSync uses Google for secure and convenient authentication.
+              Your data remains private and under your control.
+            </p>
+
             <GoogleButton
               onClick={handleGoogleSignIn}
-              text={`Sign in with Google`}
+              text={loading ? "Connecting..." : "Sign in with Google"}
+              disabled={loading}
             />
-            <p>Don't have an account? <a href="/signup">Sign Up</a></p>
-          </form>
+
+            <div className="privacy-note">
+              <i className="fas fa-shield-alt"></i>
+              <p>We respect your privacy and will never share your personal data</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

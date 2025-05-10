@@ -93,11 +93,6 @@ const Navbar = () => {
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link to="/signup" className="nav-link signup-button">
-                                    <i className="nav-icon fas fa-user-plus"></i>Sign Up
-                                </Link>
-                            </li>
-                            <li className="nav-item">
                                 <Link to="/signin" className="nav-link signin-button">
                                     <i className="nav-icon fas fa-sign-in-alt"></i>Sign In
                                 </Link>

@@ -15,7 +15,7 @@ export default function Home() {
                         symptom tracking, and intuitive analytics.
                     </p>
                     <div className="hero-buttons">
-                        <Link to="/signup" className="primary-button">Get Started</Link>
+                        <Link to="/signin" className="primary-button">Get Started</Link>
                         <Link to="/education" className="secondary-button">Learn More</Link>
                     </div>
                 </div>
@@ -107,7 +107,7 @@ export default function Home() {
                         <li><i className="fas fa-check"></i> Make informed decisions about your reproductive health</li>
                         <li><i className="fas fa-check"></i> Communicate effectively with healthcare providers</li>
                     </ul>
-                    <Link to="/signup" className="primary-button">Start Tracking Today</Link>
+                    <Link to="/signin" className="primary-button">Start Tracking Today</Link>
                 </div>
                 <div className="benefits-image">
                     <img src="/benefits-image.png" alt="Woman feeling empowered" />
@@ -144,7 +144,7 @@ export default function Home() {
             <section className="cta-section">
                 <h2>Ready to take control of your menstrual health?</h2>
                 <p>Join thousands of women who track their cycles with FlowSync</p>
-                <Link to="/signup" className="primary-button">Sign Up Now</Link>
+                <Link to="/signin" className="primary-button">Sign In Now</Link>
             </section>
 
             {/* Footer */}
