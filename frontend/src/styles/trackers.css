@@ -1,0 +1,748 @@
+@import './variables.css';
+
+.trackers-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.trackers-header {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.trackers-header h1 {
+  font-size: var(--text-3xl);
+  color: var(--text-dark);
+  margin-bottom: var(--spacing-xs);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.trackers-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-xl);
+}
+
+@media (min-width: 992px) {
+  .trackers-layout {
+    grid-template-columns: 380px 1fr;
+  }
+}
+
+/* Calendar Section */
+.calendar-section {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-light);
+  animation: slideUp 0.5s ease-out;
+}
+
+.tracker-calendar {
+  width: 100%;
+  min-height: 300px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.calendar-month {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.calendar-controls {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.calendar-control-btn {
+  background: var(--soft-purple);
+  border: none;
+  color: var(--primary);
+  font-size: var(--text-md);
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+}
+
+.calendar-control-btn:hover {
+  background: var(--primary-gradient);
+  color: white;
+  transform: scale(1.05);
+}
+
+.calendar-control-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-light);
+  font-size: var(--text-xs);
+  margin-bottom: var(--spacing-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-dark);
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.calendar-day:hover {
+  background: var(--soft-purple);
+  transform: scale(1.1);
+  z-index: 1;
+}
+
+.calendar-day.other-month {
+  color: var(--text-muted);
+}
+
+.calendar-day.selected {
+  background: var(--primary-gradient) !important;
+  color: white !important;
+  font-weight: 700;
+  box-shadow: 0 4px 12px -4px rgba(124, 58, 237, 0.5);
+  transform: scale(1.1);
+  z-index: 2;
+}
+
+.calendar-day.period {
+  background: var(--period-color);
+  color: white;
+  font-weight: 600;
+}
+
+.calendar-day.period.predicted {
+  background: var(--period-color-light);
+  color: var(--period-color);
+  border: 2px dashed var(--period-color);
+}
+
+.calendar-day.fertile {
+  background: var(--fertile-color);
+  color: white;
+}
+
+.calendar-day.ovulation {
+  background: var(--ovulation-color);
+  color: white;
+  font-weight: 700;
+}
+
+.calendar-day.pms {
+  background: var(--pms-color-light);
+  color: var(--pms-color);
+}
+
+.calendar-day.today {
+  border: 2px solid var(--primary);
+  font-weight: 700;
+}
+
+.calendar-day .entry-dot {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  background: var(--primary);
+  border-radius: var(--radius-full);
+}
+
+/* Calendar Legend */
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 2px solid var(--border-light);
+  gap: var(--spacing-md);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: var(--text-xs);
+  color: var(--text-medium);
+  gap: var(--spacing-xs);
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+}
+
+.legend-color.period {
+  background: var(--period-color);
+}
+
+.legend-color.fertile {
+  background: var(--fertile-color);
+}
+
+.legend-color.ovulation {
+  background: var(--ovulation-color);
+}
+
+.legend-color.pms {
+  background: var(--pms-color);
+}
+
+/* Phase Info Card */
+.phase-info-card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  margin: var(--spacing-lg) 0;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-light);
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.4s ease-out;
+}
+
+.phase-info-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: var(--primary-gradient);
+}
+
+.phase-info-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  gap: var(--spacing-sm);
+}
+
+.phase-info-header h3 {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.phase-info-header .phase-date {
+  margin-left: auto;
+  font-size: var(--text-sm);
+  color: var(--text-light);
+  font-weight: 500;
+  background: var(--soft-purple);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-md);
+}
+
+.phase-info-description {
+  color: var(--text-medium);
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.7;
+  font-size: var(--text-md);
+}
+
+.phase-info-tips {
+  background: linear-gradient(135deg, var(--soft-purple) 0%, var(--soft-pink) 100%);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.phase-info-tips h4 {
+  margin-top: 0;
+  color: var(--primary);
+  font-size: var(--text-md);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 700;
+}
+
+.phase-info-tips ul {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+}
+
+.phase-info-tips li {
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-medium);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.phase-info-card.period::before {
+  background: var(--period-color);
+}
+
+.phase-info-card.fertile::before {
+  background: var(--fertile-color);
+}
+
+.phase-info-card.ovulation::before {
+  background: var(--ovulation-color);
+}
+
+.phase-info-card.pms::before {
+  background: var(--pms-color);
+}
+
+.phase-info-card.follicular::before {
+  background: var(--follicular-color);
+}
+
+/* Trackers Section */
+.trackers-section {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-light);
+  animation: slideUp 0.5s ease-out;
+  animation-delay: 0.1s;
+  animation-fill-mode: both;
+}
+
+.tracker-tabs {
+  display: flex;
+  overflow-x: auto;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-sm);
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) transparent;
+}
+
+.tracker-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tracker-tabs::-webkit-scrollbar-thumb {
+  background: var(--primary-gradient);
+  border-radius: var(--radius-full);
+}
+
+.tab-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: transparent;
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  color: var(--text-medium);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+  font-size: var(--text-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.tab-button i {
+  font-size: var(--text-md);
+}
+
+.tab-button:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--soft-purple);
+  transform: translateY(-2px);
+}
+
+.tab-button.active {
+  background: var(--primary-gradient);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 12px -4px rgba(124, 58, 237, 0.5);
+}
+
+/* Tracker Content */
+.tracker-content {
+  min-height: 300px;
+}
+
+.tracker-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: var(--text-sm);
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+@media (min-width: 768px) {
+  .form-row {
+    flex-direction: row;
+  }
+}
+
+.form-control {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-md);
+  transition: all var(--transition-fast);
+  background: var(--surface);
+  color: var(--text-dark);
+}
+
+.form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+  outline: none;
+}
+
+.form-control:hover {
+  border-color: var(--primary-light);
+}
+
+/* Symptom Checkboxes */
+.symptom-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .symptom-checkboxes {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.symptom-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--soft-purple);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.symptom-checkbox:hover {
+  background: linear-gradient(135deg, var(--soft-purple) 0%, var(--soft-pink) 100%);
+}
+
+.symptom-checkbox input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.symptom-checkbox input[type="checkbox"]:checked {
+  background: var(--primary-gradient);
+  border-color: transparent;
+}
+
+.symptom-checkbox input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.symptom-checkbox label {
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--text-sm);
+  color: var(--text-medium);
+}
+
+/* Mood Buttons */
+.mood-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .mood-buttons {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .mood-buttons {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.mood-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.mood-button i {
+  font-size: var(--text-2xl);
+  color: var(--text-light);
+  transition: all var(--transition-normal);
+}
+
+.mood-button span {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-medium);
+}
+
+.mood-button:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+.mood-button:hover i {
+  color: var(--primary);
+  transform: scale(1.2);
+}
+
+.mood-button.selected {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--soft-purple) 0%, var(--soft-pink) 100%);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px -8px rgba(124, 58, 237, 0.4);
+}
+
+.mood-button.selected i {
+  color: var(--primary);
+  animation: float 2s ease-in-out infinite;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+}
+
+.submit-button, .delete-button {
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-size: var(--text-md);
+}
+
+.submit-button {
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  flex: 2;
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: all 0.5s;
+}
+
+.submit-button:hover::before {
+  left: 100%;
+}
+
+.submit-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px -8px rgba(124, 58, 237, 0.5);
+}
+
+.delete-button {
+  background: transparent;
+  color: var(--error);
+  border: 2px solid var(--error);
+  flex: 1;
+}
+
+.delete-button:hover {
+  background: rgba(239, 68, 68, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px -4px rgba(239, 68, 68, 0.3);
+}
+
+/* Logs List */
+.logs-list {
+  margin-top: var(--spacing-2xl);
+  padding-top: var(--spacing-xl);
+  border-top: 2px solid var(--border-light);
+}
+
+.logs-list h3 {
+  font-size: var(--text-lg);
+  color: var(--text-dark);
+  margin-bottom: var(--spacing-lg);
+  font-weight: 700;
+}
+
+.log-item {
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--soft-purple) 0%, rgba(255, 255, 255, 0.5) 100%);
+  margin-bottom: var(--spacing-md);
+  transition: all var(--transition-fast);
+  border: 1px solid var(--border-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.log-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--primary-gradient);
+}
+
+.log-item:hover {
+  transform: translateX(6px);
+  box-shadow: var(--shadow-md);
+}
+
+.log-item .log-date {
+  font-size: var(--text-sm);
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+}
+
+.log-item .log-details {
+  font-size: var(--text-md);
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .trackers-container {
+    padding: var(--spacing-lg);
+  }
+  
+  .trackers-header h1 {
+    font-size: var(--text-2xl);
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .submit-button, .delete-button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .trackers-container {
+    padding: var(--spacing-md);
+  }
+  
+  .calendar-section,
+  .trackers-section {
+    padding: var(--spacing-lg);
+  }
+  
+  .calendar-month {
+    font-size: var(--text-md);
+  }
+  
+  .phase-info-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+  
+  .phase-info-header .phase-date {
+    margin-left: 0;
+  }
+  
+  .symptom-checkboxes {
+    grid-template-columns: 1fr;
+  }
+  
+  .mood-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

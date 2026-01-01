@@ -1,0 +1,269 @@
+@import './variables.css';
+
+.split-form {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    width: 100%;
+    max-width: 950px;
+    margin: var(--spacing-xl) auto;
+    box-shadow: var(--shadow-2xl);
+    border: 1px solid var(--border-light);
+    animation: fadeIn 0.5s ease-out;
+}
+
+@media (min-width: 768px) {
+    .split-form {
+        flex-direction: row;
+        min-height: 580px;
+    }
+}
+
+.split-form .image-side {
+    flex: 1;
+    background: var(--primary-gradient);
+    padding: var(--spacing-2xl);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    position: relative;
+    min-height: 250px;
+    overflow: hidden;
+}
+
+.split-form .image-side::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: float 6s ease-in-out infinite;
+}
+
+.split-form .image-side::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -30%;
+    width: 80%;
+    height: 80%;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    animation: float 8s ease-in-out infinite reverse;
+}
+
+.split-form .image-side h2 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--spacing-md);
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+}
+
+.split-form .image-side p {
+    font-size: var(--text-md);
+    max-width: 90%;
+    opacity: 0.95;
+    line-height: 1.7;
+    position: relative;
+    z-index: 1;
+}
+
+.split-form .form-side {
+    flex: 1;
+    padding: var(--spacing-2xl);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--surface);
+}
+
+.split-form .form-side h2 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--spacing-xl);
+    color: var(--text-dark);
+    position: relative;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.split-form .form-side h2::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 60px;
+    height: 4px;
+    background: var(--primary-gradient);
+    border-radius: var(--radius-full);
+}
+
+.split-form form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.split-form input {
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--text-md);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    outline: none;
+    transition: all var(--transition-fast);
+    background: var(--surface);
+    color: var(--text-dark);
+}
+
+.split-form input::placeholder {
+    color: var(--text-light);
+    transition: color var(--transition-fast);
+}
+
+.split-form input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+}
+
+.split-form input:hover {
+    border-color: var(--primary-light);
+}
+
+.split-form input:focus::placeholder {
+    color: var(--primary-light);
+}
+
+.split-form button {
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-top: var(--spacing-md);
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: var(--text-md);
+    transition: all var(--transition-fast);
+    box-shadow: 0 4px 12px -4px rgba(124, 58, 237, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.split-form button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: all 0.5s;
+}
+
+.split-form button:hover:not(:disabled)::before {
+    left: 100%;
+}
+
+.split-form button:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px -8px rgba(124, 58, 237, 0.5);
+}
+
+.split-form button:active:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.split-form button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Divider styling */
+.divider {
+    display: flex;
+    align-items: center;
+    margin: var(--spacing-md) 0;
+    color: var(--text-light);
+    font-size: var(--text-sm);
+    font-weight: 500;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: var(--border-light);
+}
+
+.divider::before {
+    margin-right: var(--spacing-md);
+}
+
+.divider::after {
+    margin-left: var(--spacing-md);
+}
+
+/* "Already have an account" text */
+.split-form form > p {
+    text-align: center;
+    margin-top: var(--spacing-lg);
+    font-size: var(--text-sm);
+    color: var(--text-medium);
+}
+
+.split-form form > p a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.split-form form > p a:hover {
+    color: var(--secondary);
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .split-form .image-side {
+        padding: var(--spacing-xl);
+    }
+    
+    .split-form .form-side {
+        padding: var(--spacing-xl);
+    }
+    
+    .split-form .image-side h2 {
+        font-size: var(--text-xl);
+    }
+}
+
+@media (max-width: 480px) {
+    .split-form {
+        margin: var(--spacing-md);
+    }
+    
+    .split-form .image-side {
+        padding: var(--spacing-lg);
+        min-height: 200px;
+    }
+    
+    .split-form .form-side {
+        padding: var(--spacing-lg);
+    }
+}

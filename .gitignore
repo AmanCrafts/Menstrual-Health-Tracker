@@ -23,5 +23,13 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment files
 .env
 .env.*
+!.env.example
+
+# Backend specific
+backend/logs/
+
+# Frontend specific
+frontend/dist/
