@@ -1,48 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link, useParams, Navigate } from 'react-router-dom';
+import { articleContent } from './education/articleContent';
 import '../styles/education.css';
 
 export default function ArticleDetail() {
     const { articleId } = useParams();
-    const [article, setArticle] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const fetchArticle = async () => {
-            try {
-                setLoading(true);
-                // In a real app, you would call an API here
-                // For now, we'll simulate by finding the article from our array
-                import('./education/articleContent').then(module => {
-                    const foundArticle = module.articleContent.find(a => a.id === articleId);
-                    if (foundArticle) {
-                        setArticle(foundArticle);
-                    } else {
-                        navigate('/education');
-                    }
-                    setLoading(false);
-                }).catch(error => {
-                    console.error("Could not load article content:", error);
-                    setLoading(false);
-                    navigate('/education');
-                });
-            } catch (error) {
-                console.error("Error fetching article:", error);
-                setLoading(false);
-                navigate('/education');
-            }
-        };
-
-        fetchArticle();
-    }, [articleId, navigate]);
-
-    if (loading) {
-        return <div className="loading-spinner">Loading article...</div>;
-    }
+    const article = articleContent.find(a => a.id === articleId);
 
     if (!article) {
-        return <div className="loading-spinner">Article not found</div>;
+        return <Navigate to="/education" replace />;
     }
 
     return (
@@ -59,7 +25,7 @@ export default function ArticleDetail() {
                             <i className="fas fa-folder"></i> {article.category}
                         </span>
                         <span className="article-meta-item">
-                            <i className="fas fa-clock"></i> {article.readTime || '5 min'} read
+                            <i className="fas fa-clock"></i> {article.readTime} read
                         </span>
                     </div>
                 </header>

@@ -4,7 +4,8 @@ export const articleContent = [
     title: 'Menstrual Hygiene Day',
     category: 'Menstrual Health',
     readTime: '5 min',
-    imageUrl: 'https://www.pinkishe.org/uploads/8/3/9/0/83901006/published/menstrual-hygiene-day.jpg?1622437945',
+    imageUrl: '/menstrual-hygiene-day.jpg',
+    excerpt: 'May 28th is celebrated as Menstrual Hygiene Day worldwide, aiming to break taboos and raise awareness about menstrual hygiene management.',
     content: `
       <p>May 28th is celebrated as Menstrual Hygiene Day worldwide. First celebrated in 2014, this day aims to break taboos surrounding menstruation and raise awareness about the importance of menstrual hygiene management for women and girls worldwide.</p>
 
@@ -54,7 +55,8 @@ export const articleContent = [
     title: 'Endometriosis: Understanding the Invisible Condition',
     category: 'Reproductive Health',
     readTime: '7 min',
-    imageUrl: 'https://www.pinkishe.org/uploads/8/3/9/0/83901006/endometriosis_orig.jpg',
+    imageUrl: '/endometriosis.webp',
+    excerpt: 'Endometriosis affects approximately 1 in 10 women of reproductive age, yet it remains widely misunderstood and often misdiagnosed.',
     content: `
       <p>Endometriosis affects approximately 1 in 10 women of reproductive age worldwide, yet it remains widely misunderstood and often misdiagnosed. This condition occurs when tissue similar to the lining of the uterus (endometrium) grows outside the uterus, commonly on the ovaries, fallopian tubes, and tissues lining the pelvis.</p>
 
@@ -117,7 +119,8 @@ export const articleContent = [
     title: 'Myths About Menstruation We Need to Stop Believing',
     category: 'Menstrual Health',
     readTime: '6 min',
-    imageUrl: 'https://www.pinkishe.org/uploads/8/3/9/0/83901006/published/myths-of-menstruation.jpg?1612760203',
+    imageUrl: '/myths-about-menstruation.webp',
+    excerpt: 'Despite being a natural biological process, menstruation remains shrouded in myths and misconceptions that perpetuate stigma.',
     content: `
       <p>Despite being a natural biological process that affects half the world's population, menstruation remains shrouded in myths, misconceptions, and taboos. These myths not only perpetuate stigma but can also lead to harmful practices. Let's debunk some common menstrual myths and replace them with facts.</p>
 
@@ -166,7 +169,8 @@ export const articleContent = [
     title: 'The Complete Guide to Menstrual Cups',
     category: 'Periods',
     readTime: '7 min',
-    imageUrl: 'https://www.pinkishe.org/uploads/8/3/9/0/83901006/menstrualcup_orig.jpg',
+    imageUrl: '/menstrual-cup.webp',
+    excerpt: 'Menstrual cups are a sustainable, cost-effective alternative to traditional period products. Learn everything about choosing and using them.',
     content: `
       <p>Menstrual cups have gained popularity as a sustainable, cost-effective alternative to traditional period products. These flexible cups made of medical-grade silicone, latex, or thermoplastic elastomer (TPE) are inserted into the vagina to collect menstrual flow rather than absorb it.</p>
 
@@ -241,7 +245,8 @@ export const articleContent = [
     title: 'Understanding and Managing Premenstrual Syndrome (PMS)',
     category: 'Menstrual Health',
     readTime: '6 min',
-    imageUrl: 'https://www.pinkishe.org/uploads/8/3/9/0/83901006/pms_orig.jpg',
+    imageUrl: '/premenstrual-syndrome.webp',
+    excerpt: 'PMS refers to physical, emotional, and behavioral symptoms many women experience before their period. Learn how to manage them effectively.',
     content: `
       <p>Premenstrual Syndrome (PMS) refers to a combination of physical, emotional, and behavioral symptoms that many women experience in the days or weeks leading up to their menstrual period. While exact causes remain unclear, hormonal fluctuations play a significant role, with symptoms typically improving once menstruation begins.</p>
 
