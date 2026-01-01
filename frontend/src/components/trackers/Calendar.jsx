@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
-    calculateNextPeriod,
     calculateFertileWindow,
     calculateOvulation,
     calculateFuturePeriods
@@ -10,9 +9,10 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
     const [calendarDays, setCalendarDays] = useState([]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
 
+    // Regenerate calendar when month, data, or selectedDate changes
     useEffect(() => {
         generateCalendarDays(currentMonth);
-    }, [currentMonth, cycleLogs, symptomLogs, moodLogs, userProfile]);
+    }, [currentMonth, cycleLogs, symptomLogs, moodLogs, userProfile, selectedDate]);
 
     // Generate days for the current month view
     const generateCalendarDays = (monthDate) => {
@@ -37,15 +37,18 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
         // Previous month days
         const prevMonthDays = new Date(year, month, 0).getDate();
         for (let i = prevMonthDays - daysFromPrevMonth + 1; i <= prevMonthDays; i++) {
+            const date = new Date(year, month - 1, i);
+            date.setHours(0, 0, 0, 0);
             days.push({
-                date: new Date(year, month - 1, i),
+                date,
                 isCurrentMonth: false,
-                isSelected: false,
+                isSelected: selectedDate && date.toDateString() === selectedDate.toDateString(),
                 isPeriod: false,
                 isFertileWindow: false,
                 isOvulation: false,
                 isPms: false,
                 isPredictor: false,
+                isLogged: false,
                 hasEntries: false
             });
         }
@@ -56,6 +59,7 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
 
         for (let i = 1; i <= daysInMonth; i++) {
             const date = new Date(year, month, i);
+            date.setHours(0, 0, 0, 0);
             days.push({
                 date,
                 isCurrentMonth: true,
@@ -66,21 +70,25 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                 isOvulation: false,
                 isPms: false,
                 isPredictor: false,
+                isLogged: false,
                 hasEntries: false
             });
         }
 
         // Next month days
         for (let i = 1; i <= daysFromNextMonth; i++) {
+            const date = new Date(year, month + 1, i);
+            date.setHours(0, 0, 0, 0);
             days.push({
-                date: new Date(year, month + 1, i),
+                date,
                 isCurrentMonth: false,
-                isSelected: false,
+                isSelected: selectedDate && date.toDateString() === selectedDate.toDateString(),
                 isPeriod: false,
                 isFertileWindow: false,
                 isOvulation: false,
                 isPms: false,
                 isPredictor: false,
+                isLogged: false,
                 hasEntries: false
             });
         }
@@ -89,6 +97,7 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
         if (cycleLogs && cycleLogs.length > 0) {
             cycleLogs.forEach(log => {
                 const startDate = new Date(log.startDate);
+                startDate.setHours(0, 0, 0, 0);
                 let endDate;
 
                 if (log.endDate) {
@@ -97,36 +106,61 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                     endDate = new Date(startDate);
                     endDate.setDate(startDate.getDate() + (userProfile?.periodLength || 5) - 1);
                 }
+                endDate.setHours(0, 0, 0, 0);
 
                 days.forEach(day => {
-                    if (day.date >= startDate && day.date <= endDate) {
+                    const dayDate = new Date(day.date);
+                    dayDate.setHours(0, 0, 0, 0);
+                    if (dayDate >= startDate && dayDate <= endDate) {
                         day.isPeriod = true;
+                        day.isLogged = true; // Mark as logged (not predicted)
                     }
                 });
             });
         }
 
-        // Mark predicted cycles
-        if (userProfile && userProfile.lastPeriod) {
-            const lastPeriodDate = new Date(userProfile.lastPeriod);
-            const cycleLength = userProfile.cycleLength || 28;
-            const periodLength = userProfile.periodLength || 5;
+        // Get reference date for predictions (from cycleLogs or userProfile)
+        let lastPeriodDate = null;
+        if (cycleLogs && cycleLogs.length > 0) {
+            // Sort to get most recent period
+            const sortedLogs = [...cycleLogs].sort((a, b) =>
+                new Date(b.startDate) - new Date(a.startDate)
+            );
+            lastPeriodDate = new Date(sortedLogs[0].startDate);
+        } else if (userProfile?.lastPeriod) {
+            lastPeriodDate = new Date(userProfile.lastPeriod);
+        }
+
+        // Mark predicted cycles and other phases
+        if (lastPeriodDate) {
+            lastPeriodDate.setHours(0, 0, 0, 0);
+            const cycleLength = userProfile?.cycleLength || 28;
+            const periodLength = userProfile?.periodLength || 5;
 
             // Calculate future periods (next 3)
             const futurePeriods = calculateFuturePeriods(lastPeriodDate, cycleLength, cycleLogs, 3);
 
             // For each predicted period, mark the days
-            futurePeriods.forEach(periodStartDate => {
-                // Skip if the period is before the calendar start
-                if (periodStartDate < days[0].date) return;
+            futurePeriods.forEach(prediction => {
+                // Handle both old format (Date) and new format (object with predictedDate)
+                const periodStartDate = prediction.predictedDate || prediction;
 
-                // Mark period days
+                // Skip if invalid
+                if (!periodStartDate) return;
+
+                const periodStart = new Date(periodStartDate);
+                periodStart.setHours(0, 0, 0, 0);
+
+                // Mark predicted period days
                 for (let i = 0; i < periodLength; i++) {
-                    const periodDay = new Date(periodStartDate);
-                    periodDay.setDate(periodStartDate.getDate() + i);
+                    const periodDay = new Date(periodStart);
+                    periodDay.setDate(periodStart.getDate() + i);
+                    periodDay.setHours(0, 0, 0, 0);
 
                     days.forEach(day => {
-                        if (day.date.toDateString() === periodDay.toDateString()) {
+                        const dayDate = new Date(day.date);
+                        dayDate.setHours(0, 0, 0, 0);
+                        if (dayDate.toDateString() === periodDay.toDateString() && !day.isLogged) {
                             day.isPeriod = true;
                             day.isPredictor = true;
                         }
@@ -134,38 +168,117 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                 }
 
                 // Calculate fertile window for this period
-                const fertileWindow = calculateFertileWindow(periodStartDate, cycleLength);
+                const fertileWindow = calculateFertileWindow(periodStart, cycleLength);
 
                 // Mark fertile window days
-                days.forEach(day => {
-                    if (day.date >= fertileWindow.start && day.date <= fertileWindow.end) {
-                        day.isFertileWindow = true;
-                    }
-                });
+                if (fertileWindow && fertileWindow.start && fertileWindow.end) {
+                    const fertileStart = new Date(fertileWindow.start);
+                    fertileStart.setHours(0, 0, 0, 0);
+                    const fertileEnd = new Date(fertileWindow.end);
+                    fertileEnd.setHours(0, 0, 0, 0);
+
+                    days.forEach(day => {
+                        const dayDate = new Date(day.date);
+                        dayDate.setHours(0, 0, 0, 0);
+                        if (dayDate >= fertileStart && dayDate <= fertileEnd && !day.isPeriod) {
+                            day.isFertileWindow = true;
+                        }
+                    });
+                }
 
                 // Calculate ovulation day
-                const ovulationDate = calculateOvulation(periodStartDate, cycleLength);
+                const ovulationResult = calculateOvulation(periodStart, cycleLength);
+                const ovulationDate = ovulationResult?.date || null;
 
                 // Mark ovulation day
+                if (ovulationDate) {
+                    const ovDate = new Date(ovulationDate);
+                    ovDate.setHours(0, 0, 0, 0);
+
+                    days.forEach(day => {
+                        const dayDate = new Date(day.date);
+                        dayDate.setHours(0, 0, 0, 0);
+                        if (dayDate.toDateString() === ovDate.toDateString()) {
+                            day.isOvulation = true;
+                            day.isFertileWindow = false; // Ovulation takes priority
+                        }
+                    });
+                }
+
+                // Calculate PMS days (7 days before period)
+                const pmsStart = new Date(periodStart);
+                pmsStart.setDate(periodStart.getDate() - 7);
+                pmsStart.setHours(0, 0, 0, 0);
+
+                const pmsEnd = new Date(periodStart);
+                pmsEnd.setDate(periodStart.getDate() - 1);
+                pmsEnd.setHours(0, 0, 0, 0);
+
+                // Mark PMS days (only if not marked as something else)
                 days.forEach(day => {
-                    if (day.date.toDateString() === ovulationDate.toDateString()) {
-                        day.isOvulation = true;
-                    }
-                });
-
-                // Calculate PMS days (5-7 days before period)
-                const pmsStart = new Date(periodStartDate);
-                pmsStart.setDate(periodStartDate.getDate() - 7);
-
-                const pmsEnd = new Date(periodStartDate);
-                pmsEnd.setDate(periodStartDate.getDate() - 1);
-
-                // Mark PMS days
-                days.forEach(day => {
-                    if (day.date >= pmsStart && day.date <= pmsEnd) {
+                    const dayDate = new Date(day.date);
+                    dayDate.setHours(0, 0, 0, 0);
+                    if (dayDate >= pmsStart && dayDate <= pmsEnd &&
+                        !day.isPeriod && !day.isFertileWindow && !day.isOvulation) {
                         day.isPms = true;
                     }
                 });
+            });
+
+            // Also mark current cycle's phases (from most recent period)
+            const nextPeriodDate = new Date(lastPeriodDate);
+            nextPeriodDate.setDate(lastPeriodDate.getDate() + cycleLength);
+            nextPeriodDate.setHours(0, 0, 0, 0);
+
+            // Current cycle fertile window
+            const currentFertile = calculateFertileWindow(nextPeriodDate, cycleLength);
+            if (currentFertile && currentFertile.start && currentFertile.end) {
+                const fertileStart = new Date(currentFertile.start);
+                fertileStart.setHours(0, 0, 0, 0);
+                const fertileEnd = new Date(currentFertile.end);
+                fertileEnd.setHours(0, 0, 0, 0);
+
+                days.forEach(day => {
+                    const dayDate = new Date(day.date);
+                    dayDate.setHours(0, 0, 0, 0);
+                    if (dayDate >= fertileStart && dayDate <= fertileEnd && !day.isPeriod) {
+                        day.isFertileWindow = true;
+                    }
+                });
+            }
+
+            // Current cycle ovulation
+            const currentOvulation = calculateOvulation(nextPeriodDate, cycleLength);
+            if (currentOvulation?.date) {
+                const ovDate = new Date(currentOvulation.date);
+                ovDate.setHours(0, 0, 0, 0);
+
+                days.forEach(day => {
+                    const dayDate = new Date(day.date);
+                    dayDate.setHours(0, 0, 0, 0);
+                    if (dayDate.toDateString() === ovDate.toDateString()) {
+                        day.isOvulation = true;
+                        day.isFertileWindow = false;
+                    }
+                });
+            }
+
+            // Current cycle PMS
+            const currentPmsStart = new Date(nextPeriodDate);
+            currentPmsStart.setDate(nextPeriodDate.getDate() - 7);
+            currentPmsStart.setHours(0, 0, 0, 0);
+
+            const currentPmsEnd = new Date(nextPeriodDate);
+            currentPmsEnd.setDate(nextPeriodDate.getDate() - 1);
+            currentPmsEnd.setHours(0, 0, 0, 0);
+
+            days.forEach(day => {
+                const dayDate = new Date(day.date);
+                dayDate.setHours(0, 0, 0, 0);
+                if (dayDate >= currentPmsStart && dayDate <= currentPmsEnd &&
+                    !day.isPeriod && !day.isFertileWindow && !day.isOvulation) {
+                    day.isPms = true;
+                }
             });
         }
 
@@ -262,7 +375,11 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                             ${day.hasEntries ? 'has-entry' : ''}
                             ${day.isPredictor ? 'predicted' : ''}
                         `}
-                        onClick={() => onDateSelect(day.date)}
+                        onClick={() => {
+                            const clickedDate = new Date(day.date);
+                            clickedDate.setHours(0, 0, 0, 0);
+                            onDateSelect(clickedDate);
+                        }}
                     >
                         {day.date.getDate()}
                         {day.hasEntries && <span className="entry-dot"></span>}
@@ -276,8 +393,12 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                     <span>Period</span>
                 </div>
                 <div className="legend-item">
+                    <div className="legend-color predicted"></div>
+                    <span>Predicted</span>
+                </div>
+                <div className="legend-item">
                     <div className="legend-color fertile"></div>
-                    <span>Fertile Window</span>
+                    <span>Fertile</span>
                 </div>
                 <div className="legend-item">
                     <div className="legend-color ovulation"></div>

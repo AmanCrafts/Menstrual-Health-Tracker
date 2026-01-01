@@ -38,7 +38,11 @@ export default function Trackers() {
     } = useData();
 
     const [activeTab, setActiveTab] = useState('period');
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(() => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return today;
+    });
     const [successMessage, setSuccessMessage] = useState('');
     const [phaseInfo, setPhaseInfo] = useState(null);
 
@@ -59,25 +63,38 @@ export default function Trackers() {
 
     // Update phase info when selected date changes
     useEffect(() => {
-        if (periodData && periodData.length > 0 && selectedDate) {
+        if (!selectedDate) {
+            setPhaseInfo(null);
+            return;
+        }
+
+        // Normalize the check date
+        const checkDate = new Date(selectedDate);
+        checkDate.setHours(0, 0, 0, 0);
+
+        if (periodData && periodData.length > 0) {
             // Sort to get the most recent period
             const sortedPeriods = [...periodData].sort((a, b) =>
                 new Date(b.startDate) - new Date(a.startDate)
             );
             const lastPeriodDate = new Date(sortedPeriods[0].startDate);
+            lastPeriodDate.setHours(0, 0, 0, 0);
 
             const info = getCyclePhaseInfo(
-                selectedDate,
+                checkDate,
                 lastPeriodDate,
                 currentUser?.cycleLength || 28,
                 currentUser?.periodLength || 5,
                 periodData
             );
             setPhaseInfo(info);
-        } else if (currentUser?.lastPeriod && selectedDate) {
+        } else if (currentUser?.lastPeriod) {
+            const lastPeriodDate = new Date(currentUser.lastPeriod);
+            lastPeriodDate.setHours(0, 0, 0, 0);
+
             const info = getCyclePhaseInfo(
-                selectedDate,
-                new Date(currentUser.lastPeriod),
+                checkDate,
+                lastPeriodDate,
                 currentUser?.cycleLength || 28,
                 currentUser?.periodLength || 5,
                 []
@@ -93,7 +110,10 @@ export default function Trackers() {
     };
 
     const handleDateSelect = (date) => {
-        setSelectedDate(date);
+        // Normalize the selected date to remove time component
+        const normalizedDate = new Date(date);
+        normalizedDate.setHours(0, 0, 0, 0);
+        setSelectedDate(normalizedDate);
     };
 
     // Handle period tracking form submission
@@ -226,9 +246,191 @@ export default function Trackers() {
 
             <div className="trackers-header">
                 <h1>Track Your Health</h1>
+                <p className="trackers-subtitle">Monitor your cycle, symptoms, mood, and overall wellness</p>
             </div>
 
-            <div className="trackers-layout">
+            {/* Phase Status Banner - Horizontal */}
+            {phaseInfo && (
+                <div className={`phase-banner ${phaseInfo.phase}`}>
+                    <div className="phase-banner-main">
+                        <div className="phase-banner-icon">
+                            <i className={`fas ${phaseInfo.phase === 'period' ? 'fa-tint' :
+                                phaseInfo.phase === 'ovulation' ? 'fa-star' :
+                                    phaseInfo.phase === 'fertile' ? 'fa-heart' :
+                                        phaseInfo.phase === 'pms' ? 'fa-cloud' : 'fa-leaf'
+                                }`}></i>
+                        </div>
+                        <div className="phase-banner-info">
+                            <span className="phase-banner-label">Current Phase</span>
+                            <h2 className="phase-banner-title">{phaseInfo.info.name}</h2>
+                            <p className="phase-banner-desc">{phaseInfo.info.description}</p>
+                        </div>
+                    </div>
+
+                    <div className="phase-banner-stats">
+                        <div className="phase-stat">
+                            <span className="phase-stat-value">{phaseInfo.cycleDay}</span>
+                            <span className="phase-stat-label">Cycle Day</span>
+                        </div>
+                        <div className="phase-stat-divider"></div>
+                        <div className="phase-stat">
+                            <span className="phase-stat-value">{phaseInfo.daysUntilPeriod > 0 ? phaseInfo.daysUntilPeriod : '—'}</span>
+                            <span className="phase-stat-label">Days to Period</span>
+                        </div>
+                        <div className="phase-stat-divider"></div>
+                        <div className="phase-stat">
+                            <span className="phase-stat-value">{phaseInfo.info.energy?.split(' ')[0] || 'Moderate'}</span>
+                            <span className="phase-stat-label">Energy</span>
+                        </div>
+                        {(phaseInfo.isFertile || phaseInfo.isOvulation) && (
+                            <>
+                                <div className="phase-stat-divider"></div>
+                                <div className="phase-stat fertility-stat">
+                                    <span className="phase-stat-value">
+                                        <i className="fas fa-heart"></i> {phaseInfo.isOvulation ? 'Peak' : 'High'}
+                                    </span>
+                                    <span className="phase-stat-label">Fertility</span>
+                                </div>
+                            </>
+                        )}
+                        {/* Ovulation-specific: Days until ovulation */}
+                        {!phaseInfo.isOvulation && !phaseInfo.isPeriod && phaseInfo.ovulationDate && (
+                            <>
+                                <div className="phase-stat-divider"></div>
+                                <div className="phase-stat ovulation-stat">
+                                    <span className="phase-stat-value">
+                                        <i className="fas fa-star"></i>
+                                        {(() => {
+                                            const checkDate = new Date(selectedDate);
+                                            checkDate.setHours(0, 0, 0, 0);
+                                            const ovDate = new Date(phaseInfo.ovulationDate);
+                                            ovDate.setHours(0, 0, 0, 0);
+                                            const diff = Math.round((ovDate - checkDate) / (1000 * 60 * 60 * 24));
+                                            return diff > 0 ? diff : '—';
+                                        })()}
+                                    </span>
+                                    <span className="phase-stat-label">Days to Ovulation</span>
+                                </div>
+                            </>
+                        )}
+                        {/* Fertile window: Days remaining */}
+                        {phaseInfo.isFertile && phaseInfo.fertileWindow && (
+                            <>
+                                <div className="phase-stat-divider"></div>
+                                <div className="phase-stat fertile-window-stat">
+                                    <span className="phase-stat-value">
+                                        {(() => {
+                                            const checkDate = new Date(selectedDate);
+                                            checkDate.setHours(0, 0, 0, 0);
+                                            const endDate = new Date(phaseInfo.fertileWindow.end);
+                                            endDate.setHours(0, 0, 0, 0);
+                                            const diff = Math.round((endDate - checkDate) / (1000 * 60 * 60 * 24));
+                                            return diff >= 0 ? diff + 1 : 0;
+                                        })()}
+                                    </span>
+                                    <span className="phase-stat-label">Fertile Days Left</span>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Fertility Predictions Card - Always show fertile window & ovulation info */}
+            {phaseInfo && (phaseInfo.fertileWindow || phaseInfo.ovulationDate) && (
+                <div className="fertility-predictions-card">
+                    <h3 className="fertility-predictions-title">
+                        <i className="fas fa-seedling" aria-hidden="true"></i>
+                        Fertility Predictions
+                    </h3>
+                    <div className="fertility-predictions-grid">
+                        {phaseInfo.ovulationDate && (
+                            <div className={`prediction-item ovulation-prediction ${phaseInfo.isOvulation ? 'active' : ''}`}>
+                                <div className="prediction-icon">
+                                    <i className="fas fa-star"></i>
+                                </div>
+                                <div className="prediction-info">
+                                    <span className="prediction-label">Ovulation Day</span>
+                                    <span className="prediction-value">
+                                        {phaseInfo.isOvulation ? (
+                                            <span className="prediction-active">Today!</span>
+                                        ) : (
+                                            phaseInfo.ovulationDate.toLocaleDateString('en-US', {
+                                                month: 'short',
+                                                day: 'numeric'
+                                            })
+                                        )}
+                                    </span>
+                                    <span className="prediction-desc">Peak fertility - egg release</span>
+                                </div>
+                            </div>
+                        )}
+                        {phaseInfo.fertileWindow && (
+                            <div className={`prediction-item fertile-prediction ${phaseInfo.isFertile ? 'active' : ''}`}>
+                                <div className="prediction-icon">
+                                    <i className="fas fa-heart"></i>
+                                </div>
+                                <div className="prediction-info">
+                                    <span className="prediction-label">Fertile Window</span>
+                                    <span className="prediction-value">
+                                        {phaseInfo.isFertile ? (
+                                            <span className="prediction-active">Now</span>
+                                        ) : (
+                                            <>
+                                                {phaseInfo.fertileWindow.start.toLocaleDateString('en-US', {
+                                                    month: 'short',
+                                                    day: 'numeric'
+                                                })}
+                                                {' - '}
+                                                {phaseInfo.fertileWindow.end.toLocaleDateString('en-US', {
+                                                    month: 'short',
+                                                    day: 'numeric'
+                                                })}
+                                            </>
+                                        )}
+                                    </span>
+                                    <span className="prediction-desc">
+                                        {phaseInfo.isFertile
+                                            ? 'You are currently in your fertile window'
+                                            : '~6 days of higher fertility'
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                        {phaseInfo.nextPeriod && (
+                            <div className={`prediction-item period-prediction ${phaseInfo.isPeriod ? 'active' : ''}`}>
+                                <div className="prediction-icon">
+                                    <i className="fas fa-calendar-alt"></i>
+                                </div>
+                                <div className="prediction-info">
+                                    <span className="prediction-label">Next Period</span>
+                                    <span className="prediction-value">
+                                        {phaseInfo.isPeriod ? (
+                                            <span className="prediction-active">Current</span>
+                                        ) : (
+                                            phaseInfo.nextPeriod.toLocaleDateString('en-US', {
+                                                month: 'short',
+                                                day: 'numeric'
+                                            })
+                                        )}
+                                    </span>
+                                    <span className="prediction-desc">
+                                        {phaseInfo.isPeriod
+                                            ? 'You are on your period'
+                                            : `In ${phaseInfo.daysUntilPeriod} days`
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Main Content - Calendar & Trackers Side by Side */}
+            <div className="trackers-main-layout">
+                {/* Calendar Section */}
                 <div className="calendar-section">
                     <Calendar
                         selectedDate={selectedDate}
@@ -239,58 +441,64 @@ export default function Trackers() {
                         userProfile={currentUser}
                     />
 
-                    {phaseInfo && (
-                        <div className={`phase-info-card ${phaseInfo.phase}`}>
-                            <div className="phase-info-header">
-                                <h3>{phaseInfo.info.name}</h3>
-                                <span className="phase-date">
-                                    Cycle Day {phaseInfo.cycleDay}
-                                </span>
-                            </div>
-                            <p className="phase-info-description">
-                                {phaseInfo.info.description}
-                            </p>
-                            <div className="phase-info-tips">
-                                <h4>Tips for this phase:</h4>
-                                <ul>
-                                    {phaseInfo.info.tips.map((tip, index) => (
-                                        <li key={index}>{tip}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    )}
+                    <div className="selected-date-info">
+                        <span className="selected-date-label">Selected Date</span>
+                        <span className="selected-date-value">
+                            {selectedDate.toLocaleDateString('en-US', {
+                                weekday: 'long',
+                                month: 'long',
+                                day: 'numeric'
+                            })}
+                        </span>
+                    </div>
                 </div>
 
+                {/* Trackers Section */}
                 <div className="trackers-section">
-                    <div className="tracker-tabs">
+                    <div className="tracker-tabs" role="tablist" aria-label="Health tracking categories">
                         <button
+                            type="button"
+                            role="tab"
+                            aria-selected={activeTab === 'period'}
                             className={`tab-button ${activeTab === 'period' ? 'active' : ''}`}
                             onClick={() => handleTabChange('period')}
                         >
-                            <i className="fas fa-calendar-alt"></i> Period
+                            <i className="fas fa-calendar-alt" aria-hidden="true"></i>
+                            <span>Period</span>
                         </button>
                         <button
+                            type="button"
+                            role="tab"
+                            aria-selected={activeTab === 'symptom'}
                             className={`tab-button ${activeTab === 'symptom' ? 'active' : ''}`}
                             onClick={() => handleTabChange('symptom')}
                         >
-                            <i className="fas fa-notes-medical"></i> Symptoms
+                            <i className="fas fa-notes-medical" aria-hidden="true"></i>
+                            <span>Symptoms</span>
                         </button>
                         <button
+                            type="button"
+                            role="tab"
+                            aria-selected={activeTab === 'mood'}
                             className={`tab-button ${activeTab === 'mood' ? 'active' : ''}`}
                             onClick={() => handleTabChange('mood')}
                         >
-                            <i className="fas fa-smile"></i> Mood
+                            <i className="fas fa-smile" aria-hidden="true"></i>
+                            <span>Mood</span>
                         </button>
                         <button
+                            type="button"
+                            role="tab"
+                            aria-selected={activeTab === 'health'}
                             className={`tab-button ${activeTab === 'health' ? 'active' : ''}`}
                             onClick={() => handleTabChange('health')}
                         >
-                            <i className="fas fa-heartbeat"></i> Health
+                            <i className="fas fa-heartbeat" aria-hidden="true"></i>
+                            <span>Health</span>
                         </button>
                     </div>
 
-                    <div className="tracker-content">
+                    <div className="tracker-content" role="tabpanel">
                         {activeTab === 'period' && (
                             <PeriodTracker
                                 selectedDate={selectedDate}
@@ -330,6 +538,32 @@ export default function Trackers() {
                     </div>
                 </div>
             </div>
+
+            {/* Tips Section - Horizontal Cards */}
+            {phaseInfo && (
+                <div className="phase-tips-section">
+                    <h3 className="tips-section-title">
+                        <i className="fas fa-lightbulb" aria-hidden="true"></i>
+                        Tips for {phaseInfo.info.name}
+                    </h3>
+                    <div className="tips-horizontal-grid">
+                        {phaseInfo.info.tips.map((tip, index) => (
+                            <div key={`tip-${index}`} className="tip-card">
+                                <div className="tip-number">{index + 1}</div>
+                                <p className="tip-text">{tip}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="hormone-info-bar">
+                        <div className="hormone-item">
+                            <i className="fas fa-dna" aria-hidden="true"></i>
+                            <span className="hormone-label">Hormones:</span>
+                            <span className="hormone-value">{phaseInfo.info.hormones}</span>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

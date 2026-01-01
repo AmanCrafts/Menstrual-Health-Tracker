@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import rateLimit from 'express-rate-limit';
 
 import config from './config/index.js';
 import connectDB from './config/database.js';
@@ -30,16 +29,18 @@ app.use(helmet());
 // CORS configuration
 app.use(cors(config.cors));
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: config.rateLimit.windowMs,
-  max: config.rateLimit.max,
-  message: {
-    success: false,
-    message: 'Too many requests, please try again later'
-  }
-});
-app.use('/api', limiter);
+// Rate limiting disabled during development
+// Uncomment below for production:
+// import rateLimit from 'express-rate-limit';
+// const limiter = rateLimit({
+//   windowMs: config.rateLimit.windowMs,
+//   max: config.rateLimit.max,
+//   message: {
+//     success: false,
+//     message: 'Too many requests, please try again later'
+//   }
+// });
+// app.use('/api', limiter);
 
 // Body parser
 app.use(express.json({ limit: '10kb' }));

@@ -141,7 +141,7 @@ export const updatePeriodLog = async (req, res) => {
   try {
     const { startDate, endDate, flowIntensity, painLevel, symptoms, notes } = req.body;
 
-    let periodLog = await PeriodLog.findOne({
+    const periodLog = await PeriodLog.findOne({
       _id: req.params.id,
       user: req.user._id
     });
@@ -214,26 +214,93 @@ export const deletePeriodLog = async (req, res) => {
 };
 
 /**
- * @desc    Get cycle statistics
+ * @desc    Get comprehensive cycle statistics
  * @route   GET /api/periods/stats
  * @access  Private
  */
 export const getCycleStats = async (req, res) => {
   try {
-    const [avgCycleLength, avgPeriodLength] = await Promise.all([
-      PeriodLog.calculateAverageCycleLength(req.user._id),
-      PeriodLog.calculateAveragePeriodLength(req.user._id)
-    ]);
-
-    const recentPeriods = await PeriodLog.getUserHistory(req.user._id, 6);
+    // Get comprehensive statistics using the improved model method
+    const stats = await PeriodLog.getCycleStatistics(req.user._id);
+    
+    // Get recent periods with full data
+    const recentPeriods = await PeriodLog.getUserHistory(req.user._id, 12);
+    
+    // Calculate additional insights
+    const insights = [];
+    
+    // Cycle regularity insight
+    if (stats.regularity.category === 'very_regular' || stats.regularity.category === 'regular') {
+      insights.push({
+        type: 'positive',
+        title: 'Regular Cycles',
+        description: `Your cycles are ${stats.regularity.category.replace('_', ' ')} with ${stats.regularity.variance || 0} day variance.`,
+        icon: 'check-circle'
+      });
+    } else if (stats.regularity.category === 'irregular') {
+      insights.push({
+        type: 'warning',
+        title: 'Irregular Cycles',
+        description: 'Your cycle length varies significantly. Factors like stress, weight, or hormonal changes may be involved.',
+        icon: 'exclamation-triangle'
+      });
+    }
+    
+    // Cycle length insight
+    if (stats.averageCycleLength < 21) {
+      insights.push({
+        type: 'alert',
+        title: 'Short Cycles',
+        description: 'Your average cycle is less than 21 days, which may warrant attention.',
+        icon: 'exclamation-circle'
+      });
+    } else if (stats.averageCycleLength > 35) {
+      insights.push({
+        type: 'warning',
+        title: 'Long Cycles',
+        description: 'Your average cycle is over 35 days. This can be normal but worth monitoring.',
+        icon: 'clock'
+      });
+    }
+    
+    // Period length insight
+    if (stats.averagePeriodLength > 7) {
+      insights.push({
+        type: 'warning',
+        title: 'Extended Periods',
+        description: `Your periods last ${stats.averagePeriodLength} days on average, which is longer than typical.`,
+        icon: 'clock'
+      });
+    }
+    
+    // Trend insight
+    if (stats.trend === 'shortening') {
+      insights.push({
+        type: 'info',
+        title: 'Cycles Shortening',
+        description: 'Your recent cycles appear to be getting shorter.',
+        icon: 'arrow-down'
+      });
+    } else if (stats.trend === 'lengthening') {
+      insights.push({
+        type: 'info',
+        title: 'Cycles Lengthening',
+        description: 'Your recent cycles appear to be getting longer.',
+        icon: 'arrow-up'
+      });
+    }
 
     res.status(200).json({
       success: true,
       data: {
-        averageCycleLength: avgCycleLength,
-        averagePeriodLength: avgPeriodLength,
-        totalLogged: recentPeriods.length,
-        recentPeriods
+        averageCycleLength: stats.averageCycleLength,
+        averagePeriodLength: stats.averagePeriodLength,
+        regularity: stats.regularity,
+        trend: stats.trend,
+        totalLogged: stats.totalLogged,
+        lastPeriod: stats.lastPeriod,
+        recentPeriods,
+        insights
       }
     });
   } catch (error) {
@@ -246,22 +313,28 @@ export const getCycleStats = async (req, res) => {
 };
 
 /**
- * @desc    Get cycle predictions
+ * @desc    Get cycle predictions with improved algorithm
  * @route   GET /api/periods/predictions
  * @access  Private
  */
 export const getCyclePredictions = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
-    const avgCycleLength = await PeriodLog.calculateAverageCycleLength(req.user._id);
-    const avgPeriodLength = await PeriodLog.calculateAveragePeriodLength(req.user._id);
-
-    // Get most recent period
-    const recentPeriods = await PeriodLog.getUserHistory(req.user._id, 1);
     
+    // Get comprehensive statistics
+    const stats = await PeriodLog.getCycleStatistics(req.user._id);
+    const { 
+      averageCycleLength, 
+      averagePeriodLength, 
+      regularity, 
+      trend, 
+      lastPeriod 
+    } = stats;
+    
+    // Get most recent period date
     let lastPeriodDate = user.cycleSettings?.lastPeriodDate;
-    if (recentPeriods.length > 0) {
-      const recentDate = new Date(recentPeriods[0].startDate);
+    if (lastPeriod) {
+      const recentDate = new Date(lastPeriod.startDate);
       if (!lastPeriodDate || recentDate > new Date(lastPeriodDate)) {
         lastPeriodDate = recentDate;
       }
@@ -272,62 +345,156 @@ export const getCyclePredictions = async (req, res) => {
         success: true,
         data: {
           message: 'Not enough data for predictions. Please log your first period.',
-          predictions: []
+          hasData: false,
+          predictions: [],
+          confidence: { score: 0, level: 'none' }
         }
       });
     }
 
-    // Calculate predictions
+    // Calculate predictions using improved algorithm
     const predictions = [];
     let nextPeriod = new Date(lastPeriodDate);
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Calculate base confidence from regularity
+    const baseConfidence = regularity.score || 50;
+    
+    // Calculate variance for prediction ranges
+    const variance = regularity.variance || 2;
 
-    // Get next 3 predicted periods
-    for (let i = 0; i < 3; i++) {
+    // Generate predictions for next 6 cycles
+    for (let i = 0; i < 6; i++) {
       nextPeriod = new Date(nextPeriod);
-      nextPeriod.setDate(nextPeriod.getDate() + avgCycleLength);
+      nextPeriod.setDate(nextPeriod.getDate() + averageCycleLength);
 
       // Skip if in the past
       if (nextPeriod < today && i === 0) {
-        continue;
+        // If first prediction is in past, recalculate
+        while (nextPeriod < today) {
+          nextPeriod.setDate(nextPeriod.getDate() + averageCycleLength);
+        }
       }
+      
+      // Skip past dates
+      if (nextPeriod < today) continue;
 
-      const endDate = new Date(nextPeriod);
-      endDate.setDate(endDate.getDate() + avgPeriodLength - 1);
+      // Calculate period end date
+      const periodEndDate = new Date(nextPeriod);
+      periodEndDate.setDate(periodEndDate.getDate() + averagePeriodLength - 1);
 
-      // Calculate ovulation (14 days before period)
+      // Calculate ovulation (14 days before next period, adjusted for cycle length)
+      const lutealPhase = averageCycleLength < 26 ? 12 : averageCycleLength > 32 ? 14 : 14;
       const ovulationDate = new Date(nextPeriod);
-      ovulationDate.setDate(ovulationDate.getDate() - 14);
+      ovulationDate.setDate(ovulationDate.getDate() - lutealPhase);
 
       // Calculate fertile window (5 days before ovulation to 1 day after)
       const fertileStart = new Date(ovulationDate);
       fertileStart.setDate(fertileStart.getDate() - 5);
       const fertileEnd = new Date(ovulationDate);
       fertileEnd.setDate(fertileEnd.getDate() + 1);
+      
+      // Calculate peak fertility (2 days before to ovulation day)
+      const peakFertileStart = new Date(ovulationDate);
+      peakFertileStart.setDate(peakFertileStart.getDate() - 2);
+      
+      // Calculate PMS window (10 days to 1 day before period)
+      const pmsStart = new Date(nextPeriod);
+      pmsStart.setDate(pmsStart.getDate() - 10);
+      const pmsEnd = new Date(nextPeriod);
+      pmsEnd.setDate(pmsEnd.getDate() - 1);
+
+      // Calculate prediction range based on variance
+      const rangeMargin = Math.max(1, Math.ceil(variance));
+      const predictedRangeStart = new Date(nextPeriod);
+      predictedRangeStart.setDate(predictedRangeStart.getDate() - rangeMargin);
+      const predictedRangeEnd = new Date(nextPeriod);
+      predictedRangeEnd.setDate(predictedRangeEnd.getDate() + rangeMargin);
+
+      // Calculate confidence (decreases for predictions further in future)
+      const monthsAhead = Math.floor(
+        (nextPeriod - today) / (30 * 24 * 60 * 60 * 1000)
+      );
+      const confidence = Math.max(30, Math.min(95, baseConfidence - (monthsAhead * 5)));
 
       predictions.push({
+        cycleNumber: predictions.length + 1,
         periodStart: nextPeriod.toISOString(),
-        periodEnd: endDate.toISOString(),
+        periodEnd: periodEndDate.toISOString(),
+        predictedRange: {
+          start: predictedRangeStart.toISOString(),
+          end: predictedRangeEnd.toISOString()
+        },
         ovulationDate: ovulationDate.toISOString(),
         fertileWindow: {
           start: fertileStart.toISOString(),
-          end: fertileEnd.toISOString()
-        }
+          end: fertileEnd.toISOString(),
+          peakStart: peakFertileStart.toISOString(),
+          peakEnd: ovulationDate.toISOString()
+        },
+        pmsWindow: {
+          start: pmsStart.toISOString(),
+          end: pmsEnd.toISOString()
+        },
+        confidence
       });
+      
+      if (predictions.length >= 3) break;
     }
 
     // Calculate current cycle day
-    const daysSinceLastPeriod = Math.floor((today - new Date(lastPeriodDate)) / (1000 * 60 * 60 * 24));
-    const currentCycleDay = (daysSinceLastPeriod % avgCycleLength) + 1;
+    const daysSinceLastPeriod = Math.floor(
+      (today - new Date(lastPeriodDate)) / (1000 * 60 * 60 * 24)
+    );
+    const currentCycleDay = (daysSinceLastPeriod % averageCycleLength) + 1;
+    const daysUntilNextPeriod = averageCycleLength - daysSinceLastPeriod;
+
+    // Determine current phase
+    let currentPhase = 'follicular';
+    if (currentCycleDay <= averagePeriodLength) {
+      currentPhase = 'period';
+    } else if (predictions.length > 0) {
+      const nextOvulation = new Date(predictions[0].ovulationDate);
+      const daysUntilOvulation = Math.floor((nextOvulation - today) / (1000 * 60 * 60 * 24));
+      
+      if (daysUntilOvulation <= 0 && daysUntilOvulation >= -1) {
+        currentPhase = 'ovulation';
+      } else if (daysUntilOvulation > 0 && daysUntilOvulation <= 6) {
+        currentPhase = 'fertile';
+      } else if (daysUntilNextPeriod <= 10 && daysUntilNextPeriod > 0) {
+        currentPhase = 'pms';
+      }
+    }
 
     res.status(200).json({
       success: true,
       data: {
+        hasData: true,
         lastPeriodDate,
-        averageCycleLength: avgCycleLength,
-        averagePeriodLength: avgPeriodLength,
+        averageCycleLength,
+        averagePeriodLength,
         currentCycleDay,
-        predictions
+        daysUntilNextPeriod: daysUntilNextPeriod > 0 ? daysUntilNextPeriod : averageCycleLength,
+        currentPhase,
+        regularity: {
+          score: regularity.score,
+          category: regularity.category,
+          variance: regularity.variance,
+          message: regularity.message
+        },
+        trend,
+        predictions,
+        confidence: {
+          score: baseConfidence,
+          level: baseConfidence >= 80 ? 'high' : baseConfidence >= 60 ? 'moderate' : 'low',
+          factors: [
+            regularity.dataPoints >= 6 ? 'Sufficient history' : 'Limited history',
+            regularity.category === 'regular' || regularity.category === 'very_regular' 
+              ? 'Regular cycles' 
+              : 'Irregular cycles'
+          ]
+        }
       }
     });
   } catch (error) {

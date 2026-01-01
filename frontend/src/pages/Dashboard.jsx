@@ -15,6 +15,14 @@ import {
 } from '../utils/cycleCalculations';
 import '../styles/dashboard.css';
 
+// Helper function to safely format dates
+const formatDate = (date, options = { month: 'short', day: 'numeric' }) => {
+    if (!date) return 'N/A';
+    const dateObj = date instanceof Date ? date : new Date(date);
+    if (Number.isNaN(dateObj.getTime())) return 'N/A';
+    return dateObj.toLocaleDateString('en-US', options);
+};
+
 export default function Dashboard() {
     const { currentUser } = useAuth();
     const { periodData, symptomsData, predictions, loading, error } = useData();
@@ -47,9 +55,9 @@ export default function Dashboard() {
             const nextPeriod = calculateNextPeriod(lastPeriodDate, cycleLength, periodData);
 
             // Calculate days until next period
-            const daysUntilPeriod = Math.ceil(
+            const daysUntilPeriod = nextPeriod ? Math.ceil(
                 (nextPeriod - today) / (1000 * 60 * 60 * 24)
-            );
+            ) : null;
 
             // Calculate current cycle day
             const cycleDay = calculateCycleDay(lastPeriodDate, today, cycleLength);
@@ -57,13 +65,14 @@ export default function Dashboard() {
             // Calculate fertile window
             const fertileWindow = calculateFertileWindow(nextPeriod, cycleLength);
 
-            // Calculate ovulation
-            const ovulationDate = calculateOvulation(nextPeriod, cycleLength);
+            // Calculate ovulation (now returns an object with date property)
+            const ovulationResult = calculateOvulation(nextPeriod, cycleLength);
+            const ovulationDate = ovulationResult?.date || null;
 
             // Calculate days until ovulation
-            const daysUntilOvulation = Math.ceil(
+            const daysUntilOvulation = ovulationDate ? Math.ceil(
                 (ovulationDate - today) / (1000 * 60 * 60 * 24)
-            );
+            ) : null;
 
             // Calculate PMS window
             const pmsWindow = calculatePmsDays(nextPeriod);
@@ -102,11 +111,12 @@ export default function Dashboard() {
             const periodLength = currentUser?.periodLength || 5;
 
             const nextPeriod = calculateNextPeriod(lastPeriodDate, cycleLength, []);
-            const daysUntilPeriod = Math.ceil((nextPeriod - today) / (1000 * 60 * 60 * 24));
+            const daysUntilPeriod = nextPeriod ? Math.ceil((nextPeriod - today) / (1000 * 60 * 60 * 24)) : null;
             const cycleDay = calculateCycleDay(lastPeriodDate, today, cycleLength);
             const fertileWindow = calculateFertileWindow(nextPeriod, cycleLength);
-            const ovulationDate = calculateOvulation(nextPeriod, cycleLength);
-            const daysUntilOvulation = Math.ceil((ovulationDate - today) / (1000 * 60 * 60 * 24));
+            const ovulationResult = calculateOvulation(nextPeriod, cycleLength);
+            const ovulationDate = ovulationResult?.date || null;
+            const daysUntilOvulation = ovulationDate ? Math.ceil((ovulationDate - today) / (1000 * 60 * 60 * 24)) : null;
             const pmsWindow = calculatePmsDays(nextPeriod);
             const phaseInfo = getCyclePhaseInfo(today, lastPeriodDate, cycleLength, periodLength, []);
 
@@ -171,7 +181,7 @@ export default function Dashboard() {
                         </div>
                         <div className="card-content">
                             <h3>{cycleInfo.phaseInfo.info.name}</h3>
-                            <p>Cycle Day {cycleInfo.cycleDay}</p>
+                            <p>Cycle Day {cycleInfo.cycleDay?.day || cycleInfo.cycleDay || 'N/A'}</p>
                             <p className="phase-description">{cycleInfo.phaseInfo.info.description}</p>
                         </div>
                         <div className="card-footer">
@@ -187,19 +197,21 @@ export default function Dashboard() {
                         </div>
                         <div className="card-content">
                             <div className="next-date">
-                                {cycleInfo.nextPeriod.toLocaleDateString(`en-US`, {
-                                    month: `short`,
-                                    day: `numeric`,
-                                    year: `numeric`
+                                {formatDate(cycleInfo.nextPeriod, {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric'
                                 })}
                             </div>
                             <div className="days-until">
-                                {cycleInfo.daysUntilPeriod === 0 ? `Expected today` :
-                                    `${cycleInfo.daysUntilPeriod} day${cycleInfo.daysUntilPeriod !== 1 ? `s` : ``} from now`}
+                                {cycleInfo.daysUntilPeriod === 0 ? 'Expected today' :
+                                    cycleInfo.daysUntilPeriod > 0 ?
+                                        `${cycleInfo.daysUntilPeriod} day${cycleInfo.daysUntilPeriod !== 1 ? 's' : ''} from now` :
+                                        'Calculating...'}
                             </div>
                         </div>
                         <div className="card-footer">
-                            <Link to="/trackers" state={{ openTab: `period` }} className="dashboard-link">Track Period</Link>
+                            <Link to="/trackers" state={{ openTab: 'period' }} className="dashboard-link">Track Period</Link>
                         </div>
                     </div>
 
@@ -211,23 +223,18 @@ export default function Dashboard() {
                         </div>
                         <div className="card-content">
                             <p>
-                                <strong>Fertile days:</strong> {cycleInfo.fertileWindow.start.toLocaleDateString(`en-US`, {
-                                    month: `short`,
-                                    day: `numeric`
-                                })} - {cycleInfo.fertileWindow.end.toLocaleDateString(`en-US`, {
-                                    month: `short`,
-                                    day: `numeric`
-                                })}
+                                <strong>Fertile days:</strong> {cycleInfo.fertileWindow ? (
+                                    `${formatDate(cycleInfo.fertileWindow.start)} - ${formatDate(cycleInfo.fertileWindow.end)}`
+                                ) : 'Calculating...'}
                             </p>
                             <p>
-                                <strong>Ovulation day:</strong> {cycleInfo.ovulationDate.toLocaleDateString(`en-US`, {
-                                    month: `short`,
-                                    day: `numeric`
-                                })}
-                                {cycleInfo.daysUntilOvulation > 0 ?
-                                    ` (in ${cycleInfo.daysUntilOvulation} days)` :
-                                    cycleInfo.daysUntilOvulation === 0 ?
-                                        ` (today)` : ` (passed)`}
+                                <strong>Ovulation day:</strong> {formatDate(cycleInfo.ovulationDate)}
+                                {cycleInfo.daysUntilOvulation !== null && (
+                                    cycleInfo.daysUntilOvulation > 0 ?
+                                        ` (in ${cycleInfo.daysUntilOvulation} days)` :
+                                        cycleInfo.daysUntilOvulation === 0 ?
+                                            ' (today)' : ' (passed)'
+                                )}
                             </p>
                         </div>
                         <div className="card-footer">
@@ -272,10 +279,7 @@ export default function Dashboard() {
                             <div className="stat-item">
                                 <span className="stat-label">Last Period:</span>
                                 <span className="stat-value">
-                                    {cycleInfo.lastPeriodDate.toLocaleDateString('en-US', {
-                                        month: 'short',
-                                        day: 'numeric'
-                                    })}
+                                    {formatDate(cycleInfo.lastPeriodDate)}
                                 </span>
                             </div>
                         </div>

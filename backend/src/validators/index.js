@@ -1,5 +1,6 @@
 import { body, param, query, validationResult } from 'express-validator';
 
+
 /**
  * Validation result handler middleware
  */
