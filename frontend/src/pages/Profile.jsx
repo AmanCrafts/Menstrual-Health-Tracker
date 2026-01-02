@@ -30,21 +30,17 @@ export default function Profile() {
 
     const navigate = useNavigate();
 
-    // Redirect if not logged in
+    // Initialize form with existing profile data when currentUser loads
     useEffect(() => {
-        if (!currentUser) {
-            navigate('/signin');
-            return;
+        if (currentUser) {
+            setDisplayName(currentUser.displayName || '');
+            setBirthDate(currentUser.birthDate || '');
+            setCycleLength(currentUser.cycleLength?.toString() || '28');
+            setPeriodLength(currentUser.periodLength?.toString() || '5');
+            setLastPeriod(currentUser.lastPeriod || '');
+            setHeight(currentUser.height?.toString() || '');
         }
-
-        // Fill form with existing profile data
-        setDisplayName(currentUser.displayName || '');
-        setBirthDate(currentUser.birthDate || '');
-        setCycleLength(currentUser.cycleLength?.toString() || '28');
-        setPeriodLength(currentUser.periodLength?.toString() || '5');
-        setLastPeriod(currentUser.lastPeriod || '');
-        setHeight(currentUser.height?.toString() || '');
-    }, [currentUser, navigate]);
+    }, [currentUser]);
 
     // Handle profile save
     const handleSaveProfile = async (e) => {

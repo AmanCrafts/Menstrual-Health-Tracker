@@ -654,9 +654,11 @@
 /* Tracker Tabs */
 .tracker-tabs {
   display: flex;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-xs);
+  padding: var(--spacing-xs);
+  background: var(--background);
+  border-radius: var(--radius-lg);
   overflow-x: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--primary) transparent;
@@ -675,14 +677,16 @@
 .tab-button {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  padding: var(--spacing-sm) var(--spacing-md);
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+  min-width: 0;
+  padding: var(--spacing-md) var(--spacing-lg);
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--text-medium);
   background: transparent;
-  border: 2px solid var(--border-light);
+  border: none;
   border-radius: var(--radius-md);
   white-space: nowrap;
   cursor: pointer;
@@ -690,20 +694,18 @@
 }
 
 .tab-button i {
-  font-size: var(--text-md);
+  font-size: var(--text-base);
+  flex-shrink: 0;
 }
 
 .tab-button:hover {
   color: var(--primary);
   background: var(--soft-purple);
-  border-color: var(--primary);
-  transform: translateY(-2px);
 }
 
 .tab-button.active {
   color: white;
   background: var(--primary-gradient);
-  border-color: transparent;
   box-shadow: 0 4px 12px -4px rgba(124, 58, 237, 0.5);
 }
 
@@ -1446,8 +1448,9 @@
   }
   
   .tab-button {
-    padding: var(--spacing-xs) var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
     font-size: var(--text-xs);
+    gap: var(--spacing-xs);
   }
   
   .tab-button i {
@@ -1561,14 +1564,15 @@
   }
   
   .tracker-tabs {
-    gap: 4px;
+    gap: var(--spacing-xs);
     margin-bottom: var(--spacing-md);
+    padding: var(--spacing-xs);
   }
   
   .tab-button {
-    padding: var(--spacing-sm);
-    min-width: 44px;
-    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-sm);
+    flex: 1;
+    min-width: 0;
   }
   
   .tab-button span {
@@ -1577,6 +1581,7 @@
   
   .tab-button i {
     margin: 0;
+    font-size: var(--text-base);
   }
   
   .symptom-checkboxes {

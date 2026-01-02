@@ -11,6 +11,7 @@ import Navbar from './components/Navbar.jsx'
 import Education from './pages/Education.jsx'
 import ArticleDetail from './pages/ArticleDetail.jsx'
 import TestModeToggle from './components/TestModeToggle.jsx'
+import ProtectedRoute, { PublicOnlyRoute } from './components/ProtectedRoute.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
 import { DataProvider } from './contexts/DataContext.jsx'
 import { useData } from './contexts/DataContext.jsx'
@@ -45,11 +46,41 @@ const App = () => {
         <Router>
           <Navbar />
           <Routes>
-            <Route path="/signin" element={<Signin />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/trackers" element={<Trackers />} />
+            {/* Public routes - redirect to dashboard if already logged in */}
+            <Route path="/signin" element={
+              <PublicOnlyRoute>
+                <Signin />
+              </PublicOnlyRoute>
+            } />
+            <Route path="/signup" element={
+              <PublicOnlyRoute>
+                <Signup />
+              </PublicOnlyRoute>
+            } />
+
+            {/* Protected routes - require authentication */}
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+              <ProtectedRoute>
+                <Analytics />
+              </ProtectedRoute>
+            } />
+            <Route path="/trackers" element={
+              <ProtectedRoute>
+                <Trackers />
+              </ProtectedRoute>
+            } />
+
+            {/* Public routes - accessible to everyone */}
             <Route path="/education" element={<Education />} />
             <Route path="/education/article/:articleId" element={<ArticleDetail />} />
             <Route path="/" element={<Home />} />

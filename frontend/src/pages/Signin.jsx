@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { useAuth } from '../contexts/useAuth.jsx'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import Alert from '../components/Alert.jsx'
 import GoogleButton from '../components/GoogleButton.jsx'
 import '../styles/signin.css'
@@ -13,6 +13,10 @@ const Signin = () => {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Get the page they were trying to visit, default to dashboard
+  const from = location.state?.from?.pathname || '/dashboard'
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -32,7 +36,7 @@ const Signin = () => {
       setSuccess('Login successful! Redirecting...')
 
       setTimeout(() => {
-        navigate('/dashboard')
+        navigate(from, { replace: true })
       }, 500)
     } catch (error) {
       console.error('Login error:', error)
@@ -59,7 +63,7 @@ const Signin = () => {
       setSuccess('Google login successful! Redirecting...')
 
       setTimeout(() => {
-        navigate('/dashboard')
+        navigate(from, { replace: true })
       }, 500)
     } catch (error) {
       console.error('Google sign-in error:', error)

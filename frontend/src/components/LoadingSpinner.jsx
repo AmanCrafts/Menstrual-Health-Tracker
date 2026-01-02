@@ -1,14 +1,25 @@
 import React from 'react';
 import '../styles/loadingSpinner.css';
 
-export default function LoadingSpinner() {
+/**
+ * LoadingSpinner Component
+ * @param {boolean} fullPage - If true, centers the spinner in the full viewport
+ * @param {string} message - Optional loading message to display
+ */
+export default function LoadingSpinner({ fullPage = false, message = 'Loading...' }) {
+    const containerClass = fullPage ? 'spinner-fullpage' : 'spinner-inline';
+
     return (
-        <div className="loading-spinner-container">
-            <div className="loading-spinner">
-                <div className="spinner-circle"></div>
-                <div className="spinner-circle inner"></div>
+        <div className={containerClass}>
+            <div className="spinner-wrapper">
+                <div className="loader-three-rings">
+                    <div className="ring"></div>
+                    <div className="ring"></div>
+                    <div className="ring"></div>
+                    <div className="dot"></div>
+                </div>
+                {message && <p className="spinner-message">{message}</p>}
             </div>
-            <p>Loading...</p>
         </div>
     );
 }

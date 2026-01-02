@@ -55,12 +55,6 @@ export default function Trackers() {
         }
     }, [location.state]);
 
-    useEffect(() => {
-        if (!currentUser) {
-            navigate('/signin');
-        }
-    }, [currentUser, navigate]);
-
     // Update phase info when selected date changes
     useEffect(() => {
         if (!selectedDate) {

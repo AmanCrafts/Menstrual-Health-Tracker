@@ -18,11 +18,6 @@ export default function Analytics() {
     const [hasEnoughData, setHasEnoughData] = useState(false);
 
     useEffect(() => {
-        if (!currentUser) {
-            navigate('/signin');
-            return;
-        }
-
         // Check if we have enough data to show analytics
         if (periodData && periodData.length >= 2) {
             setHasEnoughData(true);
@@ -30,7 +25,7 @@ export default function Analytics() {
         } else {
             setHasEnoughData(false);
         }
-    }, [currentUser, periodData, symptomsData, moodsData, timeRange, navigate]);
+    }, [periodData, symptomsData, moodsData, timeRange]);
 
     // Calculate all statistics
     const calculateStatistics = () => {

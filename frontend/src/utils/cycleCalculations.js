@@ -629,20 +629,6 @@ export function getCyclePhaseInfo(date, lastPeriodDate, cycleLength, periodLengt
   const isFertile = fertileWindow && isDateInRange(checkDate, fertileWindow.start, fertileWindow.end);
   const isPMS = pmsDays && isDateInRange(checkDate, pmsDays.start, pmsDays.end);
   
-  // Debug logging (remove in production)
-  console.log('Phase Detection:', {
-    checkDate: checkDate.toLocaleDateString(),
-    referencePeriod: referencePeriod.toLocaleDateString(),
-    currentCycleStart: currentCycleStart.toLocaleDateString(),
-    nextPeriod: nextPeriodFromRef.toLocaleDateString(),
-    cycleDay,
-    cycleNumber,
-    ovulationDate: ovulation?.date?.toLocaleDateString(),
-    fertileStart: fertileWindow?.start?.toLocaleDateString(),
-    fertileEnd: fertileWindow?.end?.toLocaleDateString(),
-    isPeriod, isOvulation, isFertile, isPMS
-  });
-  
   if (isPeriod) {
     phase = 'period';
     phaseInfo = {
