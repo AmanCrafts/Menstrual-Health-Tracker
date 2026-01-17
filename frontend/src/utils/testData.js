@@ -415,24 +415,25 @@ const getRandomMoodNote = (mood) => {
 };
 const getRandomHealthNote = () => Math.random() < 0.5 ? healthNotes[Math.floor(Math.random() * healthNotes.length)] : "";
 
-// Generate test users
+// Generate test users - matching the seeded database users
 export const testUsers = {
-  // User 1: Regular cycles (28 days, low variability)
+  // User 1: Sarah Johnson (28-day cycle, 5-day periods)
   user1: {
+    userId: 'sarah.johnson@example.com',
     userProfile: {
-      displayName: "Emma Thompson",
-      email: "emma.thompson@example.com",
-      age: 27,
+      displayName: "Sarah Johnson",
+      email: "sarah.johnson@example.com",
+      age: 30, // Born 1995-06-15
       height: 165,
       weight: 62,
-      lastPeriod: daysAgo(15), // 15 days ago
+      lastPeriod: daysAgo(5),
       cycleLength: 28,
       periodLength: 5,
       usingHormonal: false,
       lastUpdated: new Date().toISOString()
     },
     periodData: {
-      logs: generatePeriodLogs(daysAgo(375), 14, 28, 1, 5), // 14 cycles with 28±1 day length
+      logs: generatePeriodLogs(daysAgo(340), 12, 28, 2, 5), // 12 cycles with 28±2 day length
       lastUpdated: new Date().toISOString()
     },
     get symptomsData() {
@@ -450,22 +451,23 @@ export const testUsers = {
     }
   },
   
-  // User 2: Irregular cycles (highly variable)
+  // User 2: Emma Williams (30-day cycle, 6-day periods)
   user2: {
+    userId: 'emma.williams@example.com',
     userProfile: {
-      displayName: "Sophia Rodriguez",
-      email: "sophia.rodriguez@example.com",
-      age: 31,
+      displayName: "Emma Williams",
+      email: "emma.williams@example.com",
+      age: 27, // Born 1998-03-22
       height: 170,
       weight: 68,
-      lastPeriod: daysAgo(22), // 22 days ago
-      cycleLength: 32,
+      lastPeriod: daysAgo(12),
+      cycleLength: 30,
       periodLength: 6,
       usingHormonal: false,
       lastUpdated: new Date().toISOString()
     },
     periodData: {
-      logs: generatePeriodLogs(daysAgo(400), 12, 32, 7, 6), // 12 cycles with 32±7 day length (very irregular)
+      logs: generatePeriodLogs(daysAgo(360), 12, 30, 2, 6), // 12 cycles with 30±2 day length
       lastUpdated: new Date().toISOString()
     },
     get symptomsData() {
@@ -483,55 +485,23 @@ export const testUsers = {
     }
   },
   
-  // User 3: Short cycles
+  // User 3: Olivia Brown (26-day cycle, 4-day periods)
   user3: {
+    userId: 'olivia.brown@example.com',
     userProfile: {
-      displayName: "Olivia Chen",
-      email: "olivia.chen@example.com",
-      age: 24,
+      displayName: "Olivia Brown",
+      email: "olivia.brown@example.com",
+      age: 33, // Born 1992-11-08
       height: 160,
       weight: 54,
-      lastPeriod: daysAgo(19), // 19 days ago
-      cycleLength: 24,
+      lastPeriod: daysAgo(8),
+      cycleLength: 26,
       periodLength: 4,
-      usingHormonal: true, // On birth control
-      lastUpdated: new Date().toISOString()
-    },
-    periodData: {
-      logs: generatePeriodLogs(daysAgo(340), 15, 24, 2, 4), // 15 cycles with 24±2 day length (short cycles)
-      lastUpdated: new Date().toISOString()
-    },
-    get symptomsData() {
-      return {
-        logs: generateSymptomLogs(this.periodData.logs, this.userProfile.cycleLength),
-        lastUpdated: new Date().toISOString()
-      };
-    },
-    get notesData() {
-      return {
-        moodLogs: generateMoodLogs(this.periodData.logs, this.userProfile.cycleLength),
-        healthLogs: generateHealthLogs(this.periodData.logs, this.userProfile),
-        lastUpdated: new Date().toISOString()
-      };
-    }
-  },
-  
-  // User 4: Long cycles
-  user4: {
-    userProfile: {
-      displayName: "Amara Jackson",
-      email: "amara.jackson@example.com",
-      age: 29,
-      height: 175,
-      weight: 72,
-      lastPeriod: daysAgo(35), // 35 days ago
-      cycleLength: 36,
-      periodLength: 7,
       usingHormonal: false,
       lastUpdated: new Date().toISOString()
     },
     periodData: {
-      logs: generatePeriodLogs(daysAgo(450), 11, 36, 4, 7), // 11 cycles with 36±4 day length (long cycles)
+      logs: generatePeriodLogs(daysAgo(312), 12, 26, 2, 4), // 12 cycles with 26±2 day length (short cycles)
       lastUpdated: new Date().toISOString()
     },
     get symptomsData() {
@@ -549,27 +519,57 @@ export const testUsers = {
     }
   },
   
-  // User 5: Sparse data (missing some months)
-  user5: {
+  // User 4: Ava Davis (32-day cycle, 5-day periods)
+  user4: {
+    userId: 'ava.davis@example.com',
     userProfile: {
-      displayName: "Maya Patel",
-      email: "maya.patel@example.com",
-      age: 22,
-      height: 162,
-      weight: 58,
-      lastPeriod: daysAgo(10), // 10 days ago
-      cycleLength: 29,
+      displayName: "Ava Davis",
+      email: "ava.davis@example.com",
+      age: 29, // Born 1996-09-30
+      height: 175,
+      weight: 72,
+      lastPeriod: daysAgo(20),
+      cycleLength: 32,
       periodLength: 5,
       usingHormonal: false,
       lastUpdated: new Date().toISOString()
     },
     periodData: {
-      // Create logs with gaps (some missing months)
-      get logs() {
-        const baseLogs = generatePeriodLogs(daysAgo(390), 13, 29, 3, 5);
-        // Remove approximately 30% of the logs randomly to create gaps
-        return baseLogs.filter(() => Math.random() > 0.3);
-      },
+      logs: generatePeriodLogs(daysAgo(384), 12, 32, 2, 5), // 12 cycles with 32±2 day length (long cycles)
+      lastUpdated: new Date().toISOString()
+    },
+    get symptomsData() {
+      return {
+        logs: generateSymptomLogs(this.periodData.logs, this.userProfile.cycleLength),
+        lastUpdated: new Date().toISOString()
+      };
+    },
+    get notesData() {
+      return {
+        moodLogs: generateMoodLogs(this.periodData.logs, this.userProfile.cycleLength),
+        healthLogs: generateHealthLogs(this.periodData.logs, this.userProfile),
+        lastUpdated: new Date().toISOString()
+      };
+    }
+  },
+  
+  // User 5: Mia Martinez (29-day cycle, 7-day periods)
+  user5: {
+    userId: 'mia.martinez@example.com',
+    userProfile: {
+      displayName: "Mia Martinez",
+      email: "mia.martinez@example.com",
+      age: 31, // Born 1994-01-17
+      height: 162,
+      weight: 58,
+      lastPeriod: daysAgo(3),
+      cycleLength: 29,
+      periodLength: 7,
+      usingHormonal: false,
+      lastUpdated: new Date().toISOString()
+    },
+    periodData: {
+      logs: generatePeriodLogs(daysAgo(348), 12, 29, 2, 7), // 12 cycles with 29±2 day length
       lastUpdated: new Date().toISOString()
     },
     get symptomsData() {
@@ -606,11 +606,11 @@ export const getTestUsersList = () => {
 // Helper to get user descriptions
 const getUserDescription = (userId) => {
   switch(userId) {
-    case 'user1': return "Regular 28-day cycles";
-    case 'user2': return "Irregular cycles (variable length)";
-    case 'user3': return "Short cycles (24 days average)";
-    case 'user4': return "Long cycles (36 days average)";
-    case 'user5': return "Incomplete tracking history";
+    case 'user1': return "Regular 28-day cycles, healthy patterns";
+    case 'user2': return "Irregular cycles (possible PCOS)";
+    case 'user3': return "Short 26-day cycles, light symptoms";
+    case 'user4': return "Heavy periods, severe symptoms";
+    case 'user5': return "Athletic, active lifestyle";
     default: return "Test user";
   }
 };

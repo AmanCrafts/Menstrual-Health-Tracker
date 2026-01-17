@@ -64,25 +64,78 @@ export function DataProvider({ children }) {
         }
     }, [testMode, isDeveloper]);
 
-    // Load test data
-    const loadTestData = useCallback(() => {
+    // Load test data - authenticate as test user and fetch their real backend data
+    const loadTestData = useCallback(async () => {
         setLoading(true);
         try {
             const userData = getTestUserData(testUser);
+            const testUserEmail = userData.userProfile.email;
 
-            // Convert test data format to match API response format
-            setPeriodData(userData.periodData?.periods || []);
-            setSymptomsData(userData.symptomsData?.symptoms || []);
-            setMoodsData([]);
-            setHealthData([]);
-            setPredictions(null);
+            console.log('Switching to test user:', testUserEmail);
+
+            // Store the developer's tokens temporarily
+            const developerAccessToken = api.getAccessToken();
+            const developerRefreshToken = api.getRefreshToken();
+
+            // Login as test user (password is 'pass123' for all test users)
+            const loginResponse = await api.login(testUserEmail, 'pass123');
+
+            if (!loginResponse.success) {
+                console.error('Test user login failed:', loginResponse);
+                throw new Error('Failed to authenticate as test user');
+            }
+
+            console.log('Successfully authenticated as test user');
+
+            // Now fetch real data from backend for this test user
+            const [periodsRes, symptomsRes, moodsRes, healthRes, predictionsRes] = await Promise.all([
+                api.getPeriods().catch(err => {
+                    console.error('Error fetching periods:', err);
+                    return { success: false, error: err };
+                }),
+                api.getSymptoms().catch(err => {
+                    console.error('Error fetching symptoms:', err);
+                    return { success: false, error: err };
+                }),
+                api.getMoods().catch(err => {
+                    console.error('Error fetching moods:', err);
+                    return { success: false, error: err };
+                }),
+                api.getHealthLogs().catch(err => {
+                    console.error('Error fetching health logs:', err);
+                    return { success: false, error: err };
+                }),
+                api.getPeriodPredictions().catch(err => {
+                    console.error('Error fetching predictions:', err);
+                    return { success: false, error: err };
+                }),
+            ]);
+
+            if (periodsRes.success) setPeriodData(periodsRes.data || []);
+            if (symptomsRes.success) setSymptomsData(symptomsRes.data || []);
+            if (moodsRes.success) setMoodsData(moodsRes.data || []);
+            if (healthRes.success) setHealthData(healthRes.data || []);
+            if (predictionsRes.success) setPredictions(predictionsRes.data || null);
+
+            console.log('Loaded data:', {
+                periods: periodsRes.success ? periodsRes.data?.length : 0,
+                symptoms: symptomsRes.success ? symptomsRes.data?.length : 0,
+                moods: moodsRes.success ? moodsRes.data?.length : 0,
+                health: healthRes.success ? healthRes.data?.length : 0
+            });
 
             setError(null);
             setIsInitialized(true);
-            console.log('Test data loaded for user:', testUser);
+
+            // Restore developer tokens so they remain logged in
+            if (developerAccessToken) {
+                api.setTokens(developerAccessToken, developerRefreshToken);
+            }
+
+            console.log('Restored developer token');
         } catch (err) {
             console.error('Error loading test data:', err);
-            setError('Failed to load test data');
+            setError('Failed to load test user data from backend: ' + err.message);
         } finally {
             setLoading(false);
         }
@@ -155,8 +208,10 @@ export function DataProvider({ children }) {
 
     const addPeriodLog = async (periodLog) => {
         if (testMode) {
-            setPeriodData(prev => [...prev, { ...periodLog, _id: Date.now().toString() }]);
-            return true;
+            // In test mode, prevent modifications - it's read-only
+            setError('Cannot modify data in test mode. This is read-only.');
+            setTimeout(() => setError(null), 3000);
+            return false;
         }
 
         try {
@@ -180,8 +235,10 @@ export function DataProvider({ children }) {
 
     const updatePeriodLog = async (id, updates) => {
         if (testMode) {
-            setPeriodData(prev => prev.map(p => p._id === id ? { ...p, ...updates } : p));
-            return true;
+            // In test mode, prevent modifications - it's read-only
+            setError('Cannot modify data in test mode. This is read-only.');
+            setTimeout(() => setError(null), 3000);
+            return false;
         }
 
         try {
@@ -202,8 +259,9 @@ export function DataProvider({ children }) {
 
     const deletePeriodLog = async (id) => {
         if (testMode) {
-            setPeriodData(prev => prev.filter(p => p._id !== id));
-            return true;
+            setError('Cannot modify data in test mode. This is read-only.');
+            setTimeout(() => setError(null), 3000);
+            return false;
         }
 
         try {
@@ -228,8 +286,9 @@ export function DataProvider({ children }) {
 
     const addSymptomLog = async (symptomLog) => {
         if (testMode) {
-            setSymptomsData(prev => [...prev, { ...symptomLog, _id: Date.now().toString() }]);
-            return true;
+            setError('Cannot modify data in test mode. This is read-only.');
+            setTimeout(() => setError(null), 3000);
+            return false;
         }
 
         try {
@@ -250,8 +309,9 @@ export function DataProvider({ children }) {
 
     const updateSymptomLog = async (id, updates) => {
         if (testMode) {
-            setSymptomsData(prev => prev.map(s => s._id === id ? { ...s, ...updates } : s));
-            return true;
+            setError('Cannot modify data in test mode. This is read-only.');
+            setTimeout(() => setError(null), 3000);
+            return false;
         }
 
         try {
@@ -272,8 +332,9 @@ export function DataProvider({ children }) {
 
     const deleteSymptomLog = async (id) => {
         if (testMode) {
-            setSymptomsData(prev => prev.filter(s => s._id !== id));
-            return true;
+            setError('Cannot modify data in test mode. This is read-only.');
+            setTimeout(() => setError(null), 3000);
+            return false;
         }
 
         try {
@@ -298,8 +359,9 @@ export function DataProvider({ children }) {
 
     const addMoodLog = async (moodLog) => {
         if (testMode) {
-            setMoodsData(prev => [...prev, { ...moodLog, _id: Date.now().toString() }]);
-            return true;
+            setError('Cannot modify data in test mode. This is read-only.');
+            setTimeout(() => setError(null), 3000);
+            return false;
         }
 
         try {
@@ -320,8 +382,9 @@ export function DataProvider({ children }) {
 
     const updateMoodLog = async (id, updates) => {
         if (testMode) {
-            setMoodsData(prev => prev.map(m => m._id === id ? { ...m, ...updates } : m));
-            return true;
+            setError('Cannot modify data in test mode. This is read-only.');
+            setTimeout(() => setError(null), 3000);
+            return false;
         }
 
         try {
@@ -342,8 +405,9 @@ export function DataProvider({ children }) {
 
     const deleteMoodLog = async (id) => {
         if (testMode) {
-            setMoodsData(prev => prev.filter(m => m._id !== id));
-            return true;
+            setError('Cannot modify data in test mode. This is read-only.');
+            setTimeout(() => setError(null), 3000);
+            return false;
         }
 
         try {
@@ -368,8 +432,9 @@ export function DataProvider({ children }) {
 
     const addHealthLog = async (healthLog) => {
         if (testMode) {
-            setHealthData(prev => [...prev, { ...healthLog, _id: Date.now().toString() }]);
-            return true;
+            setError('Cannot modify data in test mode. This is read-only.');
+            setTimeout(() => setError(null), 3000);
+            return false;
         }
 
         try {
@@ -390,8 +455,9 @@ export function DataProvider({ children }) {
 
     const updateHealthLog = async (id, updates) => {
         if (testMode) {
-            setHealthData(prev => prev.map(h => h._id === id ? { ...h, ...updates } : h));
-            return true;
+            setError('Cannot modify data in test mode. This is read-only.');
+            setTimeout(() => setError(null), 3000);
+            return false;
         }
 
         try {
@@ -412,8 +478,9 @@ export function DataProvider({ children }) {
 
     const deleteHealthLog = async (id) => {
         if (testMode) {
-            setHealthData(prev => prev.filter(h => h._id !== id));
-            return true;
+            setError('Cannot modify data in test mode. This is read-only.');
+            setTimeout(() => setError(null), 3000);
+            return false;
         }
 
         try {
