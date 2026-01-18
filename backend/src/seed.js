@@ -28,6 +28,18 @@ const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + mi
 // User data templates with distinct patterns
 const users = [
   {
+    email: 'test@g.com',
+    password: 'pass123',
+    displayName: 'Demo User',
+    birthDate: new Date('1996-08-10'),
+    cycleSettings: {
+      averageCycleLength: 28,
+      averagePeriodLength: 5,
+      lastPeriodDate: getDaysAgo(7)
+    },
+    profile: 'regular' // Demo user with regular, healthy cycles
+  },
+  {
     email: 'sarah.johnson@example.com',
     password: 'pass123',
     displayName: 'Sarah Johnson',

@@ -5,7 +5,6 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
-// Token storage keys
 const ACCESS_TOKEN_KEY = 'flowsync_access_token';
 const REFRESH_TOKEN_KEY = 'flowsync_refresh_token';
 
@@ -75,11 +74,9 @@ const apiRequest = async (endpoint, options = {}) => {
     const data = await response.json();
 
     if (!response.ok) {
-      // Handle token expiration
       if (response.status === 401 && data.message === 'Token expired') {
         const refreshed = await refreshAccessToken();
         if (refreshed) {
-          // Retry the request with new token
           headers['Authorization'] = `Bearer ${getAccessToken()}`;
           const retryResponse = await fetch(`${API_BASE_URL}${endpoint}`, { ...config, headers });
           return retryResponse.json();
@@ -127,10 +124,6 @@ const refreshAccessToken = async () => {
     return false;
   }
 };
-
-// =====================
-// Authentication API
-// =====================
 
 /**
  * Register a new user

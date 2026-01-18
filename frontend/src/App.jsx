@@ -19,22 +19,25 @@ import { useAuth } from './contexts/useAuth.jsx'
 import './styles/global.css'
 import './styles/testMode.css'
 
-const DEVELOPER_EMAIL = 'theamanmalikarts@gmail.com';
+const ALLOWED_TEST_MODE_EMAILS = ['theamanmalikarts@gmail.com', 'test@g.com'];
 
 function TestModeController() {
   const { testMode, setTestMode, testUser, setTestUser } = useData();
   const { currentUser } = useAuth();
 
-  if (!currentUser || currentUser.email !== DEVELOPER_EMAIL) {
+  if (!currentUser || !ALLOWED_TEST_MODE_EMAILS.includes(currentUser.email)) {
     return null;
   }
+
+  const isDemoUser = currentUser.email === 'test@g.com';
 
   return (
     <TestModeToggle
       isEnabled={testMode}
-      onToggle={setTestMode}
+      onToggle={isDemoUser ? undefined : setTestMode}
       currentUser={testUser}
       onUserChange={setTestUser}
+      locked={isDemoUser}
     />
   );
 }
@@ -46,7 +49,6 @@ const App = () => {
         <Router>
           <Navbar />
           <Routes>
-            {/* Public routes - redirect to dashboard if already logged in */}
             <Route path="/signin" element={
               <PublicOnlyRoute>
                 <Signin />
@@ -58,7 +60,6 @@ const App = () => {
               </PublicOnlyRoute>
             } />
 
-            {/* Protected routes - require authentication */}
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
@@ -80,7 +81,6 @@ const App = () => {
               </ProtectedRoute>
             } />
 
-            {/* Public routes - accessible to everyone */}
             <Route path="/education" element={<Education />} />
             <Route path="/education/article/:articleId" element={<ArticleDetail />} />
             <Route path="/" element={<Home />} />

@@ -66,6 +66,26 @@ const Signin = () => {
     }
   }
 
+  const handleDemoLogin = async () => {
+    setError('')
+    setSuccess('')
+
+    try {
+      setLoading(true)
+      await login('test@g.com', 'pass123')
+      setSuccess('Demo login successful! Redirecting...')
+
+      setTimeout(() => {
+        navigate(from, { replace: true })
+      }, 500)
+    } catch (error) {
+      console.error('Demo login error:', error)
+      setError('Failed to login with demo account. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleGoogleSignIn = async () => {
     setError('')
     setSuccess('')
@@ -226,6 +246,17 @@ const Signin = () => {
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
             </svg>
             {loading ? 'Connecting...' : 'Continue with Google'}
+          </button>
+
+          {/* Demo Login Button */}
+          <button
+            type="button"
+            className="auth-demo-btn"
+            onClick={handleDemoLogin}
+            disabled={loading}
+          >
+            <i className="fas fa-flask"></i>
+            {loading ? 'Logging in...' : 'Demo Login (For Recruiters)'}
           </button>
 
           {/* Privacy Note */}

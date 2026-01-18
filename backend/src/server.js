@@ -7,8 +7,6 @@ import config from './config/index.js';
 import connectDB from './config/database.js';
 import logger from './utils/logger.js';
 import { notFound, errorHandler } from './middleware/errorHandler.js';
-
-// Import routes
 import {
   authRoutes,
   periodRoutes,
@@ -17,43 +15,33 @@ import {
   healthRoutes
 } from './routes/index.js';
 
-// Initialize express app
 const app = express();
-
-// Connect to MongoDB
 connectDB();
 
-// Security Middleware
 app.use(helmet());
-
-// CORS configuration
 app.use(cors(config.cors));
 
-// Rate limiting disabled during development
-// Uncomment below for production:
-// import rateLimit from 'express-rate-limit';
-// const limiter = rateLimit({
-//   windowMs: config.rateLimit.windowMs,
-//   max: config.rateLimit.max,
-//   message: {
-//     success: false,
-//     message: 'Too many requests, please try again later'
-//   }
-// });
-// app.use('/api', limiter);
+import rateLimit from 'express-rate-limit';
+const limiter = rateLimit({
+  windowMs: config.rateLimit.windowMs,
+  max: config.rateLimit.max,
+  message: {
+    success: false,
+    message: 'Too many requests, please try again later'
+  }
+});
+app.use('/api', limiter);
 
 // Body parser
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
-// HTTP request logging
 if (config.env === 'development') {
   app.use(morgan('dev'));
 } else {
   app.use(morgan('combined', { stream: logger.stream }));
 }
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
@@ -63,14 +51,12 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/periods', periodRoutes);
 app.use('/api/symptoms', symptomRoutes);
 app.use('/api/moods', moodRoutes);
 app.use('/api/health', healthRoutes);
 
-// API documentation endpoint
 app.get('/api', (req, res) => {
   res.status(200).json({
     success: true,
@@ -125,34 +111,30 @@ app.get('/api', (req, res) => {
   });
 });
 
-// Error handling
 app.use(notFound);
 app.use(errorHandler);
 
-// Start server
 const PORT = config.port;
 
 const server = app.listen(PORT, () => {
   logger.info(`
   ╔═══════════════════════════════════════════════════════════╗
   ║                                                           ║
-  ║   🌸 FlowSync API Server Started Successfully! 🌸         ║
+  ║   FlowSync API Server Started Successfully!               ║
   ║                                                           ║
-  ║   Environment: ${config.env.padEnd(40)}║
-  ║   Port: ${PORT.toString().padEnd(47)}║
-  ║   API URL: http://localhost:${PORT}/api                     ║
+  ║   Environment: ${config.env.padEnd(40)}                   ║
+  ║   Port: ${PORT.toString().padEnd(47)}                     ║
+  ║   API URL: http://localhost:${PORT}/api                   ║
   ║                                                           ║
   ╚═══════════════════════════════════════════════════════════╝
   `);
 });
 
-// Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   logger.error(`Unhandled Rejection: ${err.message}`);
   server.close(() => process.exit(1));
 });
 
-// Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
   logger.error(`Uncaught Exception: ${err.message}`);
   process.exit(1);

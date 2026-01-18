@@ -417,6 +417,44 @@ const getRandomHealthNote = () => Math.random() < 0.5 ? healthNotes[Math.floor(M
 
 // Generate test users - matching the seeded database users
 export const testUsers = {
+  // Demo User: Demo User (test@g.com)
+  demoUser: {
+    userId: 'test@g.com',
+    userProfile: {
+      displayName: "Demo User",
+      email: "test@g.com",
+      age: 29, // Born 1996-08-10
+      height: 163,
+      weight: 58,
+      lastPeriod: daysAgo(7),
+      cycleLength: 28,
+      periodLength: 5,
+      usingHormonal: false,
+      lastUpdated: new Date().toISOString()
+    },
+    periodData: {
+      logs: generatePeriodLogs(daysAgo(320), 12, 28, 1, 5), // 12 cycles with regular 28±1 day length
+      lastUpdated: new Date().toISOString()
+    },
+    get symptomsData() {
+      return {
+        logs: generateSymptomLogs(this.periodData.logs, 'moderate'),
+        lastUpdated: new Date().toISOString()
+      };
+    },
+    get moodsData() {
+      return {
+        logs: generateMoodLogs(this.periodData.logs, 'stable'),
+        lastUpdated: new Date().toISOString()
+      };
+    },
+    get healthData() {
+      return {
+        logs: generateHealthLogs(12, 58, 163, 28, 7),
+        lastUpdated: new Date().toISOString()
+      };
+    }
+  },
   // User 1: Sarah Johnson (28-day cycle, 5-day periods)
   user1: {
     userId: 'sarah.johnson@example.com',
@@ -606,6 +644,7 @@ export const getTestUsersList = () => {
 // Helper to get user descriptions
 const getUserDescription = (userId) => {
   switch(userId) {
+    case 'demoUser': return "Demo account for recruiters";
     case 'user1': return "Regular 28-day cycles, healthy patterns";
     case 'user2': return "Irregular cycles (possible PCOS)";
     case 'user3': return "Short 26-day cycles, light symptoms";

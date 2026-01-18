@@ -3,10 +3,9 @@ import { useAuth } from './useAuth';
 import * as api from '../services/api';
 import { getTestUserData } from '../utils/testData';
 
-const DEVELOPER_EMAIL = 'theamanmalikarts@gmail.com';
+const ALLOWED_TEST_MODE_EMAILS = ['theamanmalikarts@gmail.com', 'test@g.com'];
 export const DataContext = createContext();
 
-// Constants for local storage keys (used as fallback)
 const LS_TEST_MODE = 'flowsync_test_mode';
 const LS_TEST_USER = 'flowsync_test_user';
 
@@ -17,22 +16,19 @@ export function useData() {
 export function DataProvider({ children }) {
     const { currentUser, isAuthenticated } = useAuth();
 
-    // Data states
     const [periodData, setPeriodData] = useState([]);
     const [symptomsData, setSymptomsData] = useState([]);
     const [moodsData, setMoodsData] = useState([]);
     const [healthData, setHealthData] = useState([]);
     const [predictions, setPredictions] = useState(null);
 
-    // UI states
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isInitialized, setIsInitialized] = useState(false);
 
-    // Check if current user is developer
-    const isDeveloper = currentUser && currentUser.email === DEVELOPER_EMAIL;
+    const isDeveloper = currentUser && ALLOWED_TEST_MODE_EMAILS.includes(currentUser.email);
+    const isDemoUser = currentUser && currentUser.email === 'test@g.com';
 
-    // Test mode state - only available for developer
     const [testMode, setTestMode] = useState(() => {
         try {
             const saved = localStorage.getItem(LS_TEST_MODE);
@@ -44,27 +40,30 @@ export function DataProvider({ children }) {
 
     const [testUser, setTestUser] = useState(() => {
         try {
+            if (currentUser && currentUser.email === 'test@g.com') {
+                return 'demoUser';
+            }
             return localStorage.getItem(LS_TEST_USER) || 'user1';
         } catch {
             return 'user1';
         }
     });
 
-    // Ensure test mode is disabled for non-developers
     useEffect(() => {
-        if (!isDeveloper && testMode) {
+        if (isDemoUser && !testMode) {
+            setTestMode(true);
+        } else if (!isDeveloper && testMode) {
             setTestMode(false);
         }
-    }, [isDeveloper, testMode]);
+    }, [isDeveloper, isDemoUser, testMode]);
 
-    // Save test mode preferences
     useEffect(() => {
         if (isDeveloper) {
             localStorage.setItem(LS_TEST_MODE, testMode);
+            localStorage.setItem(LS_TEST_USER, testUser);
         }
-    }, [testMode, isDeveloper]);
+    }, [testMode, testUser, isDeveloper]);
 
-    // Load test data - authenticate as test user and fetch their real backend data
     const loadTestData = useCallback(async () => {
         setLoading(true);
         try {
@@ -73,11 +72,9 @@ export function DataProvider({ children }) {
 
             console.log('Switching to test user:', testUserEmail);
 
-            // Store the developer's tokens temporarily
             const developerAccessToken = api.getAccessToken();
             const developerRefreshToken = api.getRefreshToken();
 
-            // Login as test user (password is 'pass123' for all test users)
             const loginResponse = await api.login(testUserEmail, 'pass123');
 
             if (!loginResponse.success) {
@@ -87,7 +84,6 @@ export function DataProvider({ children }) {
 
             console.log('Successfully authenticated as test user');
 
-            // Now fetch real data from backend for this test user
             const [periodsRes, symptomsRes, moodsRes, healthRes, predictionsRes] = await Promise.all([
                 api.getPeriods().catch(err => {
                     console.error('Error fetching periods:', err);
@@ -127,7 +123,6 @@ export function DataProvider({ children }) {
             setError(null);
             setIsInitialized(true);
 
-            // Restore developer tokens so they remain logged in
             if (developerAccessToken) {
                 api.setTokens(developerAccessToken, developerRefreshToken);
             }
@@ -141,7 +136,6 @@ export function DataProvider({ children }) {
         }
     }, [testUser]);
 
-    // Load real data from backend
     const loadUserData = useCallback(async () => {
         if (!isAuthenticated()) {
             setLoading(false);
@@ -150,7 +144,6 @@ export function DataProvider({ children }) {
 
         setLoading(true);
         try {
-            // Load all data in parallel
             const [periodsRes, symptomsRes, moodsRes, healthRes, predictionsRes] = await Promise.all([
                 api.getPeriods().catch(err => ({ success: false, error: err })),
                 api.getSymptoms().catch(err => ({ success: false, error: err })),
@@ -280,9 +273,6 @@ export function DataProvider({ children }) {
         }
     };
 
-    // =====================
-    // Symptom Data Functions
-    // =====================
 
     const addSymptomLog = async (symptomLog) => {
         if (testMode) {
@@ -353,9 +343,6 @@ export function DataProvider({ children }) {
         }
     };
 
-    // =====================
-    // Mood Data Functions
-    // =====================
 
     const addMoodLog = async (moodLog) => {
         if (testMode) {
@@ -426,9 +413,6 @@ export function DataProvider({ children }) {
         }
     };
 
-    // =====================
-    // Health Data Functions
-    // =====================
 
     const addHealthLog = async (healthLog) => {
         if (testMode) {
@@ -498,10 +482,6 @@ export function DataProvider({ children }) {
             setLoading(false);
         }
     };
-
-    // =====================
-    // Export & Utility Functions
-    // =====================
 
     const exportUserData = async () => {
         try {

@@ -74,6 +74,20 @@ input:checked + .toggle-slider:before {
   transform: translateX(22px);
 }
 
+/* Locked state for test mode toggle */
+.toggle-switch.locked {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.toggle-switch.locked input {
+  cursor: not-allowed;
+}
+
+.toggle-switch.locked .toggle-slider {
+  cursor: not-allowed;
+}
+
 .toggle-label {
   font-size: var(--text-sm);
   font-weight: 600;

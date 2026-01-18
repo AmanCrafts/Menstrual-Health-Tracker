@@ -11,16 +11,12 @@ export const protect = async (req, res, next) => {
   try {
     let token;
 
-    // Check for token in Authorization header
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
-    }
-    // Also check for token in cookies
-    else if (req.cookies && req.cookies.token) {
+    } else if (req.cookies && req.cookies.token) {
       token = req.cookies.token;
     }
 
-    // Check if token exists
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -29,10 +25,8 @@ export const protect = async (req, res, next) => {
     }
 
     try {
-      // Verify token
       const decoded = jwt.verify(token, config.jwt.secret);
 
-      // Get user from token
       const user = await User.findById(decoded.id);
 
       if (!user) {
@@ -49,7 +43,6 @@ export const protect = async (req, res, next) => {
         });
       }
 
-      // Attach user to request
       req.user = user;
       next();
     } catch (err) {

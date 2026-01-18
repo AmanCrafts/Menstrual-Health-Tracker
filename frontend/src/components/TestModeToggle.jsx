@@ -4,7 +4,7 @@ import { getTestUsersList } from '../utils/testData';
 /**
  * A component that provides a toggle for test mode and test user selection
  */
-export default function TestModeToggle({ isEnabled, onToggle, currentUser, onUserChange }) {
+export default function TestModeToggle({ isEnabled, onToggle, currentUser, onUserChange, locked = false }) {
     const [testUsers, setTestUsers] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -15,7 +15,10 @@ export default function TestModeToggle({ isEnabled, onToggle, currentUser, onUse
     }, [isEnabled]);
 
     const toggleTestMode = () => {
-        onToggle(!isEnabled);
+        // Don't allow toggling if locked
+        if (!locked && onToggle) {
+            onToggle(!isEnabled);
+        }
     };
 
     const handleUserChange = (userId) => {
@@ -26,15 +29,18 @@ export default function TestModeToggle({ isEnabled, onToggle, currentUser, onUse
     return (
         <div className="test-mode-container">
             <div className="test-mode-toggle">
-                <label className="toggle-switch">
+                <label className={`toggle-switch ${locked ? 'locked' : ''}`}>
                     <input
                         type="checkbox"
                         checked={isEnabled}
                         onChange={toggleTestMode}
+                        disabled={locked}
                     />
                     <span className="toggle-slider"></span>
                 </label>
-                <span className="toggle-label">Test Mode</span>
+                <span className="toggle-label">
+                    Test Mode {locked && <i className="fas fa-lock" style={{ fontSize: '12px', marginLeft: '4px', opacity: 0.7 }}></i>}
+                </span>
             </div>
 
             {isEnabled && (
