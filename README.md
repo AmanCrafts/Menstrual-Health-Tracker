@@ -77,26 +77,12 @@
 
 ### Frontend
 
-| Technology     | Purpose                                            |
-| -------------- | -------------------------------------------------- |
-| React 19       | UI framework with hooks and context API            |
-| React Router 7 | Client-side routing and navigation                 |
-| Vite 6         | Lightning-fast build tool and dev server           |
-| React Calendar | Interactive calendar component                     |
-| CSS3           | Custom styling with CSS variables and flexbox/grid |
-
-### Backend
-
 | Technology   | Purpose                                    |
 | ------------ | ------------------------------------------ |
 | Node.js 18+  | JavaScript runtime environment             |
-| Express.js 4 | Web application framework                  |
-| MongoDB      | NoSQL database for flexible data storage   |
-| Mongoose     | ODM for MongoDB with schema validation     |
 | JWT          | Secure authentication with JSON Web Tokens |
 | bcryptjs     | Password hashing and encryption            |
 
-### DevOps & Tooling
 
 | Technology             | Purpose                                  |
 | ---------------------- | ---------------------------------------- |
@@ -107,6 +93,7 @@
 | **Winston**            | Application-level logging                |
 | **Express Validator**  | Request validation middleware            |
 | **Express Rate Limit** | API rate limiting                        |
+
 
 ### API Architecture
 
