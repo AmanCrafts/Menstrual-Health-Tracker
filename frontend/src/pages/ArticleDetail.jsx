@@ -5,7 +5,7 @@ import '../styles/education.css';
 
 export default function ArticleDetail() {
     const { articleId } = useParams();
-    const article = articleContent.find(a => a.id === articleId);
+    const article = articleContent.find((a) => a.id === articleId);
 
     if (!article) {
         return <Navigate to="/education" replace />;

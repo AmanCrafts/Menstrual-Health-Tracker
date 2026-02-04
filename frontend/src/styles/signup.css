@@ -43,7 +43,7 @@
     right: -50%;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
     animation: float 6s ease-in-out infinite;
 }
 
@@ -54,7 +54,7 @@
     left: -30%;
     width: 80%;
     height: 80%;
-    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
     animation: float 8s ease-in-out infinite reverse;
 }
 
@@ -94,7 +94,7 @@
 }
 
 .split-form .form-side h2::after {
-    content: "";
+    content: '';
     position: absolute;
     left: 0;
     bottom: -8px;
@@ -164,12 +164,7 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-        120deg,
-        transparent,
-        rgba(255, 255, 255, 0.3),
-        transparent
-    );
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     transition: all 0.5s;
 }
 
@@ -204,7 +199,7 @@
 
 .divider::before,
 .divider::after {
-    content: "";
+    content: '';
     flex: 1;
     height: 2px;
     background: var(--border-light);
@@ -243,11 +238,11 @@
     .split-form .image-side {
         padding: var(--spacing-xl);
     }
-    
+
     .split-form .form-side {
         padding: var(--spacing-xl);
     }
-    
+
     .split-form .image-side h2 {
         font-size: var(--text-xl);
     }
@@ -257,12 +252,12 @@
     .split-form {
         margin: var(--spacing-md);
     }
-    
+
     .split-form .image-side {
         padding: var(--spacing-lg);
         min-height: 200px;
     }
-    
+
     .split-form .form-side {
         padding: var(--spacing-lg);
     }

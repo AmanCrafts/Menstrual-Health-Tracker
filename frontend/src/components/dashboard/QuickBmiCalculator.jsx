@@ -21,7 +21,7 @@ export default function QuickBmiCalculator() {
             updateUserProfile({
                 ...userProfile,
                 height: parseFloat(height),
-                weight: parseFloat(weight)
+                weight: parseFloat(weight),
             });
         }
     };
@@ -32,11 +32,10 @@ export default function QuickBmiCalculator() {
 
             {bmi ? (
                 <div className="bmi-result">
-                    <p>Your BMI: <strong>{bmi}</strong></p>
-                    <button
-                        onClick={() => setBmi(null)}
-                        className="small-button"
-                    >
+                    <p>
+                        Your BMI: <strong>{bmi}</strong>
+                    </p>
+                    <button onClick={() => setBmi(null)} className="small-button">
                         Recalculate
                     </button>
                 </div>

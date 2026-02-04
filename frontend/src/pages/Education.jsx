@@ -10,12 +10,13 @@ export default function Education() {
         { id: 'all', name: 'All Articles' },
         { id: 'Menstrual Health', name: 'Menstrual Health' },
         { id: 'Periods', name: 'Periods' },
-        { id: 'Reproductive Health', name: 'Reproductive Health' }
+        { id: 'Reproductive Health', name: 'Reproductive Health' },
     ];
 
-    const filteredArticles = selectedCategory === 'all'
-        ? articleContent
-        : articleContent.filter(article => article.category === selectedCategory);
+    const filteredArticles =
+        selectedCategory === 'all'
+            ? articleContent
+            : articleContent.filter((article) => article.category === selectedCategory);
 
     return (
         <div className="education-container">
@@ -25,7 +26,7 @@ export default function Education() {
             </div>
 
             <div className="category-filter">
-                {categories.map(category => (
+                {categories.map((category) => (
                     <button
                         key={category.id}
                         className={`category-button ${selectedCategory === category.id ? 'active' : ''}`}
@@ -37,7 +38,7 @@ export default function Education() {
             </div>
 
             <div className="article-grid">
-                {filteredArticles.map(article => (
+                {filteredArticles.map((article) => (
                     <Link
                         to={`/education/article/${article.id}`}
                         key={article.id}

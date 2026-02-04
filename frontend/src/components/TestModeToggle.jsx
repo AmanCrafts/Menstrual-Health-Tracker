@@ -4,7 +4,13 @@ import { getTestUsersList } from '../utils/testData';
 /**
  * A component that provides a toggle for test mode and test user selection
  */
-export default function TestModeToggle({ isEnabled, onToggle, currentUser, onUserChange, locked = false }) {
+export default function TestModeToggle({
+    isEnabled,
+    onToggle,
+    currentUser,
+    onUserChange,
+    locked = false,
+}) {
     const [testUsers, setTestUsers] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -39,25 +45,29 @@ export default function TestModeToggle({ isEnabled, onToggle, currentUser, onUse
                     <span className="toggle-slider"></span>
                 </label>
                 <span className="toggle-label">
-                    Test Mode {locked && <i className="fas fa-lock" style={{ fontSize: '12px', marginLeft: '4px', opacity: 0.7 }}></i>}
+                    Test Mode{' '}
+                    {locked && (
+                        <i
+                            className="fas fa-lock"
+                            style={{ fontSize: '12px', marginLeft: '4px', opacity: 0.7 }}
+                        ></i>
+                    )}
                 </span>
             </div>
 
             {isEnabled && (
                 <div className="test-user-selector">
-                    <button
-                        className="test-user-button"
-                        onClick={() => setIsOpen(!isOpen)}
-                    >
+                    <button className="test-user-button" onClick={() => setIsOpen(!isOpen)}>
                         <span className="current-user">
-                            {testUsers.find(u => u.id === currentUser)?.name || 'Select Test User'}
+                            {testUsers.find((u) => u.id === currentUser)?.name ||
+                                'Select Test User'}
                         </span>
                         <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'}`}></i>
                     </button>
 
                     {isOpen && (
                         <div className="test-user-dropdown">
-                            {testUsers.map(user => (
+                            {testUsers.map((user) => (
                                 <div
                                     key={user.id}
                                     className={`test-user-option ${currentUser === user.id ? 'active' : ''}`}

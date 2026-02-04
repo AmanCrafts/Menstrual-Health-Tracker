@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/useAuth';
 import { useData } from '../contexts/DataContext';
 import Calendar from '../components/trackers/Calendar';
@@ -13,7 +13,6 @@ import { getCyclePhaseInfo } from '../utils/cycleCalculations';
 import '../styles/trackers.css';
 
 export default function Trackers() {
-    const navigate = useNavigate();
     const location = useLocation();
     const { currentUser } = useAuth();
     const {
@@ -34,7 +33,7 @@ export default function Trackers() {
         updateHealthLog,
         deleteHealthLog,
         loading,
-        error
+        error,
     } = useData();
 
     const [activeTab, setActiveTab] = useState('period');
@@ -68,8 +67,8 @@ export default function Trackers() {
 
         if (periodData && periodData.length > 0) {
             // Sort to get the most recent period
-            const sortedPeriods = [...periodData].sort((a, b) =>
-                new Date(b.startDate) - new Date(a.startDate)
+            const sortedPeriods = [...periodData].sort(
+                (a, b) => new Date(b.startDate) - new Date(a.startDate)
             );
             const lastPeriodDate = new Date(sortedPeriods[0].startDate);
             lastPeriodDate.setHours(0, 0, 0, 0);
@@ -114,8 +113,10 @@ export default function Trackers() {
     const handlePeriodSubmit = async (formData) => {
         try {
             // Check if a period log already exists for this start date
-            const existingLog = periodData.find(log =>
-                new Date(log.startDate).toDateString() === new Date(formData.startDate).toDateString()
+            const existingLog = periodData.find(
+                (log) =>
+                    new Date(log.startDate).toDateString() ===
+                    new Date(formData.startDate).toDateString()
             );
 
             if (existingLog) {
@@ -137,8 +138,9 @@ export default function Trackers() {
     const handleSymptomSubmit = async (formData) => {
         try {
             // Check if a symptom log already exists for this date
-            const existingLog = symptomsData.find(log =>
-                new Date(log.date).toDateString() === new Date(formData.date).toDateString()
+            const existingLog = symptomsData.find(
+                (log) =>
+                    new Date(log.date).toDateString() === new Date(formData.date).toDateString()
             );
 
             if (existingLog) {
@@ -160,8 +162,9 @@ export default function Trackers() {
     const handleMoodSubmit = async (formData) => {
         try {
             // Check if a mood log already exists for this date
-            const existingLog = moodsData.find(log =>
-                new Date(log.date).toDateString() === new Date(formData.date).toDateString()
+            const existingLog = moodsData.find(
+                (log) =>
+                    new Date(log.date).toDateString() === new Date(formData.date).toDateString()
             );
 
             if (existingLog) {
@@ -183,8 +186,9 @@ export default function Trackers() {
     const handleHealthSubmit = async (formData) => {
         try {
             // Check if a health log already exists for this date
-            const existingLog = healthData.find(log =>
-                new Date(log.date).toDateString() === new Date(formData.date).toDateString()
+            const existingLog = healthData.find(
+                (log) =>
+                    new Date(log.date).toDateString() === new Date(formData.date).toDateString()
             );
 
             if (existingLog) {
@@ -222,7 +226,9 @@ export default function Trackers() {
                     break;
             }
 
-            setSuccessMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} log deleted successfully!`);
+            setSuccessMessage(
+                `${type.charAt(0).toUpperCase() + type.slice(1)} log deleted successfully!`
+            );
             setTimeout(() => setSuccessMessage(''), 3000);
         } catch (err) {
             console.error(`Error deleting ${type} log:`, err);
@@ -240,7 +246,9 @@ export default function Trackers() {
 
             <div className="trackers-header">
                 <h1>Track Your Health</h1>
-                <p className="trackers-subtitle">Monitor your cycle, symptoms, mood, and overall wellness</p>
+                <p className="trackers-subtitle">
+                    Monitor your cycle, symptoms, mood, and overall wellness
+                </p>
             </div>
 
             {/* Phase Status Banner - Horizontal */}
@@ -248,11 +256,19 @@ export default function Trackers() {
                 <div className={`phase-banner ${phaseInfo.phase}`}>
                     <div className="phase-banner-main">
                         <div className="phase-banner-icon">
-                            <i className={`fas ${phaseInfo.phase === 'period' ? 'fa-tint' :
-                                phaseInfo.phase === 'ovulation' ? 'fa-star' :
-                                    phaseInfo.phase === 'fertile' ? 'fa-heart' :
-                                        phaseInfo.phase === 'pms' ? 'fa-cloud' : 'fa-leaf'
-                                }`}></i>
+                            <i
+                                className={`fas ${
+                                    phaseInfo.phase === 'period'
+                                        ? 'fa-tint'
+                                        : phaseInfo.phase === 'ovulation'
+                                          ? 'fa-star'
+                                          : phaseInfo.phase === 'fertile'
+                                            ? 'fa-heart'
+                                            : phaseInfo.phase === 'pms'
+                                              ? 'fa-cloud'
+                                              : 'fa-leaf'
+                                }`}
+                            ></i>
                         </div>
                         <div className="phase-banner-info">
                             <span className="phase-banner-label">Current Phase</span>
@@ -268,12 +284,16 @@ export default function Trackers() {
                         </div>
                         <div className="phase-stat-divider"></div>
                         <div className="phase-stat">
-                            <span className="phase-stat-value">{phaseInfo.daysUntilPeriod > 0 ? phaseInfo.daysUntilPeriod : '—'}</span>
+                            <span className="phase-stat-value">
+                                {phaseInfo.daysUntilPeriod > 0 ? phaseInfo.daysUntilPeriod : '—'}
+                            </span>
                             <span className="phase-stat-label">Days to Period</span>
                         </div>
                         <div className="phase-stat-divider"></div>
                         <div className="phase-stat">
-                            <span className="phase-stat-value">{phaseInfo.info.energy?.split(' ')[0] || 'Moderate'}</span>
+                            <span className="phase-stat-value">
+                                {phaseInfo.info.energy?.split(' ')[0] || 'Moderate'}
+                            </span>
                             <span className="phase-stat-label">Energy</span>
                         </div>
                         {(phaseInfo.isFertile || phaseInfo.isOvulation) && (
@@ -281,32 +301,37 @@ export default function Trackers() {
                                 <div className="phase-stat-divider"></div>
                                 <div className="phase-stat fertility-stat">
                                     <span className="phase-stat-value">
-                                        <i className="fas fa-heart"></i> {phaseInfo.isOvulation ? 'Peak' : 'High'}
+                                        <i className="fas fa-heart"></i>{' '}
+                                        {phaseInfo.isOvulation ? 'Peak' : 'High'}
                                     </span>
                                     <span className="phase-stat-label">Fertility</span>
                                 </div>
                             </>
                         )}
                         {/* Ovulation-specific: Days until ovulation */}
-                        {!phaseInfo.isOvulation && !phaseInfo.isPeriod && phaseInfo.ovulationDate && (
-                            <>
-                                <div className="phase-stat-divider"></div>
-                                <div className="phase-stat ovulation-stat">
-                                    <span className="phase-stat-value">
-                                        <i className="fas fa-star"></i>
-                                        {(() => {
-                                            const checkDate = new Date(selectedDate);
-                                            checkDate.setHours(0, 0, 0, 0);
-                                            const ovDate = new Date(phaseInfo.ovulationDate);
-                                            ovDate.setHours(0, 0, 0, 0);
-                                            const diff = Math.round((ovDate - checkDate) / (1000 * 60 * 60 * 24));
-                                            return diff > 0 ? diff : '—';
-                                        })()}
-                                    </span>
-                                    <span className="phase-stat-label">Days to Ovulation</span>
-                                </div>
-                            </>
-                        )}
+                        {!phaseInfo.isOvulation &&
+                            !phaseInfo.isPeriod &&
+                            phaseInfo.ovulationDate && (
+                                <>
+                                    <div className="phase-stat-divider"></div>
+                                    <div className="phase-stat ovulation-stat">
+                                        <span className="phase-stat-value">
+                                            <i className="fas fa-star"></i>
+                                            {(() => {
+                                                const checkDate = new Date(selectedDate);
+                                                checkDate.setHours(0, 0, 0, 0);
+                                                const ovDate = new Date(phaseInfo.ovulationDate);
+                                                ovDate.setHours(0, 0, 0, 0);
+                                                const diff = Math.round(
+                                                    (ovDate - checkDate) / (1000 * 60 * 60 * 24)
+                                                );
+                                                return diff > 0 ? diff : '—';
+                                            })()}
+                                        </span>
+                                        <span className="phase-stat-label">Days to Ovulation</span>
+                                    </div>
+                                </>
+                            )}
                         {/* Fertile window: Days remaining */}
                         {phaseInfo.isFertile && phaseInfo.fertileWindow && (
                             <>
@@ -318,7 +343,9 @@ export default function Trackers() {
                                             checkDate.setHours(0, 0, 0, 0);
                                             const endDate = new Date(phaseInfo.fertileWindow.end);
                                             endDate.setHours(0, 0, 0, 0);
-                                            const diff = Math.round((endDate - checkDate) / (1000 * 60 * 60 * 24));
+                                            const diff = Math.round(
+                                                (endDate - checkDate) / (1000 * 60 * 60 * 24)
+                                            );
                                             return diff >= 0 ? diff + 1 : 0;
                                         })()}
                                     </span>
@@ -339,7 +366,9 @@ export default function Trackers() {
                     </h3>
                     <div className="fertility-predictions-grid">
                         {phaseInfo.ovulationDate && (
-                            <div className={`prediction-item ovulation-prediction ${phaseInfo.isOvulation ? 'active' : ''}`}>
+                            <div
+                                className={`prediction-item ovulation-prediction ${phaseInfo.isOvulation ? 'active' : ''}`}
+                            >
                                 <div className="prediction-icon">
                                     <i className="fas fa-star"></i>
                                 </div>
@@ -351,16 +380,20 @@ export default function Trackers() {
                                         ) : (
                                             phaseInfo.ovulationDate.toLocaleDateString('en-US', {
                                                 month: 'short',
-                                                day: 'numeric'
+                                                day: 'numeric',
                                             })
                                         )}
                                     </span>
-                                    <span className="prediction-desc">Peak fertility - egg release</span>
+                                    <span className="prediction-desc">
+                                        Peak fertility - egg release
+                                    </span>
                                 </div>
                             </div>
                         )}
                         {phaseInfo.fertileWindow && (
-                            <div className={`prediction-item fertile-prediction ${phaseInfo.isFertile ? 'active' : ''}`}>
+                            <div
+                                className={`prediction-item fertile-prediction ${phaseInfo.isFertile ? 'active' : ''}`}
+                            >
                                 <div className="prediction-icon">
                                     <i className="fas fa-heart"></i>
                                 </div>
@@ -371,29 +404,36 @@ export default function Trackers() {
                                             <span className="prediction-active">Now</span>
                                         ) : (
                                             <>
-                                                {phaseInfo.fertileWindow.start.toLocaleDateString('en-US', {
-                                                    month: 'short',
-                                                    day: 'numeric'
-                                                })}
+                                                {phaseInfo.fertileWindow.start.toLocaleDateString(
+                                                    'en-US',
+                                                    {
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                    }
+                                                )}
                                                 {' - '}
-                                                {phaseInfo.fertileWindow.end.toLocaleDateString('en-US', {
-                                                    month: 'short',
-                                                    day: 'numeric'
-                                                })}
+                                                {phaseInfo.fertileWindow.end.toLocaleDateString(
+                                                    'en-US',
+                                                    {
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                    }
+                                                )}
                                             </>
                                         )}
                                     </span>
                                     <span className="prediction-desc">
                                         {phaseInfo.isFertile
                                             ? 'You are currently in your fertile window'
-                                            : '~6 days of higher fertility'
-                                        }
+                                            : '~6 days of higher fertility'}
                                     </span>
                                 </div>
                             </div>
                         )}
                         {phaseInfo.nextPeriod && (
-                            <div className={`prediction-item period-prediction ${phaseInfo.isPeriod ? 'active' : ''}`}>
+                            <div
+                                className={`prediction-item period-prediction ${phaseInfo.isPeriod ? 'active' : ''}`}
+                            >
                                 <div className="prediction-icon">
                                     <i className="fas fa-calendar-alt"></i>
                                 </div>
@@ -405,15 +445,14 @@ export default function Trackers() {
                                         ) : (
                                             phaseInfo.nextPeriod.toLocaleDateString('en-US', {
                                                 month: 'short',
-                                                day: 'numeric'
+                                                day: 'numeric',
                                             })
                                         )}
                                     </span>
                                     <span className="prediction-desc">
                                         {phaseInfo.isPeriod
                                             ? 'You are on your period'
-                                            : `In ${phaseInfo.daysUntilPeriod} days`
-                                        }
+                                            : `In ${phaseInfo.daysUntilPeriod} days`}
                                     </span>
                                 </div>
                             </div>
@@ -441,7 +480,7 @@ export default function Trackers() {
                             {selectedDate.toLocaleDateString('en-US', {
                                 weekday: 'long',
                                 month: 'long',
-                                day: 'numeric'
+                                day: 'numeric',
                             })}
                         </span>
                     </div>
@@ -449,7 +488,11 @@ export default function Trackers() {
 
                 {/* Trackers Section */}
                 <div className="trackers-section">
-                    <div className="tracker-tabs" role="tablist" aria-label="Health tracking categories">
+                    <div
+                        className="tracker-tabs"
+                        role="tablist"
+                        aria-label="Health tracking categories"
+                    >
                         <button
                             type="button"
                             role="tab"

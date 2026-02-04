@@ -2,10 +2,17 @@ import { useState, useEffect } from 'react';
 import {
     calculateFertileWindow,
     calculateOvulation,
-    calculateFuturePeriods
+    calculateFuturePeriods,
 } from '../../utils/cycleCalculations';
 
-export default function Calendar({ selectedDate, onDateSelect, cycleLogs, symptomLogs, moodLogs, userProfile }) {
+export default function Calendar({
+    selectedDate,
+    onDateSelect,
+    cycleLogs,
+    symptomLogs,
+    moodLogs,
+    userProfile,
+}) {
     const [calendarDays, setCalendarDays] = useState([]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
 
@@ -49,7 +56,7 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                 isPms: false,
                 isPredictor: false,
                 isLogged: false,
-                hasEntries: false
+                hasEntries: false,
             });
         }
 
@@ -71,7 +78,7 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                 isPms: false,
                 isPredictor: false,
                 isLogged: false,
-                hasEntries: false
+                hasEntries: false,
             });
         }
 
@@ -89,13 +96,13 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                 isPms: false,
                 isPredictor: false,
                 isLogged: false,
-                hasEntries: false
+                hasEntries: false,
             });
         }
 
         // Mark logged period days
         if (cycleLogs && cycleLogs.length > 0) {
-            cycleLogs.forEach(log => {
+            cycleLogs.forEach((log) => {
                 const startDate = new Date(log.startDate);
                 startDate.setHours(0, 0, 0, 0);
                 let endDate;
@@ -108,7 +115,7 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                 }
                 endDate.setHours(0, 0, 0, 0);
 
-                days.forEach(day => {
+                days.forEach((day) => {
                     const dayDate = new Date(day.date);
                     dayDate.setHours(0, 0, 0, 0);
                     if (dayDate >= startDate && dayDate <= endDate) {
@@ -123,8 +130,8 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
         let lastPeriodDate = null;
         if (cycleLogs && cycleLogs.length > 0) {
             // Sort to get most recent period
-            const sortedLogs = [...cycleLogs].sort((a, b) =>
-                new Date(b.startDate) - new Date(a.startDate)
+            const sortedLogs = [...cycleLogs].sort(
+                (a, b) => new Date(b.startDate) - new Date(a.startDate)
             );
             lastPeriodDate = new Date(sortedLogs[0].startDate);
         } else if (userProfile?.lastPeriod) {
@@ -141,7 +148,7 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
             const futurePeriods = calculateFuturePeriods(lastPeriodDate, cycleLength, cycleLogs, 3);
 
             // For each predicted period, mark the days
-            futurePeriods.forEach(prediction => {
+            futurePeriods.forEach((prediction) => {
                 // Handle both old format (Date) and new format (object with predictedDate)
                 const periodStartDate = prediction.predictedDate || prediction;
 
@@ -157,7 +164,7 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                     periodDay.setDate(periodStart.getDate() + i);
                     periodDay.setHours(0, 0, 0, 0);
 
-                    days.forEach(day => {
+                    days.forEach((day) => {
                         const dayDate = new Date(day.date);
                         dayDate.setHours(0, 0, 0, 0);
                         if (dayDate.toDateString() === periodDay.toDateString() && !day.isLogged) {
@@ -177,7 +184,7 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                     const fertileEnd = new Date(fertileWindow.end);
                     fertileEnd.setHours(0, 0, 0, 0);
 
-                    days.forEach(day => {
+                    days.forEach((day) => {
                         const dayDate = new Date(day.date);
                         dayDate.setHours(0, 0, 0, 0);
                         if (dayDate >= fertileStart && dayDate <= fertileEnd && !day.isPeriod) {
@@ -195,7 +202,7 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                     const ovDate = new Date(ovulationDate);
                     ovDate.setHours(0, 0, 0, 0);
 
-                    days.forEach(day => {
+                    days.forEach((day) => {
                         const dayDate = new Date(day.date);
                         dayDate.setHours(0, 0, 0, 0);
                         if (dayDate.toDateString() === ovDate.toDateString()) {
@@ -215,11 +222,16 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                 pmsEnd.setHours(0, 0, 0, 0);
 
                 // Mark PMS days (only if not marked as something else)
-                days.forEach(day => {
+                days.forEach((day) => {
                     const dayDate = new Date(day.date);
                     dayDate.setHours(0, 0, 0, 0);
-                    if (dayDate >= pmsStart && dayDate <= pmsEnd &&
-                        !day.isPeriod && !day.isFertileWindow && !day.isOvulation) {
+                    if (
+                        dayDate >= pmsStart &&
+                        dayDate <= pmsEnd &&
+                        !day.isPeriod &&
+                        !day.isFertileWindow &&
+                        !day.isOvulation
+                    ) {
                         day.isPms = true;
                     }
                 });
@@ -238,7 +250,7 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                 const fertileEnd = new Date(currentFertile.end);
                 fertileEnd.setHours(0, 0, 0, 0);
 
-                days.forEach(day => {
+                days.forEach((day) => {
                     const dayDate = new Date(day.date);
                     dayDate.setHours(0, 0, 0, 0);
                     if (dayDate >= fertileStart && dayDate <= fertileEnd && !day.isPeriod) {
@@ -253,7 +265,7 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
                 const ovDate = new Date(currentOvulation.date);
                 ovDate.setHours(0, 0, 0, 0);
 
-                days.forEach(day => {
+                days.forEach((day) => {
                     const dayDate = new Date(day.date);
                     dayDate.setHours(0, 0, 0, 0);
                     if (dayDate.toDateString() === ovDate.toDateString()) {
@@ -272,11 +284,16 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
             currentPmsEnd.setDate(nextPeriodDate.getDate() - 1);
             currentPmsEnd.setHours(0, 0, 0, 0);
 
-            days.forEach(day => {
+            days.forEach((day) => {
                 const dayDate = new Date(day.date);
                 dayDate.setHours(0, 0, 0, 0);
-                if (dayDate >= currentPmsStart && dayDate <= currentPmsEnd &&
-                    !day.isPeriod && !day.isFertileWindow && !day.isOvulation) {
+                if (
+                    dayDate >= currentPmsStart &&
+                    dayDate <= currentPmsEnd &&
+                    !day.isPeriod &&
+                    !day.isFertileWindow &&
+                    !day.isOvulation
+                ) {
                     day.isPms = true;
                 }
             });
@@ -284,9 +301,9 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
 
         // Mark days with entries (symptoms, moods)
         if (symptomLogs && symptomLogs.length > 0) {
-            symptomLogs.forEach(log => {
+            symptomLogs.forEach((log) => {
                 const logDate = new Date(log.date);
-                days.forEach(day => {
+                days.forEach((day) => {
                     if (day.date.toDateString() === logDate.toDateString()) {
                         day.hasEntries = true;
                     }
@@ -295,9 +312,9 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
         }
 
         if (moodLogs && moodLogs.length > 0) {
-            moodLogs.forEach(log => {
+            moodLogs.forEach((log) => {
                 const logDate = new Date(log.date);
-                days.forEach(day => {
+                days.forEach((day) => {
                     if (day.date.toDateString() === logDate.toDateString()) {
                         day.hasEntries = true;
                     }
@@ -310,7 +327,7 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
 
     // Handle month navigation
     const goToPreviousMonth = () => {
-        setCurrentMonth(prevMonth => {
+        setCurrentMonth((prevMonth) => {
             const newMonth = new Date(prevMonth);
             newMonth.setMonth(prevMonth.getMonth() - 1);
             return newMonth;
@@ -318,7 +335,7 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
     };
 
     const goToNextMonth = () => {
-        setCurrentMonth(prevMonth => {
+        setCurrentMonth((prevMonth) => {
             const newMonth = new Date(prevMonth);
             newMonth.setMonth(prevMonth.getMonth() + 1);
             return newMonth;
@@ -335,16 +352,10 @@ export default function Calendar({ selectedDate, onDateSelect, cycleLogs, sympto
             <div className="calendar-header">
                 <div className="calendar-month">{formatMonth(currentMonth)}</div>
                 <div className="calendar-controls">
-                    <button
-                        className="calendar-control-btn"
-                        onClick={goToPreviousMonth}
-                    >
+                    <button className="calendar-control-btn" onClick={goToPreviousMonth}>
                         <i className="fas fa-chevron-left"></i>
                     </button>
-                    <button
-                        className="calendar-control-btn"
-                        onClick={goToNextMonth}
-                    >
+                    <button className="calendar-control-btn" onClick={goToNextMonth}>
                         <i className="fas fa-chevron-right"></i>
                     </button>
                 </div>

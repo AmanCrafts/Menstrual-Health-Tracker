@@ -23,12 +23,12 @@ export default function MoodTracker({ selectedDate, moodLogs, onSubmit, onDelete
     const formatDateForInput = (date) => {
         if (!date) return '';
         const d = new Date(date);
-        let month = '' + (d.getMonth() + 1);
-        let day = '' + d.getDate();
+        let month = `${d.getMonth() + 1}`;
+        let day = `${d.getDate()}`;
         const year = d.getFullYear();
 
-        if (month.length < 2) month = '0' + month;
-        if (day.length < 2) day = '0' + day;
+        if (month.length < 2) month = `0${month}`;
+        if (day.length < 2) day = `0${day}`;
 
         return [year, month, day].join('-');
     };
@@ -39,8 +39,8 @@ export default function MoodTracker({ selectedDate, moodLogs, onSubmit, onDelete
             setDate(formatDateForInput(selectedDate));
 
             // Check if there's an existing log for this date
-            const existingMoodLog = moodLogs?.find(log =>
-                new Date(log.date).toDateString() === new Date(selectedDate).toDateString()
+            const existingMoodLog = moodLogs?.find(
+                (log) => new Date(log.date).toDateString() === new Date(selectedDate).toDateString()
             );
 
             if (existingMoodLog) {
@@ -70,7 +70,7 @@ export default function MoodTracker({ selectedDate, moodLogs, onSubmit, onDelete
             date,
             mood,
             energy,
-            notes
+            notes,
         };
 
         onSubmit(moodData);
@@ -88,12 +88,15 @@ export default function MoodTracker({ selectedDate, moodLogs, onSubmit, onDelete
         <div className="mood-tracker">
             <h2>Mood Tracker</h2>
             <p className="selected-date-display">
-                Selected Date: {selectedDate ? selectedDate.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }) : ''}
+                Selected Date:{' '}
+                {selectedDate
+                    ? selectedDate.toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                      })
+                    : ''}
             </p>
 
             <form onSubmit={handleSubmit} className="tracker-form">
@@ -160,11 +163,7 @@ export default function MoodTracker({ selectedDate, moodLogs, onSubmit, onDelete
                     </button>
 
                     {existingLog && (
-                        <button
-                            type="button"
-                            className="delete-button"
-                            onClick={handleDelete}
-                        >
+                        <button type="button" className="delete-button" onClick={handleDelete}>
                             Delete
                         </button>
                     )}

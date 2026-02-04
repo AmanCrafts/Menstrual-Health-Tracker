@@ -6,127 +6,143 @@
 
 /* Full Page Spinner - for auth loading, page transitions */
 .spinner-fullpage {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--background);
-  z-index: 9999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background);
+    z-index: 9999;
 }
 
 /* Inline Spinner - for components, sections */
 .spinner-inline {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-  padding: var(--spacing-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    padding: var(--spacing-xl);
 }
 
 /* Wrapper for spinner and message */
 .spinner-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xl);
 }
 
 /* Loading message */
 .spinner-message {
-  margin: 0;
-  font-size: var(--text-lg);
-  font-weight: 600;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: messageFade 2s ease-in-out infinite;
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: messageFade 2s ease-in-out infinite;
 }
 
 @keyframes messageFade {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
 }
 
 /* Three Rings Loader */
 .loader-three-rings {
-  position: relative;
-  width: 80px;
-  height: 80px;
+    position: relative;
+    width: 80px;
+    height: 80px;
 }
 
 .loader-three-rings .ring {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 3px solid transparent;
-  animation: ringRotate 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    animation: ringRotate 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
 }
 
 .loader-three-rings .ring:nth-child(1) {
-  border-top-color: var(--primary);
+    border-top-color: var(--primary);
 }
 
 .loader-three-rings .ring:nth-child(2) {
-  width: 65%;
-  height: 65%;
-  top: 17.5%;
-  left: 17.5%;
-  border-right-color: var(--secondary);
-  animation-delay: 0.15s;
-  animation-direction: reverse;
+    width: 65%;
+    height: 65%;
+    top: 17.5%;
+    left: 17.5%;
+    border-right-color: var(--secondary);
+    animation-delay: 0.15s;
+    animation-direction: reverse;
 }
 
 .loader-three-rings .ring:nth-child(3) {
-  width: 35%;
-  height: 35%;
-  top: 32.5%;
-  left: 32.5%;
-  border-bottom-color: var(--accent);
-  animation-delay: 0.3s;
+    width: 35%;
+    height: 35%;
+    top: 32.5%;
+    left: 32.5%;
+    border-bottom-color: var(--accent);
+    animation-delay: 0.3s;
 }
 
 .loader-three-rings .dot {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 12px;
-  height: 12px;
-  margin: -6px 0 0 -6px;
-  background: var(--primary-gradient);
-  border-radius: 50%;
-  animation: dotPulse 1s ease-in-out infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    background: var(--primary-gradient);
+    border-radius: 50%;
+    animation: dotPulse 1s ease-in-out infinite;
 }
 
 @keyframes ringRotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes dotPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.4); opacity: 0.7; }
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.4);
+        opacity: 0.7;
+    }
 }
 
 /* Responsive */
 @media (max-width: 576px) {
-  .loader-three-rings {
-    width: 60px;
-    height: 60px;
-  }
-  
-  .loader-three-rings .dot {
-    width: 10px;
-    height: 10px;
-    margin: -5px 0 0 -5px;
-  }
-  
-  .spinner-message {
-    font-size: var(--text-base);
-  }
+    .loader-three-rings {
+        width: 60px;
+        height: 60px;
+    }
+
+    .loader-three-rings .dot {
+        width: 10px;
+        height: 10px;
+        margin: -5px 0 0 -5px;
+    }
+
+    .spinner-message {
+        font-size: var(--text-base);
+    }
 }

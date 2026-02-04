@@ -50,26 +50,26 @@
 
 /* Divider styles */
 .divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  margin: var(--spacing-lg) 0;
-  color: var(--text-light);
-  font-size: var(--text-sm);
-  font-weight: 500;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: var(--spacing-lg) 0;
+    color: var(--text-light);
+    font-size: var(--text-sm);
+    font-weight: 500;
 }
 
 .divider::before,
 .divider::after {
-  content: '';
-  flex: 1;
-  border-bottom: 2px solid var(--border-light);
+    content: '';
+    flex: 1;
+    border-bottom: 2px solid var(--border-light);
 }
 
 .divider::before {
-  margin-right: var(--spacing-md);
+    margin-right: var(--spacing-md);
 }
 
 .divider::after {
-  margin-left: var(--spacing-md);
+    margin-left: var(--spacing-md);
 }

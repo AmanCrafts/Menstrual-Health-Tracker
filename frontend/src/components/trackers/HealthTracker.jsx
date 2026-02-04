@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { calculateBMI, getBmiCategory } from '../../utils/cycleCalculations';
 
-export default function HealthTracker({ selectedDate, healthLogs, userProfile, onSubmit, onDelete }) {
+export default function HealthTracker({
+    selectedDate,
+    healthLogs,
+    userProfile,
+    onSubmit,
+    onDelete,
+}) {
     const [date, setDate] = useState('');
     const [weight, setWeight] = useState('');
     const [height, setHeight] = useState('');
@@ -17,12 +23,12 @@ export default function HealthTracker({ selectedDate, healthLogs, userProfile, o
     const formatDateForInput = (date) => {
         if (!date) return '';
         const d = new Date(date);
-        let month = '' + (d.getMonth() + 1);
-        let day = '' + d.getDate();
+        let month = `${d.getMonth() + 1}`;
+        let day = `${d.getDate()}`;
         const year = d.getFullYear();
 
-        if (month.length < 2) month = '0' + month;
-        if (day.length < 2) day = '0' + day;
+        if (month.length < 2) month = `0${month}`;
+        if (day.length < 2) day = `0${day}`;
 
         return [year, month, day].join('-');
     };
@@ -38,8 +44,8 @@ export default function HealthTracker({ selectedDate, healthLogs, userProfile, o
             setDate(formatDateForInput(selectedDate));
 
             // Check if there's an existing log for this date
-            const existingHealthLog = healthLogs?.find(log =>
-                new Date(log.date).toDateString() === new Date(selectedDate).toDateString()
+            const existingHealthLog = healthLogs?.find(
+                (log) => new Date(log.date).toDateString() === new Date(selectedDate).toDateString()
             );
 
             if (existingHealthLog) {
@@ -92,7 +98,7 @@ export default function HealthTracker({ selectedDate, healthLogs, userProfile, o
             waterIntake: waterIntake ? parseFloat(waterIntake) : null,
             exercise,
             stress,
-            notes
+            notes,
         };
 
         onSubmit(healthData);
@@ -110,12 +116,15 @@ export default function HealthTracker({ selectedDate, healthLogs, userProfile, o
         <div className="health-tracker">
             <h2>Health Tracker</h2>
             <p className="selected-date-display">
-                Selected Date: {selectedDate ? selectedDate.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }) : ''}
+                Selected Date:{' '}
+                {selectedDate
+                    ? selectedDate.toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                      })
+                    : ''}
             </p>
 
             <form onSubmit={handleSubmit} className="tracker-form">
@@ -165,7 +174,9 @@ export default function HealthTracker({ selectedDate, healthLogs, userProfile, o
 
                 {bmi && (
                     <div className="bmi-display">
-                        <p>BMI: <strong>{bmi}</strong> - {getBmiCategory(bmi)}</p>
+                        <p>
+                            BMI: <strong>{bmi}</strong> - {getBmiCategory(bmi)}
+                        </p>
                     </div>
                 )}
 
@@ -249,11 +260,7 @@ export default function HealthTracker({ selectedDate, healthLogs, userProfile, o
                     </button>
 
                     {existingLog && (
-                        <button
-                            type="button"
-                            className="delete-button"
-                            onClick={handleDelete}
-                        >
+                        <button type="button" className="delete-button" onClick={handleDelete}>
                             Delete
                         </button>
                     )}

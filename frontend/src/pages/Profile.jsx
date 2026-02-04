@@ -8,7 +8,7 @@ import '../styles/profile.css';
 export default function Profile() {
     // Auth context for user info and profile updates
     const { currentUser, logout, updateUserProfile, updatePassword } = useAuth();
-    const { loading: dataLoading, error: dataError, exportUserData, clearError } = useData();
+    const { loading: _dataLoading, error: dataError, exportUserData, clearError } = useData();
 
     // Form state variables
     const [displayName, setDisplayName] = useState('');
@@ -54,7 +54,7 @@ export default function Profile() {
             cycleLength: parseInt(cycleLength, 10),
             periodLength: parseInt(periodLength, 10),
             lastPeriod: lastPeriod || undefined,
-            height: height ? parseFloat(height) : undefined
+            height: height ? parseFloat(height) : undefined,
         };
 
         try {
@@ -108,7 +108,7 @@ export default function Profile() {
             await exportUserData();
             setSuccessMessage('Data exported successfully!');
             setTimeout(() => setSuccessMessage(''), 3000);
-        } catch (err) {
+        } catch {
             setErrorMessage('Failed to export data');
         } finally {
             setIsSaving(false);
@@ -121,7 +121,7 @@ export default function Profile() {
             await logout();
             navigate('/signin');
         } catch (error) {
-            console.error("Failed to log out:", error);
+            console.error('Failed to log out:', error);
         }
     };
 
@@ -132,15 +132,21 @@ export default function Profile() {
         <div className="profile-container">
             <div className="profile-header">
                 <h1>My Profile</h1>
-                <button className="logout-button" onClick={handleLogout}>Logout</button>
+                <button className="logout-button" onClick={handleLogout}>
+                    Logout
+                </button>
             </div>
 
             {(dataError || errorMessage) && (
                 <div className="error-card">
-                    <Alert type="error" message={dataError || errorMessage} onClose={() => {
-                        clearError();
-                        setErrorMessage('');
-                    }} />
+                    <Alert
+                        type="error"
+                        message={dataError || errorMessage}
+                        onClose={() => {
+                            clearError();
+                            setErrorMessage('');
+                        }}
+                    />
                 </div>
             )}
             {successMessage && <Alert type="success" message={successMessage} />}
@@ -151,7 +157,9 @@ export default function Profile() {
                         <img src={currentUser.photoURL} alt="Profile" />
                     ) : (
                         <div className="profile-avatar">
-                            {displayName ? displayName[0]?.toUpperCase() : currentUser?.email?.[0]?.toUpperCase()}
+                            {displayName
+                                ? displayName[0]?.toUpperCase()
+                                : currentUser?.email?.[0]?.toUpperCase()}
                         </div>
                     )}
                 </div>
@@ -169,11 +177,31 @@ export default function Profile() {
                             )}
 
                             <div className="profile-info">
-                                {birthDate && <p><strong>Birth Date:</strong> {birthDate}</p>}
-                                {cycleLength && <p><strong>Average Cycle Length:</strong> {cycleLength} days</p>}
-                                {periodLength && <p><strong>Average Period Length:</strong> {periodLength} days</p>}
-                                {lastPeriod && <p><strong>Last Period Start Date:</strong> {lastPeriod}</p>}
-                                {height && <p><strong>Height:</strong> {height} cm</p>}
+                                {birthDate && (
+                                    <p>
+                                        <strong>Birth Date:</strong> {birthDate}
+                                    </p>
+                                )}
+                                {cycleLength && (
+                                    <p>
+                                        <strong>Average Cycle Length:</strong> {cycleLength} days
+                                    </p>
+                                )}
+                                {periodLength && (
+                                    <p>
+                                        <strong>Average Period Length:</strong> {periodLength} days
+                                    </p>
+                                )}
+                                {lastPeriod && (
+                                    <p>
+                                        <strong>Last Period Start Date:</strong> {lastPeriod}
+                                    </p>
+                                )}
+                                {height && (
+                                    <p>
+                                        <strong>Height:</strong> {height} cm
+                                    </p>
+                                )}
                             </div>
 
                             <div className="button-group">
@@ -265,7 +293,7 @@ export default function Profile() {
 
                             <div className="button-group">
                                 <button type="submit" disabled={isSaving}>
-                                    {isSaving ? "Saving..." : "Save Profile"}
+                                    {isSaving ? 'Saving...' : 'Save Profile'}
                                 </button>
                                 <button
                                     type="button"
@@ -319,7 +347,7 @@ export default function Profile() {
                         </div>
                         <div className="button-group">
                             <button type="submit" disabled={isSaving}>
-                                {isSaving ? "Changing..." : "Change Password"}
+                                {isSaving ? 'Changing...' : 'Change Password'}
                             </button>
                             <button
                                 type="button"
@@ -345,11 +373,7 @@ export default function Profile() {
                     <span className="status-cloud">●</span>
                     Your data is securely stored in our database
                 </p>
-                <button
-                    className="export-button"
-                    onClick={handleExportData}
-                    disabled={isSaving}
-                >
+                <button className="export-button" onClick={handleExportData} disabled={isSaving}>
                     <i className="fas fa-download"></i> Export My Data
                 </button>
             </div>

@@ -11,7 +11,7 @@ import {
     calculateOvulation,
     calculatePmsDays,
     getCyclePhaseInfo,
-    generateHealthInsights
+    generateHealthInsights,
 } from '../utils/cycleCalculations';
 import '../styles/dashboard.css';
 
@@ -25,7 +25,7 @@ const formatDate = (date, options = { month: 'short', day: 'numeric' }) => {
 
 export default function Dashboard() {
     const { currentUser } = useAuth();
-    const { periodData, symptomsData, moodData, healthData, loading, error } = useData();
+    const { periodData, symptomsData, loading, error } = useData();
     const navigate = useNavigate();
     const [cycleInfo, setCycleInfo] = useState(null);
     const [insights, setInsights] = useState([]);
@@ -37,8 +37,8 @@ export default function Dashboard() {
             today.setHours(0, 0, 0, 0);
 
             // Sort period logs by date (most recent first)
-            const sortedLogs = [...periodData].sort((a, b) =>
-                new Date(b.startDate) - new Date(a.startDate)
+            const sortedLogs = [...periodData].sort(
+                (a, b) => new Date(b.startDate) - new Date(a.startDate)
             );
 
             const lastPeriodDate = new Date(sortedLogs[0].startDate);
@@ -51,9 +51,9 @@ export default function Dashboard() {
             const nextPeriod = calculateNextPeriod(lastPeriodDate, cycleLength, periodData);
 
             // Calculate days until next period
-            const daysUntilPeriod = nextPeriod ? Math.ceil(
-                (nextPeriod - today) / (1000 * 60 * 60 * 24)
-            ) : null;
+            const daysUntilPeriod = nextPeriod
+                ? Math.ceil((nextPeriod - today) / (1000 * 60 * 60 * 24))
+                : null;
 
             // Calculate current cycle day
             const cycleDayInfo = calculateCycleDay(lastPeriodDate, today, cycleLength);
@@ -66,9 +66,9 @@ export default function Dashboard() {
             const ovulationDate = ovulationResult?.date || null;
 
             // Calculate days until ovulation
-            const daysUntilOvulation = ovulationDate ? Math.ceil(
-                (ovulationDate - today) / (1000 * 60 * 60 * 24)
-            ) : null;
+            const daysUntilOvulation = ovulationDate
+                ? Math.ceil((ovulationDate - today) / (1000 * 60 * 60 * 24))
+                : null;
 
             // Calculate PMS window
             const pmsWindow = calculatePmsDays(nextPeriod);
@@ -99,7 +99,7 @@ export default function Dashboard() {
                 phaseInfo,
                 cycleLength,
                 periodLength,
-                cycleProgress
+                cycleProgress,
             });
 
             // Generate health insights
@@ -117,14 +117,24 @@ export default function Dashboard() {
             const periodLength = currentUser?.periodLength || 5;
 
             const nextPeriod = calculateNextPeriod(lastPeriodDate, cycleLength, []);
-            const daysUntilPeriod = nextPeriod ? Math.ceil((nextPeriod - today) / (1000 * 60 * 60 * 24)) : null;
+            const daysUntilPeriod = nextPeriod
+                ? Math.ceil((nextPeriod - today) / (1000 * 60 * 60 * 24))
+                : null;
             const cycleDayInfo = calculateCycleDay(lastPeriodDate, today, cycleLength);
             const fertileWindow = calculateFertileWindow(nextPeriod, cycleLength);
             const ovulationResult = calculateOvulation(nextPeriod, cycleLength);
             const ovulationDate = ovulationResult?.date || null;
-            const daysUntilOvulation = ovulationDate ? Math.ceil((ovulationDate - today) / (1000 * 60 * 60 * 24)) : null;
+            const daysUntilOvulation = ovulationDate
+                ? Math.ceil((ovulationDate - today) / (1000 * 60 * 60 * 24))
+                : null;
             const pmsWindow = calculatePmsDays(nextPeriod);
-            const phaseInfo = getCyclePhaseInfo(today, lastPeriodDate, cycleLength, periodLength, []);
+            const phaseInfo = getCyclePhaseInfo(
+                today,
+                lastPeriodDate,
+                cycleLength,
+                periodLength,
+                []
+            );
 
             const cycleDay = cycleDayInfo?.day || 1;
             const cycleProgress = Math.min(100, Math.round((cycleDay / cycleLength) * 100));
@@ -142,7 +152,7 @@ export default function Dashboard() {
                 phaseInfo,
                 cycleLength,
                 periodLength,
-                cycleProgress
+                cycleProgress,
             });
         }
     }, [currentUser, periodData, symptomsData]);
@@ -159,9 +169,15 @@ export default function Dashboard() {
             <div className="dashboard-container">
                 <div className="welcome-message">
                     <h1>Welcome to FlowSync!</h1>
-                    <p>Start your journey to better menstrual health tracking. Log your first period or complete your profile to get personalized insights.</p>
+                    <p>
+                        Start your journey to better menstrual health tracking. Log your first
+                        period or complete your profile to get personalized insights.
+                    </p>
                     <div className="welcome-buttons">
-                        <button onClick={() => navigate('/trackers', { state: { openTab: 'period' } })} className="primary-button">
+                        <button
+                            onClick={() => navigate('/trackers', { state: { openTab: 'period' } })}
+                            className="primary-button"
+                        >
                             <i className="fas fa-plus"></i> Log First Period
                         </button>
                         <button onClick={() => navigate('/profile')} className="secondary-button">
@@ -180,7 +196,7 @@ export default function Dashboard() {
             ovulation: 'fa-star',
             pms: 'fa-cloud',
             follicular: 'fa-leaf',
-            luteal: 'fa-moon'
+            luteal: 'fa-moon',
         };
         return icons[phase] || 'fa-circle';
     };
@@ -194,23 +210,37 @@ export default function Dashboard() {
                 <h1>Hello, {currentUser?.displayName || 'there'}!</h1>
                 <p>Here's your menstrual health overview</p>
                 <span className="date-today">
-                    <i className="far fa-calendar"></i> {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                    <i className="far fa-calendar"></i>{' '}
+                    {new Date().toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                    })}
                 </span>
             </div>
 
             {cycleInfo && (
                 <>
                     {/* Cycle Overview Banner */}
-                    <div className={`cycle-overview-banner ${cycleInfo.phaseInfo?.phase || 'follicular'}`}>
+                    <div
+                        className={`cycle-overview-banner ${cycleInfo.phaseInfo?.phase || 'follicular'}`}
+                    >
                         <div className="banner-top-row">
                             <div className="banner-phase-info">
                                 <div className="banner-phase-icon">
-                                    <i className={`fas ${getPhaseIcon(cycleInfo.phaseInfo?.phase)}`}></i>
+                                    <i
+                                        className={`fas ${getPhaseIcon(cycleInfo.phaseInfo?.phase)}`}
+                                    ></i>
                                 </div>
                                 <div className="banner-phase-text">
                                     <span className="banner-phase-label">Current Phase</span>
-                                    <h2 className="banner-phase-title">{cycleInfo.phaseInfo?.info?.name || 'Unknown'}</h2>
-                                    <p className="banner-phase-desc">{cycleInfo.phaseInfo?.info?.description || ''}</p>
+                                    <h2 className="banner-phase-title">
+                                        {cycleInfo.phaseInfo?.info?.name || 'Unknown'}
+                                    </h2>
+                                    <p className="banner-phase-desc">
+                                        {cycleInfo.phaseInfo?.info?.description || ''}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -227,20 +257,24 @@ export default function Dashboard() {
                                 </span>
                                 <span className="banner-stat-label">Days to Period</span>
                             </div>
-                            {cycleInfo.daysUntilOvulation !== null && cycleInfo.daysUntilOvulation > 0 && (
-                                <div className="banner-stat ovulation-stat">
-                                    <span className="banner-stat-value">
-                                        <i className="fas fa-star"></i>
-                                        {cycleInfo.daysUntilOvulation}
-                                    </span>
-                                    <span className="banner-stat-label">Days to Ovulation</span>
-                                </div>
-                            )}
+                            {cycleInfo.daysUntilOvulation !== null &&
+                                cycleInfo.daysUntilOvulation > 0 && (
+                                    <div className="banner-stat ovulation-stat">
+                                        <span className="banner-stat-value">
+                                            <i className="fas fa-star"></i>
+                                            {cycleInfo.daysUntilOvulation}
+                                        </span>
+                                        <span className="banner-stat-label">Days to Ovulation</span>
+                                    </div>
+                                )}
                             <div className="banner-stat">
-                                <span className="banner-stat-value">{cycleInfo.phaseInfo?.info?.energy?.split(' ')[0] || 'Moderate'}</span>
+                                <span className="banner-stat-value">
+                                    {cycleInfo.phaseInfo?.info?.energy?.split(' ')[0] || 'Moderate'}
+                                </span>
                                 <span className="banner-stat-label">Energy Level</span>
                             </div>
-                            {(cycleInfo.phaseInfo?.isFertile || cycleInfo.phaseInfo?.isOvulation) && (
+                            {(cycleInfo.phaseInfo?.isFertile ||
+                                cycleInfo.phaseInfo?.isOvulation) && (
                                 <div className="banner-stat fertile-stat">
                                     <span className="banner-stat-value">
                                         <i className="fas fa-heart"></i>
@@ -255,7 +289,9 @@ export default function Dashboard() {
                         <div className="banner-progress">
                             <div className="progress-labels">
                                 <span>Day 1</span>
-                                <span>Day {cycleInfo.cycleDay} of {cycleInfo.cycleLength}</span>
+                                <span>
+                                    Day {cycleInfo.cycleDay} of {cycleInfo.cycleLength}
+                                </span>
                                 <span>Day {cycleInfo.cycleLength}</span>
                             </div>
                             <div className="progress-bar-track">
@@ -269,19 +305,35 @@ export default function Dashboard() {
 
                     {/* Quick Actions */}
                     <div className="quick-actions">
-                        <Link to="/trackers" state={{ openTab: 'period' }} className="quick-action-btn period-action">
+                        <Link
+                            to="/trackers"
+                            state={{ openTab: 'period' }}
+                            className="quick-action-btn period-action"
+                        >
                             <i className="fas fa-tint"></i>
                             <span>Log Period</span>
                         </Link>
-                        <Link to="/trackers" state={{ openTab: 'symptom' }} className="quick-action-btn symptom-action">
+                        <Link
+                            to="/trackers"
+                            state={{ openTab: 'symptom' }}
+                            className="quick-action-btn symptom-action"
+                        >
                             <i className="fas fa-notes-medical"></i>
                             <span>Symptoms</span>
                         </Link>
-                        <Link to="/trackers" state={{ openTab: 'mood' }} className="quick-action-btn mood-action">
+                        <Link
+                            to="/trackers"
+                            state={{ openTab: 'mood' }}
+                            className="quick-action-btn mood-action"
+                        >
                             <i className="fas fa-smile"></i>
                             <span>Mood</span>
                         </Link>
-                        <Link to="/trackers" state={{ openTab: 'health' }} className="quick-action-btn health-action">
+                        <Link
+                            to="/trackers"
+                            state={{ openTab: 'health' }}
+                            className="quick-action-btn health-action"
+                        >
                             <i className="fas fa-heartbeat"></i>
                             <span>Health</span>
                         </Link>
@@ -299,20 +351,34 @@ export default function Dashboard() {
                             </div>
                             <div className="card-content">
                                 <div className="prediction-main-value">
-                                    {formatDate(cycleInfo.nextPeriod, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    {formatDate(cycleInfo.nextPeriod, {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric',
+                                    })}
                                 </div>
                                 <div className="prediction-secondary">
                                     {cycleInfo.daysUntilPeriod === 0 ? (
-                                        <span>Expected <span className="highlight">today</span></span>
+                                        <span>
+                                            Expected <span className="highlight">today</span>
+                                        </span>
                                     ) : cycleInfo.daysUntilPeriod > 0 ? (
-                                        <span>In <span className="highlight">{cycleInfo.daysUntilPeriod}</span> day{cycleInfo.daysUntilPeriod !== 1 ? 's' : ''}</span>
+                                        <span>
+                                            In{' '}
+                                            <span className="highlight">
+                                                {cycleInfo.daysUntilPeriod}
+                                            </span>{' '}
+                                            day{cycleInfo.daysUntilPeriod !== 1 ? 's' : ''}
+                                        </span>
                                     ) : (
                                         <span>Calculating...</span>
                                     )}
                                 </div>
                             </div>
                             <div className="card-footer">
-                                <Link to="/trackers" className="card-link">View Calendar</Link>
+                                <Link to="/trackers" className="card-link">
+                                    View Calendar
+                                </Link>
                             </div>
                         </div>
 
@@ -326,16 +392,23 @@ export default function Dashboard() {
                             </div>
                             <div className="card-content">
                                 <div className="prediction-main-value">
-                                    {cycleInfo.fertileWindow ? (
-                                        `${formatDate(cycleInfo.fertileWindow.start)} - ${formatDate(cycleInfo.fertileWindow.end)}`
-                                    ) : 'Calculating...'}
+                                    {cycleInfo.fertileWindow
+                                        ? `${formatDate(cycleInfo.fertileWindow.start)} - ${formatDate(cycleInfo.fertileWindow.end)}`
+                                        : 'Calculating...'}
                                 </div>
                                 <div className="prediction-secondary">
-                                    <span>Ovulation: <span className="highlight">{formatDate(cycleInfo.ovulationDate)}</span></span>
+                                    <span>
+                                        Ovulation:{' '}
+                                        <span className="highlight">
+                                            {formatDate(cycleInfo.ovulationDate)}
+                                        </span>
+                                    </span>
                                 </div>
                             </div>
                             <div className="card-footer">
-                                <Link to="/education/understanding-cycle" className="card-link">Learn More</Link>
+                                <Link to="/education/understanding-cycle" className="card-link">
+                                    Learn More
+                                </Link>
                             </div>
                         </div>
 
@@ -354,11 +427,15 @@ export default function Dashboard() {
                                 </div>
                                 <div className="stat-row">
                                     <span className="stat-label">Period Length</span>
-                                    <span className="stat-value">{cycleInfo.periodLength} days</span>
+                                    <span className="stat-value">
+                                        {cycleInfo.periodLength} days
+                                    </span>
                                 </div>
                                 <div className="stat-row">
                                     <span className="stat-label">Last Period</span>
-                                    <span className="stat-value">{formatDate(cycleInfo.lastPeriodDate)}</span>
+                                    <span className="stat-value">
+                                        {formatDate(cycleInfo.lastPeriodDate)}
+                                    </span>
                                 </div>
                                 <div className="stat-row">
                                     <span className="stat-label">Cycles Logged</span>
@@ -366,7 +443,9 @@ export default function Dashboard() {
                                 </div>
                             </div>
                             <div className="card-footer">
-                                <Link to="/analytics" className="card-link">View Analytics</Link>
+                                <Link to="/analytics" className="card-link">
+                                    View Analytics
+                                </Link>
                             </div>
                         </div>
 
@@ -380,18 +459,20 @@ export default function Dashboard() {
                             </div>
                             <div className="card-content">
                                 <div className="tips-list">
-                                    {cycleInfo.phaseInfo?.info?.tips?.slice(0, 3).map((tip, index) => (
-                                        <div key={index} className="tip-item">
-                                            <i className="fas fa-check-circle"></i>
-                                            <span>{tip}</span>
-                                        </div>
-                                    )) || (
-                                            <p>No tips available for this phase.</p>
-                                        )}
+                                    {cycleInfo.phaseInfo?.info?.tips
+                                        ?.slice(0, 3)
+                                        .map((tip, index) => (
+                                            <div key={index} className="tip-item">
+                                                <i className="fas fa-check-circle"></i>
+                                                <span>{tip}</span>
+                                            </div>
+                                        )) || <p>No tips available for this phase.</p>}
                                 </div>
                             </div>
                             <div className="card-footer">
-                                <Link to="/education" className="card-link">More Health Tips</Link>
+                                <Link to="/education" className="card-link">
+                                    More Health Tips
+                                </Link>
                             </div>
                         </div>
 
@@ -406,24 +487,35 @@ export default function Dashboard() {
                             <div className="card-content">
                                 <div className="stat-row">
                                     <span className="stat-label">Hormones</span>
-                                    <span className="stat-value">{cycleInfo.phaseInfo?.info?.hormones || 'N/A'}</span>
+                                    <span className="stat-value">
+                                        {cycleInfo.phaseInfo?.info?.hormones || 'N/A'}
+                                    </span>
                                 </div>
                                 <div className="stat-row">
                                     <span className="stat-label">Energy</span>
-                                    <span className="stat-value">{cycleInfo.phaseInfo?.info?.energy || 'Moderate'}</span>
+                                    <span className="stat-value">
+                                        {cycleInfo.phaseInfo?.info?.energy || 'Moderate'}
+                                    </span>
                                 </div>
                                 <div className="stat-row">
                                     <span className="stat-label">Phase Duration</span>
                                     <span className="stat-value">
-                                        {cycleInfo.phaseInfo?.phase === 'period' ? `${cycleInfo.periodLength} days` :
-                                            cycleInfo.phaseInfo?.phase === 'fertile' ? '6-7 days' :
-                                                cycleInfo.phaseInfo?.phase === 'ovulation' ? '1 day' :
-                                                    cycleInfo.phaseInfo?.phase === 'pms' ? '7-10 days' : '7-10 days'}
+                                        {cycleInfo.phaseInfo?.phase === 'period'
+                                            ? `${cycleInfo.periodLength} days`
+                                            : cycleInfo.phaseInfo?.phase === 'fertile'
+                                              ? '6-7 days'
+                                              : cycleInfo.phaseInfo?.phase === 'ovulation'
+                                                ? '1 day'
+                                                : cycleInfo.phaseInfo?.phase === 'pms'
+                                                  ? '7-10 days'
+                                                  : '7-10 days'}
                                     </span>
                                 </div>
                             </div>
                             <div className="card-footer">
-                                <Link to="/education/understanding-cycle" className="card-link">Learn About Hormones</Link>
+                                <Link to="/education/understanding-cycle" className="card-link">
+                                    Learn About Hormones
+                                </Link>
                             </div>
                         </div>
 
@@ -439,7 +531,10 @@ export default function Dashboard() {
                                 <div className="insights-list">
                                     {insights.length > 0 ? (
                                         insights.slice(0, 2).map((insight, index) => (
-                                            <div key={index} className={`insight-item ${insight.type}`}>
+                                            <div
+                                                key={index}
+                                                className={`insight-item ${insight.type}`}
+                                            >
                                                 <div className="insight-icon">
                                                     <i className={`fas fa-${insight.icon}`}></i>
                                                 </div>
@@ -456,14 +551,19 @@ export default function Dashboard() {
                                             </div>
                                             <div className="insight-content">
                                                 <h4>Track More Data</h4>
-                                                <p>Log symptoms and moods regularly for personalized insights.</p>
+                                                <p>
+                                                    Log symptoms and moods regularly for
+                                                    personalized insights.
+                                                </p>
                                             </div>
                                         </div>
                                     )}
                                 </div>
                             </div>
                             <div className="card-footer">
-                                <Link to="/analytics" className="card-link">See All Insights</Link>
+                                <Link to="/analytics" className="card-link">
+                                    See All Insights
+                                </Link>
                             </div>
                         </div>
                     </div>

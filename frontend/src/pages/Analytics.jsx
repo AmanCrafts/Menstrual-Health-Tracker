@@ -19,38 +19,41 @@ export default function Analytics() {
     const [wellnessScore, setWellnessScore] = useState(0);
     const [wellnessLevel, setWellnessLevel] = useState({ level: 'Limited', color: '#EF4444' });
 
-    const filterLogsByTimeRange = useCallback((logs) => {
-        if (!logs) return [];
-        if (timeRange === 'all') return logs;
+    const filterLogsByTimeRange = useCallback(
+        (logs) => {
+            if (!logs) return [];
+            if (timeRange === 'all') return logs;
 
-        const now = new Date();
-        const cutoffDate = new Date();
+            const now = new Date();
+            const cutoffDate = new Date();
 
-        switch (timeRange) {
-            case '3months':
-                cutoffDate.setMonth(now.getMonth() - 3);
-                break;
-            case '6months':
-                cutoffDate.setMonth(now.getMonth() - 6);
-                break;
-            case '1year':
-                cutoffDate.setFullYear(now.getFullYear() - 1);
-                break;
-            default:
-                cutoffDate.setMonth(now.getMonth() - 6);
-        }
+            switch (timeRange) {
+                case '3months':
+                    cutoffDate.setMonth(now.getMonth() - 3);
+                    break;
+                case '6months':
+                    cutoffDate.setMonth(now.getMonth() - 6);
+                    break;
+                case '1year':
+                    cutoffDate.setFullYear(now.getFullYear() - 1);
+                    break;
+                default:
+                    cutoffDate.setMonth(now.getMonth() - 6);
+            }
 
-        return logs.filter(log => {
-            const logDate = new Date(log.date || log.startDate);
-            return logDate >= cutoffDate;
-        });
-    }, [timeRange]);
+            return logs.filter((log) => {
+                const logDate = new Date(log.date || log.startDate);
+                return logDate >= cutoffDate;
+            });
+        },
+        [timeRange]
+    );
 
     const calculateVariance = useCallback((values) => {
         if (values.length <= 1) return 0;
 
         const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-        const squareDiffs = values.map(value => {
+        const squareDiffs = values.map((value) => {
             const diff = value - mean;
             return diff * diff;
         });
@@ -61,7 +64,9 @@ export default function Analytics() {
     const calculateCycleStatistics = useCallback(() => {
         if (!periodData || periodData.length < 2) return;
 
-        const sortedLogs = [...periodData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+        const sortedLogs = [...periodData].sort(
+            (a, b) => new Date(a.startDate) - new Date(b.startDate)
+        );
 
         const filteredLogs = filterLogsByTimeRange(sortedLogs);
 
@@ -73,7 +78,7 @@ export default function Analytics() {
                 avgPeriodLength: currentUser?.periodLength || 5,
                 cycleRegularity: 'Not enough data',
                 cycleLengths: [],
-                periodLengths: []
+                periodLengths: [],
             });
             return;
         }
@@ -88,7 +93,7 @@ export default function Analytics() {
                 const lengthInDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
                 periodLengths.push({
                     date: startDate,
-                    length: lengthInDays
+                    length: lengthInDays,
                 });
             }
 
@@ -100,35 +105,39 @@ export default function Analytics() {
                 if (cycleLength > 10 && cycleLength < 45) {
                     cycleLengths.push({
                         date: currentStart,
-                        length: cycleLength
+                        length: cycleLength,
                     });
                 }
             }
         }
 
-        const cycleValues = cycleLengths.map(c => c.length);
-        const periodValues = periodLengths.map(p => p.length);
+        const cycleValues = cycleLengths.map((c) => c.length);
+        const periodValues = periodLengths.map((p) => p.length);
 
-        const avgCycleLength = cycleValues.length > 0
-            ? Math.round(cycleValues.reduce((sum, val) => sum + val, 0) / cycleValues.length)
-            : currentUser?.cycleLength || 28;
+        const avgCycleLength =
+            cycleValues.length > 0
+                ? Math.round(cycleValues.reduce((sum, val) => sum + val, 0) / cycleValues.length)
+                : currentUser?.cycleLength || 28;
 
-        const avgPeriodLength = periodValues.length > 0
-            ? Math.round(periodValues.reduce((sum, val) => sum + val, 0) / periodValues.length * 10) / 10
-            : currentUser?.periodLength || 5;
+        const avgPeriodLength =
+            periodValues.length > 0
+                ? Math.round(
+                      (periodValues.reduce((sum, val) => sum + val, 0) / periodValues.length) * 10
+                  ) / 10
+                : currentUser?.periodLength || 5;
 
         const minCycleLength = cycleValues.length > 0 ? Math.min(...cycleValues) : avgCycleLength;
         const maxCycleLength = cycleValues.length > 0 ? Math.max(...cycleValues) : avgCycleLength;
 
         const cycleVariance = calculateVariance(cycleValues);
-        let cycleRegularity = "Regular";
+        let cycleRegularity = 'Regular';
 
         if (cycleVariance > 20) {
-            cycleRegularity = "Highly Irregular";
+            cycleRegularity = 'Highly Irregular';
         } else if (cycleVariance > 10) {
-            cycleRegularity = "Somewhat Irregular";
+            cycleRegularity = 'Somewhat Irregular';
         } else if (cycleVariance > 5) {
-            cycleRegularity = "Slightly Irregular";
+            cycleRegularity = 'Slightly Irregular';
         }
 
         setCycleStats({
@@ -138,7 +147,7 @@ export default function Analytics() {
             avgPeriodLength,
             cycleRegularity,
             cycleLengths,
-            periodLengths
+            periodLengths,
         });
     }, [periodData, currentUser, filterLogsByTimeRange, calculateVariance]);
 
@@ -149,7 +158,7 @@ export default function Analytics() {
 
         const symptomCounts = {};
 
-        filteredLogs.forEach(log => {
+        filteredLogs.forEach((log) => {
             if (!log.symptoms) return;
 
             Object.entries(log.symptoms).forEach(([symptom, present]) => {
@@ -169,7 +178,7 @@ export default function Analytics() {
 
         const moodCounts = {};
 
-        filteredLogs.forEach(log => {
+        filteredLogs.forEach((log) => {
             if (log.mood) {
                 moodCounts[log.mood] = (moodCounts[log.mood] || 0) + 1;
             }
@@ -246,7 +255,10 @@ export default function Analytics() {
 
         // Symptom Severity (25 points impact)
         if (filteredSymptomData.length > 0) {
-            const totalSymptomOccurrences = Object.values(symptomStats).reduce((sum, count) => sum + count, 0);
+            const totalSymptomOccurrences = Object.values(symptomStats).reduce(
+                (sum, count) => sum + count,
+                0
+            );
             const avgSymptomsPerLog = totalSymptomOccurrences / filteredSymptomData.length;
             const symptomTypes = Object.keys(symptomStats).length;
 
@@ -264,18 +276,18 @@ export default function Analytics() {
         // Emotional Health (20 points impact)
         if (filteredMoodData.length > 0) {
             const moodScores = {
-                'happy': 0,
-                'calm': 0,
-                'energetic': 0,
-                'content': 0,
-                'tired': -5,
-                'stressed': -8,
-                'anxious': -10,
-                'irritable': -12,
-                'sad': -12,
-                'angry': -10,
-                'emotional': -8,
-                'depressed': -15
+                happy: 0,
+                calm: 0,
+                energetic: 0,
+                content: 0,
+                tired: -5,
+                stressed: -8,
+                anxious: -10,
+                irritable: -12,
+                sad: -12,
+                angry: -10,
+                emotional: -8,
+                depressed: -15,
             };
 
             let moodImpact = 0;
@@ -301,14 +313,42 @@ export default function Analytics() {
         }
 
         return Math.max(0, Math.min(100, score));
-    }, [cycleStats, periodData, symptomsData, moodsData, symptomStats, moodStats, filterLogsByTimeRange]);
+    }, [
+        cycleStats,
+        periodData,
+        symptomsData,
+        moodsData,
+        symptomStats,
+        moodStats,
+        filterLogsByTimeRange,
+    ]);
 
     const getWellnessLevel = useCallback((score) => {
-        if (score >= 85) return { level: 'Excellent', color: '#10B981', description: 'Optimal menstrual health' };
-        if (score >= 70) return { level: 'Good', color: '#3B82F6', description: 'Healthy cycle with minor variations' };
-        if (score >= 55) return { level: 'Fair', color: '#F59E0B', description: 'Some health concerns noted' };
-        if (score >= 40) return { level: 'Needs Attention', color: '#F97316', description: 'Multiple health indicators flagged' };
-        return { level: 'Concerning', color: '#EF4444', description: 'Significant health concerns detected' };
+        if (score >= 85)
+            return {
+                level: 'Excellent',
+                color: '#10B981',
+                description: 'Optimal menstrual health',
+            };
+        if (score >= 70)
+            return {
+                level: 'Good',
+                color: '#3B82F6',
+                description: 'Healthy cycle with minor variations',
+            };
+        if (score >= 55)
+            return { level: 'Fair', color: '#F59E0B', description: 'Some health concerns noted' };
+        if (score >= 40)
+            return {
+                level: 'Needs Attention',
+                color: '#F97316',
+                description: 'Multiple health indicators flagged',
+            };
+        return {
+            level: 'Concerning',
+            color: '#EF4444',
+            description: 'Significant health concerns detected',
+        };
     }, []);
 
     useEffect(() => {
@@ -324,9 +364,7 @@ export default function Analytics() {
     };
 
     const formatSymptomName = (symptomKey) => {
-        return symptomKey
-            .replace(/([A-Z])/g, ' $1')
-            .replace(/^./, str => str.toUpperCase());
+        return symptomKey.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
     };
 
     if (loading) {
@@ -345,8 +383,15 @@ export default function Analytics() {
                         <i className="fas fa-chart-line"></i>
                     </div>
                     <h2>More Data Needed</h2>
-                    <p>Analytics will become available after you log at least two menstrual periods.</p>
-                    <button type="button" onClick={() => navigate('/trackers', { state: { openTab: 'period' } })} className="primary-button">
+                    <p>
+                        Analytics will become available after you log at least two menstrual
+                        periods.
+                    </p>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/trackers', { state: { openTab: 'period' } })}
+                        className="primary-button"
+                    >
                         Log My Period
                     </button>
                 </div>
@@ -361,10 +406,14 @@ export default function Analytics() {
             <div className="analytics-header">
                 <div className="header-content">
                     <h1>Analytics</h1>
-                    <p className="header-subtitle">Track your menstrual health patterns and insights</p>
+                    <p className="header-subtitle">
+                        Track your menstrual health patterns and insights
+                    </p>
                 </div>
                 <div className="time-range-selector">
-                    <label htmlFor="time-range"><i className="fas fa-calendar"></i> Time Range: </label>
+                    <label htmlFor="time-range">
+                        <i className="fas fa-calendar"></i> Time Range:{' '}
+                    </label>
                     <select
                         id="time-range"
                         value={timeRange}
@@ -382,7 +431,10 @@ export default function Analytics() {
             <div className="wellness-banner">
                 <div className="wellness-content">
                     <div className="wellness-score-container">
-                        <div className="wellness-circle" style={{ borderColor: wellnessLevel.color }}>
+                        <div
+                            className="wellness-circle"
+                            style={{ borderColor: wellnessLevel.color }}
+                        >
                             <div className="wellness-score-value">{wellnessScore}</div>
                             <div className="wellness-score-label">Score</div>
                         </div>
@@ -402,27 +454,51 @@ export default function Analytics() {
                 {cycleStats && (
                     <div className="statistics-card">
                         <div className="card-header">
-                            <h2><i className="fas fa-heartbeat"></i> Cycle Statistics</h2>
+                            <h2>
+                                <i className="fas fa-heartbeat"></i> Cycle Statistics
+                            </h2>
                         </div>
                         <div className="statistics-grid">
                             <div className="statistic-item">
-                                <div className="statistic-icon"><i className="fas fa-sync-alt"></i></div>
+                                <div className="statistic-icon">
+                                    <i className="fas fa-sync-alt"></i>
+                                </div>
                                 <div className="statistic-value">{cycleStats.avgCycleLength}</div>
-                                <div className="statistic-label">Avg. Cycle<br />Length (days)</div>
+                                <div className="statistic-label">
+                                    Avg. Cycle
+                                    <br />
+                                    Length (days)
+                                </div>
                             </div>
                             <div className="statistic-item">
-                                <div className="statistic-icon"><i className="fas fa-arrows-alt-h"></i></div>
-                                <div className="statistic-value">{cycleStats.minCycleLength}-{cycleStats.maxCycleLength}</div>
-                                <div className="statistic-label">Cycle Length<br />Range</div>
+                                <div className="statistic-icon">
+                                    <i className="fas fa-arrows-alt-h"></i>
+                                </div>
+                                <div className="statistic-value">
+                                    {cycleStats.minCycleLength}-{cycleStats.maxCycleLength}
+                                </div>
+                                <div className="statistic-label">
+                                    Cycle Length
+                                    <br />
+                                    Range
+                                </div>
                             </div>
                             <div className="statistic-item">
-                                <div className="statistic-icon"><i className="fas fa-droplet"></i></div>
+                                <div className="statistic-icon">
+                                    <i className="fas fa-droplet"></i>
+                                </div>
                                 <div className="statistic-value">{cycleStats.avgPeriodLength}</div>
-                                <div className="statistic-label">Avg. Period<br />Length (days)</div>
+                                <div className="statistic-label">
+                                    Avg. Period
+                                    <br />
+                                    Length (days)
+                                </div>
                             </div>
 
                             <div className="cycle-regularity">
-                                <div className="regularity-icon"><i className="fas fa-check-circle"></i></div>
+                                <div className="regularity-icon">
+                                    <i className="fas fa-check-circle"></i>
+                                </div>
                                 <div className="regularity-value">{cycleStats.cycleRegularity}</div>
                                 <div className="regularity-label">Cycle Regularity</div>
                             </div>
@@ -433,7 +509,9 @@ export default function Analytics() {
                 {cycleStats && cycleStats.cycleLengths.length > 0 && (
                     <div className="chart-card">
                         <div className="card-header">
-                            <h2><i className="fas fa-chart-bar"></i> Cycle Length Trends</h2>
+                            <h2>
+                                <i className="fas fa-chart-bar"></i> Cycle Length Trends
+                            </h2>
                         </div>
                         {cycleStats.cycleLengths.length > 10 ? (
                             <p className="chart-info">Showing last 10 cycles</p>
@@ -445,7 +523,7 @@ export default function Analytics() {
                                         className="bar"
                                         style={{
                                             height: `${(cycle.length / 40) * 100}%`,
-                                            backgroundColor: '#6C63FF'
+                                            backgroundColor: '#6C63FF',
                                         }}
                                         title={`Cycle starting ${new Date(cycle.date).toLocaleDateString()}: ${cycle.length} days`}
                                     ></div>
@@ -455,7 +533,10 @@ export default function Analytics() {
                         </div>
                         <div className="chart-legend">
                             <div className="legend-item">
-                                <div className="legend-color" style={{ backgroundColor: '#6C63FF' }}></div>
+                                <div
+                                    className="legend-color"
+                                    style={{ backgroundColor: '#6C63FF' }}
+                                ></div>
                                 <span>Cycle Length (days)</span>
                             </div>
                         </div>
@@ -465,7 +546,9 @@ export default function Analytics() {
                 {Object.keys(symptomStats).length > 0 && (
                     <div className="chart-card">
                         <div className="card-header">
-                            <h2><i className="fas fa-exclamation-circle"></i> Most Common Symptoms</h2>
+                            <h2>
+                                <i className="fas fa-exclamation-circle"></i> Most Common Symptoms
+                            </h2>
                         </div>
                         <div className="chart-container">
                             <div className="symptom-chart">
@@ -482,15 +565,16 @@ export default function Analytics() {
                                                     className="horizontal-bar"
                                                     style={{
                                                         width: `${(count / 30) * 100}%`,
-                                                        backgroundColor: '#FF6B6B'
+                                                        backgroundColor: '#FF6B6B',
                                                     }}
                                                     title={`${count} occurrences`}
                                                 ></div>
-                                                <span className="horizontal-bar-value">{count}</span>
+                                                <span className="horizontal-bar-value">
+                                                    {count}
+                                                </span>
                                             </div>
                                         </div>
-                                    ))
-                                }
+                                    ))}
                             </div>
                         </div>
                     </div>
@@ -499,7 +583,9 @@ export default function Analytics() {
                 {Object.keys(moodStats).length > 0 && (
                     <div className="chart-card">
                         <div className="card-header">
-                            <h2><i className="fas fa-laugh"></i> Mood Patterns</h2>
+                            <h2>
+                                <i className="fas fa-laugh"></i> Mood Patterns
+                            </h2>
                         </div>
                         <div className="chart-container">
                             <div className="mood-chart">
@@ -513,40 +599,56 @@ export default function Analytics() {
                                             <div className="mood-name">{mood}</div>
                                             <div className="mood-count">{count}</div>
                                         </div>
-                                    ))
-                                }
+                                    ))}
                             </div>
                         </div>
                     </div>
                 )}
 
                 <div className="summary-card">
-                    <h2><i className="fas fa-info-circle"></i> Data Summary</h2>
+                    <h2>
+                        <i className="fas fa-info-circle"></i> Data Summary
+                    </h2>
                     <div className="summary-grid">
                         <div className="summary-item">
-                            <div className="summary-icon" style={{ background: 'linear-gradient(135deg, #EC4899, #F43F5E)' }}>
+                            <div
+                                className="summary-icon"
+                                style={{ background: 'linear-gradient(135deg, #EC4899, #F43F5E)' }}
+                            >
                                 <i className="fas fa-calendar-days"></i>
                             </div>
                             <div className="summary-text">
-                                <div className="summary-value">{filterLogsByTimeRange(periodData).length}</div>
+                                <div className="summary-value">
+                                    {filterLogsByTimeRange(periodData).length}
+                                </div>
                                 <div className="summary-label">Period Logs</div>
                             </div>
                         </div>
                         <div className="summary-item">
-                            <div className="summary-icon" style={{ background: 'linear-gradient(135deg, #F59E0B, #FBBF24)' }}>
+                            <div
+                                className="summary-icon"
+                                style={{ background: 'linear-gradient(135deg, #F59E0B, #FBBF24)' }}
+                            >
                                 <i className="fas fa-thermometer"></i>
                             </div>
                             <div className="summary-text">
-                                <div className="summary-value">{filterLogsByTimeRange(symptomsData).length}</div>
+                                <div className="summary-value">
+                                    {filterLogsByTimeRange(symptomsData).length}
+                                </div>
                                 <div className="summary-label">Symptom Logs</div>
                             </div>
                         </div>
                         <div className="summary-item">
-                            <div className="summary-icon" style={{ background: 'linear-gradient(135deg, #8B5CF6, #A78BFA)' }}>
+                            <div
+                                className="summary-icon"
+                                style={{ background: 'linear-gradient(135deg, #8B5CF6, #A78BFA)' }}
+                            >
                                 <i className="fas fa-smile"></i>
                             </div>
                             <div className="summary-text">
-                                <div className="summary-value">{filterLogsByTimeRange(moodsData).length}</div>
+                                <div className="summary-value">
+                                    {filterLogsByTimeRange(moodsData).length}
+                                </div>
                                 <div className="summary-label">Mood Logs</div>
                             </div>
                         </div>
@@ -554,14 +656,19 @@ export default function Analytics() {
                 </div>
 
                 <div className="insights-card">
-                    <h2><i className="fas fa-lightbulb"></i> Health Insights</h2>
+                    <h2>
+                        <i className="fas fa-lightbulb"></i> Health Insights
+                    </h2>
                     <div className="insights-list">
                         {cycleStats && cycleStats.cycleRegularity === 'Regular' && (
                             <div className="insight-item success">
                                 <i className="fas fa-check-circle"></i>
                                 <div>
                                     <div className="insight-title">Healthy Cycle Regularity</div>
-                                    <div className="insight-text">Your consistent cycle pattern indicates good hormonal balance.</div>
+                                    <div className="insight-text">
+                                        Your consistent cycle pattern indicates good hormonal
+                                        balance.
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -570,7 +677,10 @@ export default function Analytics() {
                                 <i className="fas fa-exclamation-triangle"></i>
                                 <div>
                                     <div className="insight-title">Irregular Cycle Detected</div>
-                                    <div className="insight-text">Highly irregular cycles may indicate hormonal imbalance. Consider consulting a healthcare provider.</div>
+                                    <div className="insight-text">
+                                        Highly irregular cycles may indicate hormonal imbalance.
+                                        Consider consulting a healthcare provider.
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -579,68 +689,103 @@ export default function Analytics() {
                                 <i className="fas fa-info-circle"></i>
                                 <div>
                                     <div className="insight-title">Moderate Cycle Variability</div>
-                                    <div className="insight-text">Your cycle shows some irregularity. Monitor for patterns and consider lifestyle factors.</div>
-                                </div>
-                            </div>
-                        )}
-                        {cycleStats && (cycleStats.avgCycleLength < 21 || cycleStats.avgCycleLength > 35) && (
-                            <div className="insight-item warning">
-                                <i className="fas fa-exclamation-circle"></i>
-                                <div>
-                                    <div className="insight-title">Cycle Length Outside Normal Range</div>
                                     <div className="insight-text">
-                                        Your average cycle length ({cycleStats.avgCycleLength} days) is outside the typical 21-35 day range. Consult a healthcare provider if concerned.
+                                        Your cycle shows some irregularity. Monitor for patterns and
+                                        consider lifestyle factors.
                                     </div>
                                 </div>
                             </div>
                         )}
-                        {cycleStats && (cycleStats.avgPeriodLength < 3 || cycleStats.avgPeriodLength > 7) && (
-                            <div className="insight-item info">
-                                <i className="fas fa-info-circle"></i>
-                                <div>
-                                    <div className="insight-title">Period Duration Note</div>
-                                    <div className="insight-text">
-                                        Your average period length ({cycleStats.avgPeriodLength.toFixed(1)} days) is {cycleStats.avgPeriodLength < 3 ? 'shorter' : 'longer'} than typical. Monitor for changes.
+                        {cycleStats &&
+                            (cycleStats.avgCycleLength < 21 || cycleStats.avgCycleLength > 35) && (
+                                <div className="insight-item warning">
+                                    <i className="fas fa-exclamation-circle"></i>
+                                    <div>
+                                        <div className="insight-title">
+                                            Cycle Length Outside Normal Range
+                                        </div>
+                                        <div className="insight-text">
+                                            Your average cycle length ({cycleStats.avgCycleLength}{' '}
+                                            days) is outside the typical 21-35 day range. Consult a
+                                            healthcare provider if concerned.
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        {cycleStats &&
+                            (cycleStats.avgPeriodLength < 3 || cycleStats.avgPeriodLength > 7) && (
+                                <div className="insight-item info">
+                                    <i className="fas fa-info-circle"></i>
+                                    <div>
+                                        <div className="insight-title">Period Duration Note</div>
+                                        <div className="insight-text">
+                                            Your average period length (
+                                            {cycleStats.avgPeriodLength.toFixed(1)} days) is{' '}
+                                            {cycleStats.avgPeriodLength < 3 ? 'shorter' : 'longer'}{' '}
+                                            than typical. Monitor for changes.
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         {Object.keys(symptomStats).length >= 6 && (
                             <div className="insight-item warning">
                                 <i className="fas fa-notes-medical"></i>
                                 <div>
                                     <div className="insight-title">High Symptom Burden</div>
                                     <div className="insight-text">
-                                        You're experiencing {Object.keys(symptomStats).length} different types of symptoms regularly. Consider discussing symptom management with a healthcare provider.
+                                        You're experiencing {Object.keys(symptomStats).length}{' '}
+                                        different types of symptoms regularly. Consider discussing
+                                        symptom management with a healthcare provider.
                                     </div>
                                 </div>
                             </div>
                         )}
-                        {Object.keys(symptomStats).length > 0 && Object.keys(symptomStats).length < 3 && (
-                            <div className="insight-item success">
-                                <i className="fas fa-check-circle"></i>
-                                <div>
-                                    <div className="insight-title">Minimal Symptoms</div>
-                                    <div className="insight-text">You're experiencing relatively few symptoms, which is a positive health indicator.</div>
+                        {Object.keys(symptomStats).length > 0 &&
+                            Object.keys(symptomStats).length < 3 && (
+                                <div className="insight-item success">
+                                    <i className="fas fa-check-circle"></i>
+                                    <div>
+                                        <div className="insight-title">Minimal Symptoms</div>
+                                        <div className="insight-text">
+                                            You're experiencing relatively few symptoms, which is a
+                                            positive health indicator.
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
                         {(() => {
-                            const negativeMoods = ['sad', 'anxious', 'irritable', 'stressed', 'depressed', 'angry', 'emotional'];
-                            const negativeCount = Object.entries(moodStats).filter(([mood]) =>
-                                negativeMoods.includes(mood.toLowerCase())
-                            ).reduce((sum, [, count]) => sum + count, 0);
-                            const totalMoods = Object.values(moodStats).reduce((sum, count) => sum + count, 0);
-                            const negativePercent = totalMoods > 0 ? (negativeCount / totalMoods) * 100 : 0;
+                            const negativeMoods = [
+                                'sad',
+                                'anxious',
+                                'irritable',
+                                'stressed',
+                                'depressed',
+                                'angry',
+                                'emotional',
+                            ];
+                            const negativeCount = Object.entries(moodStats)
+                                .filter(([mood]) => negativeMoods.includes(mood.toLowerCase()))
+                                .reduce((sum, [, count]) => sum + count, 0);
+                            const totalMoods = Object.values(moodStats).reduce(
+                                (sum, count) => sum + count,
+                                0
+                            );
+                            const negativePercent =
+                                totalMoods > 0 ? (negativeCount / totalMoods) * 100 : 0;
 
                             if (negativePercent > 60) {
                                 return (
                                     <div className="insight-item warning">
                                         <i className="fas fa-brain"></i>
                                         <div>
-                                            <div className="insight-title">Emotional Health Concern</div>
+                                            <div className="insight-title">
+                                                Emotional Health Concern
+                                            </div>
                                             <div className="insight-text">
-                                                You're frequently experiencing negative moods ({negativePercent.toFixed(0)}% of logs). Consider stress management techniques or speaking with a mental health professional.
+                                                You're frequently experiencing negative moods (
+                                                {negativePercent.toFixed(0)}% of logs). Consider
+                                                stress management techniques or speaking with a
+                                                mental health professional.
                                             </div>
                                         </div>
                                     </div>
@@ -650,8 +795,13 @@ export default function Analytics() {
                                     <div className="insight-item success">
                                         <i className="fas fa-smile"></i>
                                         <div>
-                                            <div className="insight-title">Positive Emotional Health</div>
-                                            <div className="insight-text">Your mood logs show predominantly positive emotions, indicating good emotional well-being.</div>
+                                            <div className="insight-title">
+                                                Positive Emotional Health
+                                            </div>
+                                            <div className="insight-text">
+                                                Your mood logs show predominantly positive emotions,
+                                                indicating good emotional well-being.
+                                            </div>
                                         </div>
                                     </div>
                                 );
@@ -663,7 +813,10 @@ export default function Analytics() {
                                 <i className="fas fa-trophy"></i>
                                 <div>
                                     <div className="insight-title">Excellent Health Status</div>
-                                    <div className="insight-text">Your menstrual health metrics indicate optimal wellness. Keep maintaining your healthy habits!</div>
+                                    <div className="insight-text">
+                                        Your menstrual health metrics indicate optimal wellness.
+                                        Keep maintaining your healthy habits!
+                                    </div>
                                 </div>
                             </div>
                         )}

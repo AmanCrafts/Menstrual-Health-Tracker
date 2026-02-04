@@ -1,15 +1,19 @@
 import express from 'express';
 import {
-  createPeriodLog,
-  getPeriodLogs,
-  getPeriodLog,
-  updatePeriodLog,
-  deletePeriodLog,
-  getCycleStats,
-  getCyclePredictions
+    createPeriodLog,
+    getPeriodLogs,
+    getPeriodLog,
+    updatePeriodLog,
+    deletePeriodLog,
+    getCycleStats,
+    getCyclePredictions,
 } from '../controllers/periodController.js';
 import { protect } from '../middleware/auth.js';
-import { periodLogValidation, objectIdValidation, dateRangeValidation } from '../validators/index.js';
+import {
+    periodLogValidation,
+    objectIdValidation,
+    dateRangeValidation,
+} from '../validators/index.js';
 
 const router = express.Router();
 
@@ -21,13 +25,15 @@ router.get('/stats', getCycleStats);
 router.get('/predictions', getCyclePredictions);
 
 // CRUD routes
-router.route('/')
-  .get(dateRangeValidation, getPeriodLogs)
-  .post(periodLogValidation, createPeriodLog);
+router
+    .route('/')
+    .get(dateRangeValidation, getPeriodLogs)
+    .post(periodLogValidation, createPeriodLog);
 
-router.route('/:id')
-  .get(objectIdValidation('id'), getPeriodLog)
-  .put(objectIdValidation('id'), updatePeriodLog)
-  .delete(objectIdValidation('id'), deletePeriodLog);
+router
+    .route('/:id')
+    .get(objectIdValidation('id'), getPeriodLog)
+    .put(objectIdValidation('id'), updatePeriodLog)
+    .delete(objectIdValidation('id'), deletePeriodLog);
 
 export default router;

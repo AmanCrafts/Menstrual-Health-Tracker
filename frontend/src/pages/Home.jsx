@@ -2,21 +2,28 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/home.css';
 
-
 export default function Home() {
     return (
         <div className="home-container">
             {/* Hero Section */}
             <section className="hero-section">
                 <div className="hero-content">
-                    <h1>Track Your Cycle.<br />Understand Your Body.</h1>
+                    <h1>
+                        Track Your Cycle.
+                        <br />
+                        Understand Your Body.
+                    </h1>
                     <p className="hero-subtitle">
                         FlowSync helps you monitor your menstrual health with personalized insights,
                         symptom tracking, and intuitive analytics.
                     </p>
                     <div className="hero-buttons">
-                        <Link to="/signin" className="primary-button">Get Started</Link>
-                        <Link to="/education" className="secondary-button">Learn More</Link>
+                        <Link to="/signin" className="primary-button">
+                            Get Started
+                        </Link>
+                        <Link to="/education" className="secondary-button">
+                            Learn More
+                        </Link>
                     </div>
                 </div>
                 <div className="hero-image">
@@ -36,7 +43,9 @@ export default function Home() {
                             <i className="fas fa-calendar-alt"></i>
                         </div>
                         <h3>Period Tracking</h3>
-                        <p>Log and predict your cycles with accuracy based on your unique patterns</p>
+                        <p>
+                            Log and predict your cycles with accuracy based on your unique patterns
+                        </p>
                     </div>
                     <div className="feature-card">
                         <div className="feature-icon">
@@ -100,14 +109,32 @@ export default function Home() {
                         <p>Understanding your menstrual health empowers you to:</p>
                     </div>
                     <ul className="benefits-list">
-                        <li><i className="fas fa-check"></i> Predict your next period with accuracy</li>
-                        <li><i className="fas fa-check"></i> Identify patterns in symptoms and mood</li>
-                        <li><i className="fas fa-check"></i> Plan activities around your cycle phases</li>
-                        <li><i className="fas fa-check"></i> Recognize changes that might need medical attention</li>
-                        <li><i className="fas fa-check"></i> Make informed decisions about your reproductive health</li>
-                        <li><i className="fas fa-check"></i> Communicate effectively with healthcare providers</li>
+                        <li>
+                            <i className="fas fa-check"></i> Predict your next period with accuracy
+                        </li>
+                        <li>
+                            <i className="fas fa-check"></i> Identify patterns in symptoms and mood
+                        </li>
+                        <li>
+                            <i className="fas fa-check"></i> Plan activities around your cycle
+                            phases
+                        </li>
+                        <li>
+                            <i className="fas fa-check"></i> Recognize changes that might need
+                            medical attention
+                        </li>
+                        <li>
+                            <i className="fas fa-check"></i> Make informed decisions about your
+                            reproductive health
+                        </li>
+                        <li>
+                            <i className="fas fa-check"></i> Communicate effectively with healthcare
+                            providers
+                        </li>
                     </ul>
-                    <Link to="/signin" className="primary-button">Start Tracking Today</Link>
+                    <Link to="/signin" className="primary-button">
+                        Start Tracking Today
+                    </Link>
                 </div>
                 <div className="benefits-image">
                     <img src="/benefits-image.png" alt="Woman feeling empowered" />
@@ -123,28 +150,41 @@ export default function Home() {
                 <div className="faq-grid">
                     <div className="faq-item">
                         <h3>Is my data private?</h3>
-                        <p>Yes, your data is completely private. We offer secure local storage and optional Google Drive backup (which only you can access).</p>
+                        <p>
+                            Yes, your data is completely private. We offer secure local storage and
+                            optional Google Drive backup (which only you can access).
+                        </p>
                     </div>
                     <div className="faq-item">
                         <h3>How accurate are the predictions?</h3>
-                        <p>Predictions improve over time as you log more cycles. Most users report high accuracy after logging 3+ cycles.</p>
+                        <p>
+                            Predictions improve over time as you log more cycles. Most users report
+                            high accuracy after logging 3+ cycles.
+                        </p>
                     </div>
                     <div className="faq-item">
                         <h3>Do I need to create an account?</h3>
-                        <p>Yes, a free account is required to use FlowSync. This ensures your data can be safely stored and accessed.</p>
+                        <p>
+                            Yes, a free account is required to use FlowSync. This ensures your data
+                            can be safely stored and accessed.
+                        </p>
                     </div>
                     <div className="faq-item">
                         <h3>Can I use this if I have irregular periods?</h3>
-                        <p>Absolutely! FlowSync is especially helpful for those with irregular cycles, as it helps identify patterns over time.</p>
+                        <p>
+                            Absolutely! FlowSync is especially helpful for those with irregular
+                            cycles, as it helps identify patterns over time.
+                        </p>
                     </div>
                 </div>
             </section>
 
-
             <section className="cta-section">
                 <h2>Ready to take control of your menstrual health?</h2>
                 <p>Join thousands of women who track their cycles with FlowSync</p>
-                <Link to="/signin" className="primary-button">Sign In Now</Link>
+                <Link to="/signin" className="primary-button">
+                    Sign In Now
+                </Link>
             </section>
 
             {/* Footer */}
@@ -157,28 +197,60 @@ export default function Home() {
                         <div className="footer-column">
                             <h4>Company</h4>
                             <ul>
-                                <li><a href="#">About Us</a></li>
-                                <li><a href="#">Terms of Service</a></li>
-                                <li><a href="#">Privacy Policy</a></li>
-                                <li><a href="#">Contact</a></li>
+                                <li>
+                                    <a href="#">About Us</a>
+                                </li>
+                                <li>
+                                    <a href="#">Terms of Service</a>
+                                </li>
+                                <li>
+                                    <a href="#">Privacy Policy</a>
+                                </li>
+                                <li>
+                                    <a href="#">Contact</a>
+                                </li>
                             </ul>
                         </div>
                         <div className="footer-column">
                             <h4>Resources</h4>
                             <ul>
-                                <li><Link to="/education">Education</Link></li>
-                                <li><a href="#">Blog</a></li>
-                                <li><a href="#">Support</a></li>
-                                <li><a href="#">FAQ</a></li>
+                                <li>
+                                    <Link to="/education">Education</Link>
+                                </li>
+                                <li>
+                                    <a href="#">Blog</a>
+                                </li>
+                                <li>
+                                    <a href="#">Support</a>
+                                </li>
+                                <li>
+                                    <a href="#">FAQ</a>
+                                </li>
                             </ul>
                         </div>
                         <div className="footer-column">
                             <h4>Connect</h4>
                             <ul className="social-links">
-                                <li><a href="#"><i className="fab fa-facebook"></i></a></li>
-                                <li><a href="#"><i className="fab fa-twitter"></i></a></li>
-                                <li><a href="#"><i className="fab fa-instagram"></i></a></li>
-                                <li><a href="#"><i className="fab fa-linkedin"></i></a></li>
+                                <li>
+                                    <a href="#">
+                                        <i className="fab fa-facebook"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <i className="fab fa-twitter"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <i className="fab fa-instagram"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <i className="fab fa-linkedin"></i>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </div>

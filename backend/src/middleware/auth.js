@@ -8,57 +8,57 @@ import logger from '../utils/logger.js';
  * Protects routes by verifying JWT tokens
  */
 export const protect = async (req, res, next) => {
-  try {
-    let token;
-
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-      token = req.headers.authorization.split(' ')[1];
-    } else if (req.cookies && req.cookies.token) {
-      token = req.cookies.token;
-    }
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'Not authorized to access this route'
-      });
-    }
-
     try {
-      const decoded = jwt.verify(token, config.jwt.secret);
+        let token;
 
-      const user = await User.findById(decoded.id);
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            token = req.headers.authorization.split(' ')[1];
+        } else if (req.cookies && req.cookies.token) {
+            token = req.cookies.token;
+        }
 
-      if (!user) {
-        return res.status(401).json({
-          success: false,
-          message: 'User not found'
+        if (!token) {
+            return res.status(401).json({
+                success: false,
+                message: 'Not authorized to access this route',
+            });
+        }
+
+        try {
+            const decoded = jwt.verify(token, config.jwt.secret);
+
+            const user = await User.findById(decoded.id);
+
+            if (!user) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'User not found',
+                });
+            }
+
+            if (!user.isActive) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'User account is deactivated',
+                });
+            }
+
+            req.user = user;
+            next();
+        } catch (err) {
+            logger.error(`Token verification failed: ${err.message}`);
+            return res.status(401).json({
+                success: false,
+                message: 'Token is invalid or expired',
+            });
+        }
+    } catch (error) {
+        logger.error(`Auth middleware error: ${error.message}`);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error in authentication',
         });
-      }
-
-      if (!user.isActive) {
-        return res.status(401).json({
-          success: false,
-          message: 'User account is deactivated'
-        });
-      }
-
-      req.user = user;
-      next();
-    } catch (err) {
-      logger.error(`Token verification failed: ${err.message}`);
-      return res.status(401).json({
-        success: false,
-        message: 'Token is invalid or expired'
-      });
     }
-  } catch (error) {
-    logger.error(`Auth middleware error: ${error.message}`);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error in authentication'
-    });
-  }
 };
 
 /**
@@ -66,32 +66,32 @@ export const protect = async (req, res, next) => {
  * Attaches user to request if token is valid, but doesn't block if not
  */
 export const optionalAuth = async (req, res, next) => {
-  try {
-    let token;
+    try {
+        let token;
 
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-      token = req.headers.authorization.split(' ')[1];
-    } else if (req.cookies && req.cookies.token) {
-      token = req.cookies.token;
-    }
-
-    if (token) {
-      try {
-        const decoded = jwt.verify(token, config.jwt.secret);
-        const user = await User.findById(decoded.id);
-        if (user && user.isActive) {
-          req.user = user;
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            token = req.headers.authorization.split(' ')[1];
+        } else if (req.cookies && req.cookies.token) {
+            token = req.cookies.token;
         }
-      } catch (err) {
-        // Token invalid, but continue anyway
-        logger.debug('Optional auth token invalid');
-      }
-    }
 
-    next();
-  } catch (error) {
-    next();
-  }
+        if (token) {
+            try {
+                const decoded = jwt.verify(token, config.jwt.secret);
+                const user = await User.findById(decoded.id);
+                if (user && user.isActive) {
+                    req.user = user;
+                }
+            } catch (err) {
+                // Token invalid, but continue anyway
+                logger.debug('Optional auth token invalid');
+            }
+        }
+
+        next();
+    } catch (error) {
+        next();
+    }
 };
 
 export default { protect, optionalAuth };

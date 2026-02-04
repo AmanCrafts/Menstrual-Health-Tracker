@@ -84,28 +84,29 @@ export function DataProvider({ children }) {
 
             console.log('Successfully authenticated as test user');
 
-            const [periodsRes, symptomsRes, moodsRes, healthRes, predictionsRes] = await Promise.all([
-                api.getPeriods().catch(err => {
-                    console.error('Error fetching periods:', err);
-                    return { success: false, error: err };
-                }),
-                api.getSymptoms().catch(err => {
-                    console.error('Error fetching symptoms:', err);
-                    return { success: false, error: err };
-                }),
-                api.getMoods().catch(err => {
-                    console.error('Error fetching moods:', err);
-                    return { success: false, error: err };
-                }),
-                api.getHealthLogs().catch(err => {
-                    console.error('Error fetching health logs:', err);
-                    return { success: false, error: err };
-                }),
-                api.getPeriodPredictions().catch(err => {
-                    console.error('Error fetching predictions:', err);
-                    return { success: false, error: err };
-                }),
-            ]);
+            const [periodsRes, symptomsRes, moodsRes, healthRes, predictionsRes] =
+                await Promise.all([
+                    api.getPeriods().catch((err) => {
+                        console.error('Error fetching periods:', err);
+                        return { success: false, error: err };
+                    }),
+                    api.getSymptoms().catch((err) => {
+                        console.error('Error fetching symptoms:', err);
+                        return { success: false, error: err };
+                    }),
+                    api.getMoods().catch((err) => {
+                        console.error('Error fetching moods:', err);
+                        return { success: false, error: err };
+                    }),
+                    api.getHealthLogs().catch((err) => {
+                        console.error('Error fetching health logs:', err);
+                        return { success: false, error: err };
+                    }),
+                    api.getPeriodPredictions().catch((err) => {
+                        console.error('Error fetching predictions:', err);
+                        return { success: false, error: err };
+                    }),
+                ]);
 
             if (periodsRes.success) setPeriodData(periodsRes.data || []);
             if (symptomsRes.success) setSymptomsData(symptomsRes.data || []);
@@ -117,7 +118,7 @@ export function DataProvider({ children }) {
                 periods: periodsRes.success ? periodsRes.data?.length : 0,
                 symptoms: symptomsRes.success ? symptomsRes.data?.length : 0,
                 moods: moodsRes.success ? moodsRes.data?.length : 0,
-                health: healthRes.success ? healthRes.data?.length : 0
+                health: healthRes.success ? healthRes.data?.length : 0,
             });
 
             setError(null);
@@ -144,13 +145,14 @@ export function DataProvider({ children }) {
 
         setLoading(true);
         try {
-            const [periodsRes, symptomsRes, moodsRes, healthRes, predictionsRes] = await Promise.all([
-                api.getPeriods().catch(err => ({ success: false, error: err })),
-                api.getSymptoms().catch(err => ({ success: false, error: err })),
-                api.getMoods().catch(err => ({ success: false, error: err })),
-                api.getHealthLogs().catch(err => ({ success: false, error: err })),
-                api.getPeriodPredictions().catch(err => ({ success: false, error: err })),
-            ]);
+            const [periodsRes, symptomsRes, moodsRes, healthRes, predictionsRes] =
+                await Promise.all([
+                    api.getPeriods().catch((err) => ({ success: false, error: err })),
+                    api.getSymptoms().catch((err) => ({ success: false, error: err })),
+                    api.getMoods().catch((err) => ({ success: false, error: err })),
+                    api.getHealthLogs().catch((err) => ({ success: false, error: err })),
+                    api.getPeriodPredictions().catch((err) => ({ success: false, error: err })),
+                ]);
 
             if (periodsRes.success) setPeriodData(periodsRes.data || []);
             if (symptomsRes.success) setSymptomsData(symptomsRes.data || []);
@@ -211,7 +213,7 @@ export function DataProvider({ children }) {
             setLoading(true);
             const response = await api.createPeriod(periodLog);
             if (response.success) {
-                setPeriodData(prev => [...prev, response.data]);
+                setPeriodData((prev) => [...prev, response.data]);
                 // Refresh predictions after adding period
                 const predictionsRes = await api.getPeriodPredictions();
                 if (predictionsRes.success) setPredictions(predictionsRes.data);
@@ -238,7 +240,7 @@ export function DataProvider({ children }) {
             setLoading(true);
             const response = await api.updatePeriod(id, updates);
             if (response.success) {
-                setPeriodData(prev => prev.map(p => p._id === id ? response.data : p));
+                setPeriodData((prev) => prev.map((p) => (p._id === id ? response.data : p)));
                 return true;
             }
             throw new Error(response.message);
@@ -261,7 +263,7 @@ export function DataProvider({ children }) {
             setLoading(true);
             const response = await api.deletePeriod(id);
             if (response.success) {
-                setPeriodData(prev => prev.filter(p => p._id !== id));
+                setPeriodData((prev) => prev.filter((p) => p._id !== id));
                 return true;
             }
             throw new Error(response.message);
@@ -272,7 +274,6 @@ export function DataProvider({ children }) {
             setLoading(false);
         }
     };
-
 
     const addSymptomLog = async (symptomLog) => {
         if (testMode) {
@@ -285,7 +286,7 @@ export function DataProvider({ children }) {
             setLoading(true);
             const response = await api.createSymptom(symptomLog);
             if (response.success) {
-                setSymptomsData(prev => [...prev, response.data]);
+                setSymptomsData((prev) => [...prev, response.data]);
                 return true;
             }
             throw new Error(response.message);
@@ -308,7 +309,7 @@ export function DataProvider({ children }) {
             setLoading(true);
             const response = await api.updateSymptom(id, updates);
             if (response.success) {
-                setSymptomsData(prev => prev.map(s => s._id === id ? response.data : s));
+                setSymptomsData((prev) => prev.map((s) => (s._id === id ? response.data : s)));
                 return true;
             }
             throw new Error(response.message);
@@ -331,7 +332,7 @@ export function DataProvider({ children }) {
             setLoading(true);
             const response = await api.deleteSymptom(id);
             if (response.success) {
-                setSymptomsData(prev => prev.filter(s => s._id !== id));
+                setSymptomsData((prev) => prev.filter((s) => s._id !== id));
                 return true;
             }
             throw new Error(response.message);
@@ -342,7 +343,6 @@ export function DataProvider({ children }) {
             setLoading(false);
         }
     };
-
 
     const addMoodLog = async (moodLog) => {
         if (testMode) {
@@ -355,7 +355,7 @@ export function DataProvider({ children }) {
             setLoading(true);
             const response = await api.createMood(moodLog);
             if (response.success) {
-                setMoodsData(prev => [...prev, response.data]);
+                setMoodsData((prev) => [...prev, response.data]);
                 return true;
             }
             throw new Error(response.message);
@@ -378,7 +378,7 @@ export function DataProvider({ children }) {
             setLoading(true);
             const response = await api.updateMood(id, updates);
             if (response.success) {
-                setMoodsData(prev => prev.map(m => m._id === id ? response.data : m));
+                setMoodsData((prev) => prev.map((m) => (m._id === id ? response.data : m)));
                 return true;
             }
             throw new Error(response.message);
@@ -401,7 +401,7 @@ export function DataProvider({ children }) {
             setLoading(true);
             const response = await api.deleteMood(id);
             if (response.success) {
-                setMoodsData(prev => prev.filter(m => m._id !== id));
+                setMoodsData((prev) => prev.filter((m) => m._id !== id));
                 return true;
             }
             throw new Error(response.message);
@@ -412,7 +412,6 @@ export function DataProvider({ children }) {
             setLoading(false);
         }
     };
-
 
     const addHealthLog = async (healthLog) => {
         if (testMode) {
@@ -425,7 +424,7 @@ export function DataProvider({ children }) {
             setLoading(true);
             const response = await api.createHealthLog(healthLog);
             if (response.success) {
-                setHealthData(prev => [...prev, response.data]);
+                setHealthData((prev) => [...prev, response.data]);
                 return true;
             }
             throw new Error(response.message);
@@ -448,7 +447,7 @@ export function DataProvider({ children }) {
             setLoading(true);
             const response = await api.updateHealthLog(id, updates);
             if (response.success) {
-                setHealthData(prev => prev.map(h => h._id === id ? response.data : h));
+                setHealthData((prev) => prev.map((h) => (h._id === id ? response.data : h)));
                 return true;
             }
             throw new Error(response.message);
@@ -471,7 +470,7 @@ export function DataProvider({ children }) {
             setLoading(true);
             const response = await api.deleteHealthLog(id);
             if (response.success) {
-                setHealthData(prev => prev.filter(h => h._id !== id));
+                setHealthData((prev) => prev.filter((h) => h._id !== id));
                 return true;
             }
             throw new Error(response.message);
@@ -503,8 +502,8 @@ export function DataProvider({ children }) {
 
             return true;
         } catch (err) {
-            console.error("Error exporting data:", err);
-            setError("Failed to export data.");
+            console.error('Error exporting data:', err);
+            setError('Failed to export data.');
             return false;
         }
     };
@@ -522,9 +521,12 @@ export function DataProvider({ children }) {
     };
 
     // Computed values
-    const lastPeriod = periodData.length > 0
-        ? periodData.reduce((latest, p) => new Date(p.startDate) > new Date(latest.startDate) ? p : latest)
-        : null;
+    const lastPeriod =
+        periodData.length > 0
+            ? periodData.reduce((latest, p) =>
+                  new Date(p.startDate) > new Date(latest.startDate) ? p : latest
+              )
+            : null;
 
     const value = {
         // State
@@ -535,7 +537,7 @@ export function DataProvider({ children }) {
 
         // Test mode controls - only truly enabled for developer
         testMode: isDeveloper && testMode,
-        setTestMode: isDeveloper ? setTestMode : () => { },
+        setTestMode: isDeveloper ? setTestMode : () => {},
         testUser,
         setTestUser,
 
@@ -571,12 +573,8 @@ export function DataProvider({ children }) {
 
         // Legacy compatibility (for existing components)
         userProfile: currentUser,
-        updateUserProfile: async () => { }, // Handled by AuthContext now
+        updateUserProfile: async () => {}, // Handled by AuthContext now
     };
 
-    return (
-        <DataContext.Provider value={value}>
-            {children}
-        </DataContext.Provider>
-    );
+    return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 }

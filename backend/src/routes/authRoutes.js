@@ -1,20 +1,20 @@
 import express from 'express';
 import {
-  register,
-  login,
-  googleAuth,
-  getMe,
-  updateProfile,
-  refreshToken,
-  logout,
-  deleteAccount
+    register,
+    login,
+    googleAuth,
+    getMe,
+    updateProfile,
+    refreshToken,
+    logout,
+    deleteAccount,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/auth.js';
 import {
-  registerValidation,
-  loginValidation,
-  googleAuthValidation,
-  profileUpdateValidation
+    registerValidation,
+    loginValidation,
+    googleAuthValidation,
+    profileUpdateValidation,
 } from '../validators/index.js';
 
 const router = express.Router();

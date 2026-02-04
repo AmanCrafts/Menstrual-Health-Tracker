@@ -39,7 +39,10 @@ const Navbar = () => {
                     <img src="/parllel-logo.png" alt="FlowSync" className="logo-icon-img" />
                 </Link>
 
-                <div className={`menu-icon ${isMenuOpen ? `active` : ``}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                <div
+                    className={`menu-icon ${isMenuOpen ? `active` : ``}`}
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                >
                     <span></span>
                     <span></span>
                     <span></span>
@@ -49,27 +52,62 @@ const Navbar = () => {
                     {currentUser ? (
                         <>
                             <li className="nav-item">
-                                <Link to="/dashboard" className={location.pathname === `/dashboard` ? `nav-link active` : `nav-link`}>
+                                <Link
+                                    to="/dashboard"
+                                    className={
+                                        location.pathname === `/dashboard`
+                                            ? `nav-link active`
+                                            : `nav-link`
+                                    }
+                                >
                                     <i className="nav-icon fas fa-home"></i>Dashboard
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link to="/analytics" className={location.pathname === `/analytics` ? `nav-link active` : `nav-link`}>
+                                <Link
+                                    to="/analytics"
+                                    className={
+                                        location.pathname === `/analytics`
+                                            ? `nav-link active`
+                                            : `nav-link`
+                                    }
+                                >
                                     <i className="nav-icon fas fa-chart-line"></i>Analytics
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link to="/trackers" className={location.pathname === `/trackers` ? `nav-link active` : `nav-link`}>
+                                <Link
+                                    to="/trackers"
+                                    className={
+                                        location.pathname === `/trackers`
+                                            ? `nav-link active`
+                                            : `nav-link`
+                                    }
+                                >
                                     <i className="nav-icon fas fa-calendar-alt"></i>Trackers
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link to="/education" className={location.pathname === `/education` ? `nav-link active` : `nav-link`}>
+                                <Link
+                                    to="/education"
+                                    className={
+                                        location.pathname === `/education`
+                                            ? `nav-link active`
+                                            : `nav-link`
+                                    }
+                                >
                                     <i className="nav-icon fas fa-book"></i>Education
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link to="/profile" className={location.pathname === `/profile` ? `nav-link active` : `nav-link`}>
+                                <Link
+                                    to="/profile"
+                                    className={
+                                        location.pathname === `/profile`
+                                            ? `nav-link active`
+                                            : `nav-link`
+                                    }
+                                >
                                     <i className="nav-icon fas fa-user"></i>Profile
                                 </Link>
                             </li>
@@ -82,12 +120,24 @@ const Navbar = () => {
                     ) : (
                         <>
                             <li className="nav-item">
-                                <Link to="/" className={location.pathname === `/` ? `nav-link active` : `nav-link`}>
+                                <Link
+                                    to="/"
+                                    className={
+                                        location.pathname === `/` ? `nav-link active` : `nav-link`
+                                    }
+                                >
                                     <i className="nav-icon fas fa-home"></i>Home
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link to="/education" className={location.pathname === `/education` ? `nav-link active` : `nav-link`}>
+                                <Link
+                                    to="/education"
+                                    className={
+                                        location.pathname === `/education`
+                                            ? `nav-link active`
+                                            : `nav-link`
+                                    }
+                                >
                                     <i className="nav-icon fas fa-book"></i>Education
                                 </Link>
                             </li>

@@ -13,21 +13,27 @@ export default function ProductGuide() {
                 <header className="article-header">
                     <h1>Complete Guide to Menstrual Products</h1>
                     <div className="article-meta">
-                        <span className="read-time"><i className="fas fa-clock"></i> 8 min read</span>
-                        <span className="category"><i className="fas fa-folder"></i> Menstrual Products</span>
+                        <span className="read-time">
+                            <i className="fas fa-clock"></i> 8 min read
+                        </span>
+                        <span className="category">
+                            <i className="fas fa-folder"></i> Menstrual Products
+                        </span>
                     </div>
                 </header>
 
                 <div className="article-content-body">
                     <p>
-                        Finding the right menstrual products can significantly improve your period experience. There are more options available
-                        than ever before, each with its own benefits and considerations. This guide will help you understand your choices.
+                        Finding the right menstrual products can significantly improve your period
+                        experience. There are more options available than ever before, each with its
+                        own benefits and considerations. This guide will help you understand your
+                        choices.
                     </p>
 
                     <h2>Disposable Pads</h2>
                     <p>
-                        Disposable pads are sheets of absorbent material that attach to your underwear. They come in various sizes, absorbency
-                        levels, and designs.
+                        Disposable pads are sheets of absorbent material that attach to your
+                        underwear. They come in various sizes, absorbency levels, and designs.
                     </p>
 
                     <h3>Pros:</h3>
@@ -48,7 +54,8 @@ export default function ProductGuide() {
 
                     <h2>Tampons</h2>
                     <p>
-                        Tampons are absorbent cylinders that are inserted into the vagina to absorb menstrual flow before it leaves the body.
+                        Tampons are absorbent cylinders that are inserted into the vagina to absorb
+                        menstrual flow before it leaves the body.
                     </p>
 
                     <h3>Pros:</h3>
@@ -69,8 +76,9 @@ export default function ProductGuide() {
 
                     <h2>Menstrual Cups</h2>
                     <p>
-                        Menstrual cups are flexible cups made of medical-grade silicone, rubber, or TPE that are inserted into the vagina to collect
-                        menstrual flow rather than absorb it.
+                        Menstrual cups are flexible cups made of medical-grade silicone, rubber, or
+                        TPE that are inserted into the vagina to collect menstrual flow rather than
+                        absorb it.
                     </p>
 
                     <h3>Pros:</h3>
@@ -92,7 +100,8 @@ export default function ProductGuide() {
 
                     <h2>Period Underwear</h2>
                     <p>
-                        Period underwear has built-in absorbent layers that trap menstrual fluid, eliminating the need for additional products.
+                        Period underwear has built-in absorbent layers that trap menstrual fluid,
+                        eliminating the need for additional products.
                     </p>
 
                     <h3>Pros:</h3>
@@ -112,9 +121,7 @@ export default function ProductGuide() {
                     </ul>
 
                     <h2>Choosing What's Right for You</h2>
-                    <p>
-                        When selecting menstrual products, consider:
-                    </p>
+                    <p>When selecting menstrual products, consider:</p>
                     <ul>
                         <li>Your flow heaviness</li>
                         <li>Comfort preferences</li>
@@ -124,12 +131,14 @@ export default function ProductGuide() {
                     </ul>
 
                     <p>
-                        Many people use different products for different situations or combine methods. For example, using a menstrual cup during the day
-                        and period underwear at night, or using tampons for swimming and pads for sleeping.
+                        Many people use different products for different situations or combine
+                        methods. For example, using a menstrual cup during the day and period
+                        underwear at night, or using tampons for swimming and pads for sleeping.
                     </p>
 
                     <p>
-                        The best approach is to experiment with different options to find what works best for your body, lifestyle, and preferences.
+                        The best approach is to experiment with different options to find what works
+                        best for your body, lifestyle, and preferences.
                     </p>
                 </div>
             </article>

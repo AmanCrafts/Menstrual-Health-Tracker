@@ -28,7 +28,7 @@ export default function CycleProgressBar({ progress, phase }) {
                     className="cycle-progress-fill"
                     style={{
                         width: `${progress}%`,
-                        backgroundColor: phaseColor
+                        backgroundColor: phaseColor,
                     }}
                 ></div>
             </div>

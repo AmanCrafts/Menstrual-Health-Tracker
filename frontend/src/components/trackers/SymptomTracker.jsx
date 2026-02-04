@@ -14,7 +14,7 @@ export default function SymptomTracker({ selectedDate, symptomLogs, onSubmit, on
         acne: false,
         dizziness: false,
         insomnia: false,
-        appetite: false
+        appetite: false,
     });
     const [intensity, setIntensity] = useState('moderate');
     const [notes, setNotes] = useState('');
@@ -24,12 +24,12 @@ export default function SymptomTracker({ selectedDate, symptomLogs, onSubmit, on
     const formatDateForInput = (date) => {
         if (!date) return '';
         const d = new Date(date);
-        let month = '' + (d.getMonth() + 1);
-        let day = '' + d.getDate();
+        let month = `${d.getMonth() + 1}`;
+        let day = `${d.getDate()}`;
         const year = d.getFullYear();
 
-        if (month.length < 2) month = '0' + month;
-        if (day.length < 2) day = '0' + day;
+        if (month.length < 2) month = `0${month}`;
+        if (day.length < 2) day = `0${day}`;
 
         return [year, month, day].join('-');
     };
@@ -40,8 +40,8 @@ export default function SymptomTracker({ selectedDate, symptomLogs, onSubmit, on
             setDate(formatDateForInput(selectedDate));
 
             // Check if there's an existing log for this date
-            const existingSymptomLog = symptomLogs?.find(log =>
-                new Date(log.date).toDateString() === new Date(selectedDate).toDateString()
+            const existingSymptomLog = symptomLogs?.find(
+                (log) => new Date(log.date).toDateString() === new Date(selectedDate).toDateString()
             );
 
             if (existingSymptomLog) {
@@ -70,7 +70,7 @@ export default function SymptomTracker({ selectedDate, symptomLogs, onSubmit, on
             acne: false,
             dizziness: false,
             insomnia: false,
-            appetite: false
+            appetite: false,
         });
         setIntensity('moderate');
         setNotes('');
@@ -80,7 +80,7 @@ export default function SymptomTracker({ selectedDate, symptomLogs, onSubmit, on
     const handleSymptomChange = (symptom) => {
         setSymptoms({
             ...symptoms,
-            [symptom]: !symptoms[symptom]
+            [symptom]: !symptoms[symptom],
         });
     };
 
@@ -92,7 +92,7 @@ export default function SymptomTracker({ selectedDate, symptomLogs, onSubmit, on
             date,
             symptoms,
             intensity,
-            notes
+            notes,
         };
 
         onSubmit(symptomData);
@@ -110,12 +110,15 @@ export default function SymptomTracker({ selectedDate, symptomLogs, onSubmit, on
         <div className="symptom-tracker">
             <h2>Symptom Tracker</h2>
             <p className="selected-date-display">
-                Selected Date: {selectedDate ? selectedDate.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }) : ''}
+                Selected Date:{' '}
+                {selectedDate
+                    ? selectedDate.toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                      })
+                    : ''}
             </p>
 
             <form onSubmit={handleSubmit} className="tracker-form">
@@ -277,11 +280,7 @@ export default function SymptomTracker({ selectedDate, symptomLogs, onSubmit, on
                     </button>
 
                     {existingLog && (
-                        <button
-                            type="button"
-                            className="delete-button"
-                            onClick={handleDelete}
-                        >
+                        <button type="button" className="delete-button" onClick={handleDelete}>
                             Delete
                         </button>
                     )}

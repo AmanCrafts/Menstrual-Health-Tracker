@@ -1,12 +1,13 @@
 export const articleContent = [
-  {
-    id: 'menstrual-hygiene-day',
-    title: 'Menstrual Hygiene Day',
-    category: 'Menstrual Health',
-    readTime: '5 min',
-    imageUrl: '/menstrual-hygiene-day.jpg',
-    excerpt: 'May 28th is celebrated as Menstrual Hygiene Day worldwide, aiming to break taboos and raise awareness about menstrual hygiene management.',
-    content: `
+    {
+        id: 'menstrual-hygiene-day',
+        title: 'Menstrual Hygiene Day',
+        category: 'Menstrual Health',
+        readTime: '5 min',
+        imageUrl: '/menstrual-hygiene-day.jpg',
+        excerpt:
+            'May 28th is celebrated as Menstrual Hygiene Day worldwide, aiming to break taboos and raise awareness about menstrual hygiene management.',
+        content: `
       <p>May 28th is celebrated as Menstrual Hygiene Day worldwide. First celebrated in 2014, this day aims to break taboos surrounding menstruation and raise awareness about the importance of menstrual hygiene management for women and girls worldwide.</p>
 
       <h2>The Importance of Menstrual Hygiene</h2>
@@ -48,16 +49,17 @@ export const articleContent = [
       </ul>
 
       <p>Menstrual Hygiene Day reminds us that menstruation is a natural process that should not limit anyone's potential. By improving menstrual hygiene management globally, we can help ensure that women and girls can participate fully in society, with dignity and confidence, every day of the month.</p>
-    `
-  },
-  {
-    id: 'endometriosis',
-    title: 'Endometriosis: Understanding the Invisible Condition',
-    category: 'Reproductive Health',
-    readTime: '7 min',
-    imageUrl: '/endometriosis.webp',
-    excerpt: 'Endometriosis affects approximately 1 in 10 women of reproductive age, yet it remains widely misunderstood and often misdiagnosed.',
-    content: `
+    `,
+    },
+    {
+        id: 'endometriosis',
+        title: 'Endometriosis: Understanding the Invisible Condition',
+        category: 'Reproductive Health',
+        readTime: '7 min',
+        imageUrl: '/endometriosis.webp',
+        excerpt:
+            'Endometriosis affects approximately 1 in 10 women of reproductive age, yet it remains widely misunderstood and often misdiagnosed.',
+        content: `
       <p>Endometriosis affects approximately 1 in 10 women of reproductive age worldwide, yet it remains widely misunderstood and often misdiagnosed. This condition occurs when tissue similar to the lining of the uterus (endometrium) grows outside the uterus, commonly on the ovaries, fallopian tubes, and tissues lining the pelvis.</p>
 
       <h2>What Happens in Endometriosis?</h2>
@@ -112,16 +114,17 @@ export const articleContent = [
       </ul>
 
       <p>While endometriosis can be challenging to live with, increased awareness, earlier diagnosis, and advances in treatment options are helping many women manage their symptoms and improve their quality of life. If you experience severe period pain that interferes with daily activities, don't dismiss it as normal—talk to your healthcare provider about the possibility of endometriosis.</p>
-    `
-  },
-  {
-    id: 'myths-about-menstruation',
-    title: 'Myths About Menstruation We Need to Stop Believing',
-    category: 'Menstrual Health',
-    readTime: '6 min',
-    imageUrl: '/myths-about-menstruation.webp',
-    excerpt: 'Despite being a natural biological process, menstruation remains shrouded in myths and misconceptions that perpetuate stigma.',
-    content: `
+    `,
+    },
+    {
+        id: 'myths-about-menstruation',
+        title: 'Myths About Menstruation We Need to Stop Believing',
+        category: 'Menstrual Health',
+        readTime: '6 min',
+        imageUrl: '/myths-about-menstruation.webp',
+        excerpt:
+            'Despite being a natural biological process, menstruation remains shrouded in myths and misconceptions that perpetuate stigma.',
+        content: `
       <p>Despite being a natural biological process that affects half the world's population, menstruation remains shrouded in myths, misconceptions, and taboos. These myths not only perpetuate stigma but can also lead to harmful practices. Let's debunk some common menstrual myths and replace them with facts.</p>
 
       <h2>Myth 1: Menstruating Women Are Impure</h2>
@@ -162,16 +165,17 @@ export const articleContent = [
       </ul>
 
       <p>Next time you hear a menstrual myth, take the opportunity to share facts and help build a world where periods are understood as the normal biological process they are.</p>
-    `
-  },
-  {
-    id: 'menstrual-cup',
-    title: 'The Complete Guide to Menstrual Cups',
-    category: 'Periods',
-    readTime: '7 min',
-    imageUrl: '/menstrual-cup.webp',
-    excerpt: 'Menstrual cups are a sustainable, cost-effective alternative to traditional period products. Learn everything about choosing and using them.',
-    content: `
+    `,
+    },
+    {
+        id: 'menstrual-cup',
+        title: 'The Complete Guide to Menstrual Cups',
+        category: 'Periods',
+        readTime: '7 min',
+        imageUrl: '/menstrual-cup.webp',
+        excerpt:
+            'Menstrual cups are a sustainable, cost-effective alternative to traditional period products. Learn everything about choosing and using them.',
+        content: `
       <p>Menstrual cups have gained popularity as a sustainable, cost-effective alternative to traditional period products. These flexible cups made of medical-grade silicone, latex, or thermoplastic elastomer (TPE) are inserted into the vagina to collect menstrual flow rather than absorb it.</p>
 
       <h2>Benefits of Menstrual Cups</h2>
@@ -238,16 +242,17 @@ export const articleContent = [
       <p>While menstrual cups have many advantages, they're not for everyone. Consider your lifestyle, comfort with your body, and personal preferences. Many cup users report a learning curve but ultimately find cups to be life-changing once mastered.</p>
 
       <p>If you're interested in trying a menstrual cup, research different brands, read reviews, and consider starting during a lighter flow day when you have time to practice insertion and removal without pressure.</p>
-    `
-  },
-  {
-    id: 'premenstrual-syndrome',
-    title: 'Understanding and Managing Premenstrual Syndrome (PMS)',
-    category: 'Menstrual Health',
-    readTime: '6 min',
-    imageUrl: '/premenstrual-syndrome.webp',
-    excerpt: 'PMS refers to physical, emotional, and behavioral symptoms many women experience before their period. Learn how to manage them effectively.',
-    content: `
+    `,
+    },
+    {
+        id: 'premenstrual-syndrome',
+        title: 'Understanding and Managing Premenstrual Syndrome (PMS)',
+        category: 'Menstrual Health',
+        readTime: '6 min',
+        imageUrl: '/premenstrual-syndrome.webp',
+        excerpt:
+            'PMS refers to physical, emotional, and behavioral symptoms many women experience before their period. Learn how to manage them effectively.',
+        content: `
       <p>Premenstrual Syndrome (PMS) refers to a combination of physical, emotional, and behavioral symptoms that many women experience in the days or weeks leading up to their menstrual period. While exact causes remain unclear, hormonal fluctuations play a significant role, with symptoms typically improving once menstruation begins.</p>
 
       <h2>Common PMS Symptoms</h2>
@@ -345,6 +350,6 @@ export const articleContent = [
       </ul>
 
       <p>While PMS is common, debilitating symptoms are not something you should have to "just live with." If PMS significantly affects your quality of life, consider discussing your symptoms with a healthcare provider who can help you develop an effective management plan tailored to your needs.</p>
-    `
-  }
+    `,
+    },
 ];

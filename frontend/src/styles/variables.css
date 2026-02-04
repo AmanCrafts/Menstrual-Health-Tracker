@@ -1,174 +1,175 @@
 :root {
-  /* Modern Color Palette - Soft & Elegant */
-  --primary: #7C3AED;
-  --primary-light: #A78BFA;
-  --primary-dark: #5B21B6;
-  --primary-rgb: 124, 58, 237;
-  --primary-gradient: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
-  
-  --secondary: #EC4899;
-  --secondary-light: #F9A8D4;
-  --secondary-dark: #BE185D;
-  --secondary-rgb: 236, 72, 153;
-  
-  /* Accent Colors */
-  --accent: #06B6D4;
-  --accent-light: #67E8F9;
-  --accent-dark: #0891B2;
-  
-  /* Soft Pastels for phases */
-  --soft-pink: #FDF2F8;
-  --soft-purple: #F5F3FF;
-  --soft-blue: #EFF6FF;
-  --soft-green: #ECFDF5;
-  --soft-orange: #FFF7ED;
-  --soft-gray: #F9FAFB;
-  
-  /* Neutrals - Refined */
-  --background: #FAFAFA;
-  --surface: #FFFFFF;
-  --surface-elevated: #FFFFFF;
-  --border: #E5E7EB;
-  --border-light: #F3F4F6;
-  
-  --text-dark: #1F2937;
-  --text-medium: #6B7280;
-  --text-light: #9CA3AF;
-  --text-muted: #D1D5DB;
-  
-  /* Functional colors */
-  --success: #10B981;
-  --success-light: #D1FAE5;
-  --warning: #F59E0B;
-  --warning-light: #FEF3C7;
-  --error: #EF4444;
-  --error-light: #FEE2E2;
-  --info: #3B82F6;
-  --info-light: #DBEAFE;
-  
-  /* Phase colors - Harmonious */
-  --period-color: #F43F5E;
-  --period-color-light: #FFE4E6;
-  --period-color-bg: rgba(244, 63, 94, 0.08);
-  
-  --fertile-color: #14B8A6;
-  --fertile-color-light: #CCFBF1;
-  --fertile-color-bg: rgba(20, 184, 166, 0.08);
-  
-  --ovulation-color: #EC4899;
-  --ovulation-color-light: #FCE7F3;
-  --ovulation-color-bg: rgba(236, 72, 153, 0.08);
-  
-  --pms-color: #F97316;
-  --pms-color-light: #FFEDD5;
-  --pms-color-bg: rgba(249, 115, 22, 0.08);
-  
-  --follicular-color: #3B82F6;
-  --follicular-color-light: #DBEAFE;
-  --follicular-color-bg: rgba(59, 130, 246, 0.08);
-  
-  --luteal-color: #8B5CF6;
-  --luteal-color-light: #EDE9FE;
-  --luteal-color-bg: rgba(139, 92, 246, 0.08);
-  
-  /* Shadows - Refined & Layered */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.04);
-  --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.15);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-card-hover: 0 10px 40px -10px rgba(124, 58, 237, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-hover: 0 8px 20px rgba(124, 58, 237, 0.12);
-  
-  /* Border radius - Modern */
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-  --radius-2xl: 28px;
-  --radius-full: 9999px;
-  --radius-round: 50%;
-  
-  /* Spacing - Consistent Scale */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-  --spacing-xxl: 3rem;
-  --spacing-3xl: 4rem;
-  --spacing-4xl: 5rem;
-  
-  /* Transitions - Smooth */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-bounce: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  
-  /* Font sizes - Modern Scale */
-  --text-2xs: 0.65rem;
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-md: 1rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-xxl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
-  --text-5xl: 3rem;
-  
-  /* Font weights */
-  --font-light: 300;
-  --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
-  --font-extrabold: 800;
-  
-  /* Line heights */
-  --leading-none: 1;
-  --leading-tight: 1.25;
-  --leading-snug: 1.375;
-  --leading-normal: 1.5;
-  --leading-relaxed: 1.625;
-  --leading-loose: 2;
-  
-  /* Z-index scale */
-  --z-dropdown: 100;
-  --z-sticky: 200;
-  --z-fixed: 300;
-  --z-modal-backdrop: 400;
-  --z-modal: 500;
-  --z-popover: 600;
-  --z-tooltip: 700;
+    /* Modern Color Palette - Soft & Elegant */
+    --primary: #7c3aed;
+    --primary-light: #a78bfa;
+    --primary-dark: #5b21b6;
+    --primary-rgb: 124, 58, 237;
+    --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+
+    --secondary: #ec4899;
+    --secondary-light: #f9a8d4;
+    --secondary-dark: #be185d;
+    --secondary-rgb: 236, 72, 153;
+
+    /* Accent Colors */
+    --accent: #06b6d4;
+    --accent-light: #67e8f9;
+    --accent-dark: #0891b2;
+
+    /* Soft Pastels for phases */
+    --soft-pink: #fdf2f8;
+    --soft-purple: #f5f3ff;
+    --soft-blue: #eff6ff;
+    --soft-green: #ecfdf5;
+    --soft-orange: #fff7ed;
+    --soft-gray: #f9fafb;
+
+    /* Neutrals - Refined */
+    --background: #fafafa;
+    --surface: #ffffff;
+    --surface-elevated: #ffffff;
+    --border: #e5e7eb;
+    --border-light: #f3f4f6;
+
+    --text-dark: #1f2937;
+    --text-medium: #6b7280;
+    --text-light: #9ca3af;
+    --text-muted: #d1d5db;
+
+    /* Functional colors */
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --error: #ef4444;
+    --error-light: #fee2e2;
+    --info: #3b82f6;
+    --info-light: #dbeafe;
+
+    /* Phase colors - Harmonious */
+    --period-color: #f43f5e;
+    --period-color-light: #ffe4e6;
+    --period-color-bg: rgba(244, 63, 94, 0.08);
+
+    --fertile-color: #14b8a6;
+    --fertile-color-light: #ccfbf1;
+    --fertile-color-bg: rgba(20, 184, 166, 0.08);
+
+    --ovulation-color: #ec4899;
+    --ovulation-color-light: #fce7f3;
+    --ovulation-color-bg: rgba(236, 72, 153, 0.08);
+
+    --pms-color: #f97316;
+    --pms-color-light: #ffedd5;
+    --pms-color-bg: rgba(249, 115, 22, 0.08);
+
+    --follicular-color: #3b82f6;
+    --follicular-color-light: #dbeafe;
+    --follicular-color-bg: rgba(59, 130, 246, 0.08);
+
+    --luteal-color: #8b5cf6;
+    --luteal-color-light: #ede9fe;
+    --luteal-color-bg: rgba(139, 92, 246, 0.08);
+
+    /* Shadows - Refined & Layered */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+    --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.15);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-card-hover:
+        0 10px 40px -10px rgba(124, 58, 237, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 8px 20px rgba(124, 58, 237, 0.12);
+
+    /* Border radius - Modern */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --radius-2xl: 28px;
+    --radius-full: 9999px;
+    --radius-round: 50%;
+
+    /* Spacing - Consistent Scale */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    --spacing-xxl: 3rem;
+    --spacing-3xl: 4rem;
+    --spacing-4xl: 5rem;
+
+    /* Transitions - Smooth */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Font sizes - Modern Scale */
+    --text-2xs: 0.65rem;
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-md: 1rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-xxl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+
+    /* Font weights */
+    --font-light: 300;
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+
+    /* Line heights */
+    --leading-none: 1;
+    --leading-tight: 1.25;
+    --leading-snug: 1.375;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+    --leading-loose: 2;
+
+    /* Z-index scale */
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-fixed: 300;
+    --z-modal-backdrop: 400;
+    --z-modal: 500;
+    --z-popover: 600;
+    --z-tooltip: 700;
 }
 
 /* Dark mode theme */
-[data-theme="dark"] {
-  --background: #0F172A;
-  --surface: #1E293B;
-  --surface-elevated: #334155;
-  --border: #334155;
-  --border-light: #475569;
-  
-  --text-dark: #F1F5F9;
-  --text-medium: #CBD5E1;
-  --text-light: #94A3B8;
-  --text-muted: #64748B;
-  
-  --primary: #A78BFA;
-  --primary-light: #C4B5FD;
-  --primary-dark: #7C3AED;
-  
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+[data-theme='dark'] {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-elevated: #334155;
+    --border: #334155;
+    --border-light: #475569;
+
+    --text-dark: #f1f5f9;
+    --text-medium: #cbd5e1;
+    --text-light: #94a3b8;
+    --text-muted: #64748b;
+
+    --primary: #a78bfa;
+    --primary-light: #c4b5fd;
+    --primary-dark: #7c3aed;
+
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
 }

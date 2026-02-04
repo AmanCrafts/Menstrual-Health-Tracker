@@ -11,19 +11,19 @@ export default function RecentLogs({ logs }) {
         return date.toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
-            year: 'numeric'
+            year: 'numeric',
         });
     };
 
     // Format symptom log details
     const formatSymptomLog = (log) => {
         const symptoms = Object.entries(log.symptoms || {})
-            .filter(([_, value]) => value)
-            .map(([key]) => key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()));
+            .filter(([, value]) => value)
+            .map(([key]) =>
+                key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())
+            );
 
-        return symptoms.length > 0
-            ? `Symptoms: ${symptoms.join(', ')}`
-            : 'No symptoms recorded';
+        return symptoms.length > 0 ? `Symptoms: ${symptoms.join(', ')}` : 'No symptoms recorded';
     };
 
     // Format mood log details

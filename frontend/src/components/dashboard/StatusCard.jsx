@@ -4,9 +4,9 @@ export default function StatusCard({ title, value, unit, icon, colorized }) {
     // For BMI colors
     const getBmiColor = (bmi) => {
         if (bmi < 18.5) return '#3498db'; // Underweight - blue
-        if (bmi < 25) return '#2ecc71';   // Normal - green
-        if (bmi < 30) return '#f39c12';   // Overweight - orange
-        return '#e74c3c';                 // Obese - red
+        if (bmi < 25) return '#2ecc71'; // Normal - green
+        if (bmi < 30) return '#f39c12'; // Overweight - orange
+        return '#e74c3c'; // Obese - red
     };
 
     // For BMI category
