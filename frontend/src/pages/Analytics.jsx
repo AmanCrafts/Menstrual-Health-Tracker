@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/useAuth';
 import { useData } from '../contexts/DataContext';
@@ -12,35 +12,57 @@ export default function Analytics() {
     const { periodData, symptomsData, moodsData, loading, error } = useData();
 
     const [cycleStats, setCycleStats] = useState(null);
-    const [timeRange, setTimeRange] = useState('6months'); // '3months', '6months', '1year', 'all'
+    const [timeRange, setTimeRange] = useState('6months');
     const [symptomStats, setSymptomStats] = useState({});
     const [moodStats, setMoodStats] = useState({});
     const [hasEnoughData, setHasEnoughData] = useState(false);
+    const [wellnessScore, setWellnessScore] = useState(0);
+    const [wellnessLevel, setWellnessLevel] = useState({ level: 'Limited', color: '#EF4444' });
 
-    useEffect(() => {
-        // Check if we have enough data to show analytics
-        if (periodData && periodData.length >= 2) {
-            setHasEnoughData(true);
-            calculateStatistics();
-        } else {
-            setHasEnoughData(false);
+    const filterLogsByTimeRange = useCallback((logs) => {
+        if (!logs) return [];
+        if (timeRange === 'all') return logs;
+
+        const now = new Date();
+        const cutoffDate = new Date();
+
+        switch (timeRange) {
+            case '3months':
+                cutoffDate.setMonth(now.getMonth() - 3);
+                break;
+            case '6months':
+                cutoffDate.setMonth(now.getMonth() - 6);
+                break;
+            case '1year':
+                cutoffDate.setFullYear(now.getFullYear() - 1);
+                break;
+            default:
+                cutoffDate.setMonth(now.getMonth() - 6);
         }
-    }, [periodData, symptomsData, moodsData, timeRange]);
 
-    // Calculate all statistics
-    const calculateStatistics = () => {
-        calculateCycleStatistics();
-        calculateSymptomStatistics();
-        calculateMoodStatistics();
-    };
+        return logs.filter(log => {
+            const logDate = new Date(log.date || log.startDate);
+            return logDate >= cutoffDate;
+        });
+    }, [timeRange]);
 
-    // Calculate statistics based on cycle logs
-    const calculateCycleStatistics = () => {
+    const calculateVariance = useCallback((values) => {
+        if (values.length <= 1) return 0;
+
+        const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+        const squareDiffs = values.map(value => {
+            const diff = value - mean;
+            return diff * diff;
+        });
+        const variance = squareDiffs.reduce((sum, val) => sum + val, 0) / values.length;
+        return Math.sqrt(variance);
+    }, []);
+
+    const calculateCycleStatistics = useCallback(() => {
         if (!periodData || periodData.length < 2) return;
 
         const sortedLogs = [...periodData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
-        // Filter logs based on selected time range
         const filteredLogs = filterLogsByTimeRange(sortedLogs);
 
         if (filteredLogs.length < 2) {
@@ -56,12 +78,10 @@ export default function Analytics() {
             return;
         }
 
-        // Calculate cycle lengths between consecutive period start dates
         const cycleLengths = [];
         const periodLengths = [];
 
         for (let i = 0; i < filteredLogs.length; i++) {
-            // Calculate period length
             if (filteredLogs[i].endDate) {
                 const startDate = new Date(filteredLogs[i].startDate);
                 const endDate = new Date(filteredLogs[i].endDate);
@@ -72,13 +92,12 @@ export default function Analytics() {
                 });
             }
 
-            // Calculate cycle length (distance to next period)
             if (i < filteredLogs.length - 1) {
                 const currentStart = new Date(filteredLogs[i].startDate);
                 const nextStart = new Date(filteredLogs[i + 1].startDate);
                 const cycleLength = Math.round((nextStart - currentStart) / (1000 * 60 * 60 * 24));
 
-                if (cycleLength > 10 && cycleLength < 45) { // Filter out likely incorrect data
+                if (cycleLength > 10 && cycleLength < 45) {
                     cycleLengths.push({
                         date: currentStart,
                         length: cycleLength
@@ -87,7 +106,6 @@ export default function Analytics() {
             }
         }
 
-        // Calculate statistics
         const cycleValues = cycleLengths.map(c => c.length);
         const periodValues = periodLengths.map(p => p.length);
 
@@ -102,7 +120,6 @@ export default function Analytics() {
         const minCycleLength = cycleValues.length > 0 ? Math.min(...cycleValues) : avgCycleLength;
         const maxCycleLength = cycleValues.length > 0 ? Math.max(...cycleValues) : avgCycleLength;
 
-        // Calculate regularity
         const cycleVariance = calculateVariance(cycleValues);
         let cycleRegularity = "Regular";
 
@@ -123,15 +140,13 @@ export default function Analytics() {
             cycleLengths,
             periodLengths
         });
-    };
+    }, [periodData, currentUser, filterLogsByTimeRange, calculateVariance]);
 
-    // Calculate symptom statistics
-    const calculateSymptomStatistics = () => {
+    const calculateSymptomStatistics = useCallback(() => {
         if (!symptomsData || symptomsData.length === 0) return;
 
         const filteredLogs = filterLogsByTimeRange(symptomsData);
 
-        // Count occurrences of each symptom
         const symptomCounts = {};
 
         filteredLogs.forEach(log => {
@@ -145,15 +160,13 @@ export default function Analytics() {
         });
 
         setSymptomStats(symptomCounts);
-    };
+    }, [symptomsData, filterLogsByTimeRange]);
 
-    // Calculate mood statistics
-    const calculateMoodStatistics = () => {
+    const calculateMoodStatistics = useCallback(() => {
         if (!moodsData || moodsData.length === 0) return;
 
         const filteredLogs = filterLogsByTimeRange(moodsData);
 
-        // Count occurrences of each mood
         const moodCounts = {};
 
         filteredLogs.forEach(log => {
@@ -163,60 +176,157 @@ export default function Analytics() {
         });
 
         setMoodStats(moodCounts);
-    };
+    }, [moodsData, filterLogsByTimeRange]);
 
-    // Helper function to calculate variance
-    const calculateVariance = (values) => {
-        if (values.length <= 1) return 0;
+    const calculateStatistics = useCallback(() => {
+        calculateCycleStatistics();
+        calculateSymptomStatistics();
+        calculateMoodStatistics();
+    }, [calculateCycleStatistics, calculateSymptomStatistics, calculateMoodStatistics]);
 
-        const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-        const squareDiffs = values.map(value => {
-            const diff = value - mean;
-            return diff * diff;
-        });
-        const variance = squareDiffs.reduce((sum, val) => sum + val, 0) / values.length;
-        return Math.sqrt(variance);
-    };
+    useEffect(() => {
+        if (periodData && periodData.length >= 2) {
+            setHasEnoughData(true);
+            calculateStatistics();
+        } else {
+            setHasEnoughData(false);
+        }
+    }, [periodData, calculateStatistics]);
 
-    // Filter logs based on time range
-    const filterLogsByTimeRange = (logs) => {
-        if (!logs) return [];
-        if (timeRange === 'all') return logs;
+    /**
+     * Calculate wellness score based on health metrics
+     * Scoring: Start at 100, deduct points for health concerns
+     */
+    const calculateWellnessScore = useCallback(() => {
+        let score = 100;
+        const filteredPeriodData = filterLogsByTimeRange(periodData || []);
+        const filteredSymptomData = filterLogsByTimeRange(symptomsData || []);
+        const filteredMoodData = filterLogsByTimeRange(moodsData || []);
 
-        const now = new Date();
-        let cutoffDate = new Date();
-
-        switch (timeRange) {
-            case '3months':
-                cutoffDate.setMonth(now.getMonth() - 3);
-                break;
-            case '6months':
-                cutoffDate.setMonth(now.getMonth() - 6);
-                break;
-            case '1year':
-                cutoffDate.setFullYear(now.getFullYear() - 1);
-                break;
-            default:
-                cutoffDate.setMonth(now.getMonth() - 6);
+        if (filteredPeriodData.length < 2) {
+            return 50;
         }
 
-        return logs.filter(log => {
-            const logDate = new Date(log.date || log.startDate);
-            return logDate >= cutoffDate;
-        });
-    };
+        // Cycle Regularity (30 points impact)
+        if (cycleStats) {
+            if (cycleStats.cycleRegularity === 'Regular') {
+                // No deduction
+            } else if (cycleStats.cycleRegularity === 'Slightly Irregular') {
+                score -= 8;
+            } else if (cycleStats.cycleRegularity === 'Somewhat Irregular') {
+                score -= 18;
+            } else if (cycleStats.cycleRegularity === 'Highly Irregular') {
+                score -= 30;
+            }
 
-    // Handle time range change
+            // Cycle Length: Normal 21-35 days, ideal 26-32 days (15 points impact)
+            const avgCycle = cycleStats.avgCycleLength;
+            if (avgCycle >= 26 && avgCycle <= 32) {
+                // No deduction
+            } else if (avgCycle >= 21 && avgCycle <= 35) {
+                score -= 5;
+            } else if (avgCycle < 21) {
+                score -= 15;
+            } else if (avgCycle > 35) {
+                score -= 12;
+            }
+
+            // Period Length: Normal 3-7 days, ideal 4-5 days (10 points impact)
+            const avgPeriod = cycleStats.avgPeriodLength;
+            if (avgPeriod >= 4 && avgPeriod <= 5) {
+                // No deduction
+            } else if (avgPeriod >= 3 && avgPeriod <= 7) {
+                score -= 3;
+            } else if (avgPeriod < 3) {
+                score -= 8;
+            } else if (avgPeriod > 7) {
+                score -= 10;
+            }
+        }
+
+        // Symptom Severity (25 points impact)
+        if (filteredSymptomData.length > 0) {
+            const totalSymptomOccurrences = Object.values(symptomStats).reduce((sum, count) => sum + count, 0);
+            const avgSymptomsPerLog = totalSymptomOccurrences / filteredSymptomData.length;
+            const symptomTypes = Object.keys(symptomStats).length;
+
+            if (avgSymptomsPerLog >= 6 || symptomTypes >= 8) {
+                score -= 25;
+            } else if (avgSymptomsPerLog >= 4 || symptomTypes >= 6) {
+                score -= 18;
+            } else if (avgSymptomsPerLog >= 2 || symptomTypes >= 4) {
+                score -= 10;
+            } else if (avgSymptomsPerLog >= 1 || symptomTypes >= 2) {
+                score -= 5;
+            }
+        }
+
+        // Emotional Health (20 points impact)
+        if (filteredMoodData.length > 0) {
+            const moodScores = {
+                'happy': 0,
+                'calm': 0,
+                'energetic': 0,
+                'content': 0,
+                'tired': -5,
+                'stressed': -8,
+                'anxious': -10,
+                'irritable': -12,
+                'sad': -12,
+                'angry': -10,
+                'emotional': -8,
+                'depressed': -15
+            };
+
+            let moodImpact = 0;
+            let totalMoodLogs = 0;
+
+            Object.entries(moodStats).forEach(([mood, count]) => {
+                const moodScore = moodScores[mood.toLowerCase()] || -5;
+                moodImpact += moodScore * count;
+                totalMoodLogs += count;
+            });
+
+            const avgMoodImpact = totalMoodLogs > 0 ? moodImpact / totalMoodLogs : 0;
+
+            if (avgMoodImpact < -10) {
+                score -= 20;
+            } else if (avgMoodImpact < -7) {
+                score -= 15;
+            } else if (avgMoodImpact < -4) {
+                score -= 10;
+            } else if (avgMoodImpact < -2) {
+                score -= 5;
+            }
+        }
+
+        return Math.max(0, Math.min(100, score));
+    }, [cycleStats, periodData, symptomsData, moodsData, symptomStats, moodStats, filterLogsByTimeRange]);
+
+    const getWellnessLevel = useCallback((score) => {
+        if (score >= 85) return { level: 'Excellent', color: '#10B981', description: 'Optimal menstrual health' };
+        if (score >= 70) return { level: 'Good', color: '#3B82F6', description: 'Healthy cycle with minor variations' };
+        if (score >= 55) return { level: 'Fair', color: '#F59E0B', description: 'Some health concerns noted' };
+        if (score >= 40) return { level: 'Needs Attention', color: '#F97316', description: 'Multiple health indicators flagged' };
+        return { level: 'Concerning', color: '#EF4444', description: 'Significant health concerns detected' };
+    }, []);
+
+    useEffect(() => {
+        if (hasEnoughData) {
+            const score = calculateWellnessScore();
+            setWellnessScore(score);
+            setWellnessLevel(getWellnessLevel(score));
+        }
+    }, [hasEnoughData, calculateWellnessScore, getWellnessLevel]);
+
     const handleTimeRangeChange = (event) => {
         setTimeRange(event.target.value);
     };
 
-    // Format symptom name for display
     const formatSymptomName = (symptomKey) => {
-        // Convert camelCase to words with spaces and capitalize first letter
         return symptomKey
-            .replace(/([A-Z])/g, ' $1') // Insert space before capital letters
-            .replace(/^./, str => str.toUpperCase()); // Capitalize first letter
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, str => str.toUpperCase());
     };
 
     if (loading) {
@@ -236,46 +346,13 @@ export default function Analytics() {
                     </div>
                     <h2>More Data Needed</h2>
                     <p>Analytics will become available after you log at least two menstrual periods.</p>
-                    <button onClick={() => navigate('/trackers', { state: { openTab: 'period' } })} className="primary-button">
+                    <button type="button" onClick={() => navigate('/trackers', { state: { openTab: 'period' } })} className="primary-button">
                         Log My Period
                     </button>
                 </div>
             </div>
         );
     }
-
-    // Calculate wellness score
-    const calculateWellnessScore = () => {
-        let score = 50; // Base score
-
-        // Add points for data consistency
-        if (cycleStats && cycleStats.cycleRegularity === 'Regular') score += 15;
-        else if (cycleStats && cycleStats.cycleRegularity === 'Slightly Irregular') score += 10;
-        else if (cycleStats && cycleStats.cycleRegularity === 'Somewhat Irregular') score += 5;
-
-        // Add points for consistent logging
-        const filteredPeriodData = filterLogsByTimeRange(periodData);
-        if (filteredPeriodData.length >= 3) score += 15;
-        else if (filteredPeriodData.length >= 2) score += 10;
-
-        const filteredSymptomData = filterLogsByTimeRange(symptomsData);
-        if (filteredSymptomData.length >= 5) score += 10;
-
-        const filteredMoodData = filterLogsByTimeRange(moodsData);
-        if (filteredMoodData.length >= 5) score += 10;
-
-        return Math.min(score, 100);
-    };
-
-    const getWellnessLevel = (score) => {
-        if (score >= 80) return { level: 'Excellent', color: '#10B981' };
-        if (score >= 60) return { level: 'Good', color: '#3B82F6' };
-        if (score >= 40) return { level: 'Fair', color: '#F59E0B' };
-        return { level: 'Limited', color: '#EF4444' };
-    };
-
-    const wellnessScore = calculateWellnessScore();
-    const wellnessLevel = getWellnessLevel(wellnessScore);
 
     return (
         <div className="analytics-container">
@@ -302,7 +379,6 @@ export default function Analytics() {
                 </div>
             </div>
 
-            {/* Wellness Score Card */}
             <div className="wellness-banner">
                 <div className="wellness-content">
                     <div className="wellness-score-container">
@@ -312,18 +388,17 @@ export default function Analytics() {
                         </div>
                     </div>
                     <div className="wellness-info">
-                        <h2>Overall Wellness Status</h2>
+                        <h2>Menstrual Health Score</h2>
                         <div className="wellness-status" style={{ color: wellnessLevel.color }}>
-                            <i className="fas fa-star"></i>
+                            <i className="fas fa-heart"></i>
                             {wellnessLevel.level}
                         </div>
-                        <p>Based on your logging consistency and cycle patterns</p>
+                        <p>{wellnessLevel.description}</p>
                     </div>
                 </div>
             </div>
 
             <div className="analytics-grid">
-                {/* Key Metrics Section */}
                 {cycleStats && (
                     <div className="statistics-card">
                         <div className="card-header">
@@ -355,7 +430,6 @@ export default function Analytics() {
                     </div>
                 )}
 
-                {/* Cycle Length Trends */}
                 {cycleStats && cycleStats.cycleLengths.length > 0 && (
                     <div className="chart-card">
                         <div className="card-header">
@@ -388,7 +462,6 @@ export default function Analytics() {
                     </div>
                 )}
 
-                {/* Symptoms Section */}
                 {Object.keys(symptomStats).length > 0 && (
                     <div className="chart-card">
                         <div className="card-header">
@@ -399,7 +472,7 @@ export default function Analytics() {
                                 {Object.entries(symptomStats)
                                     .sort((a, b) => b[1] - a[1])
                                     .slice(0, 5)
-                                    .map(([symptom, count], index) => (
+                                    .map(([symptom, count]) => (
                                         <div key={symptom} className="horizontal-bar-container">
                                             <div className="horizontal-bar-label">
                                                 {formatSymptomName(symptom)}
@@ -423,7 +496,6 @@ export default function Analytics() {
                     </div>
                 )}
 
-                {/* Mood Patterns */}
                 {Object.keys(moodStats).length > 0 && (
                     <div className="chart-card">
                         <div className="card-header">
@@ -433,7 +505,7 @@ export default function Analytics() {
                             <div className="mood-chart">
                                 {Object.entries(moodStats)
                                     .sort((a, b) => b[1] - a[1])
-                                    .map(([mood, count], index) => (
+                                    .map(([mood, count]) => (
                                         <div key={mood} className="mood-item">
                                             <div className="mood-icon">
                                                 <i className={`fas fa-${getMoodIcon(mood)}`}></i>
@@ -448,7 +520,6 @@ export default function Analytics() {
                     </div>
                 )}
 
-                {/* Data Summary Card */}
                 <div className="summary-card">
                     <h2><i className="fas fa-info-circle"></i> Data Summary</h2>
                     <div className="summary-grid">
@@ -482,45 +553,117 @@ export default function Analytics() {
                     </div>
                 </div>
 
-                {/* Insights & Recommendations */}
                 <div className="insights-card">
-                    <h2><i className="fas fa-lightbulb"></i> Key Insights</h2>
+                    <h2><i className="fas fa-lightbulb"></i> Health Insights</h2>
                     <div className="insights-list">
                         {cycleStats && cycleStats.cycleRegularity === 'Regular' && (
                             <div className="insight-item success">
                                 <i className="fas fa-check-circle"></i>
                                 <div>
-                                    <div className="insight-title">Regular Cycle</div>
-                                    <div className="insight-text">Your cycle pattern is consistent, which is excellent for planning.</div>
+                                    <div className="insight-title">Healthy Cycle Regularity</div>
+                                    <div className="insight-text">Your consistent cycle pattern indicates good hormonal balance.</div>
                                 </div>
                             </div>
                         )}
-                        {cycleStats && (cycleStats.cycleRegularity === 'Somewhat Irregular' || cycleStats.cycleRegularity === 'Highly Irregular') && (
+                        {cycleStats && cycleStats.cycleRegularity === 'Highly Irregular' && (
                             <div className="insight-item warning">
                                 <i className="fas fa-exclamation-triangle"></i>
                                 <div>
-                                    <div className="insight-title">Irregular Pattern</div>
-                                    <div className="insight-text">Your cycle shows variability. Continue logging for better predictions.</div>
+                                    <div className="insight-title">Irregular Cycle Detected</div>
+                                    <div className="insight-text">Highly irregular cycles may indicate hormonal imbalance. Consider consulting a healthcare provider.</div>
                                 </div>
                             </div>
                         )}
-                        {Object.keys(symptomStats).length > 0 && (
+                        {cycleStats && cycleStats.cycleRegularity === 'Somewhat Irregular' && (
                             <div className="insight-item info">
                                 <i className="fas fa-info-circle"></i>
                                 <div>
-                                    <div className="insight-title">Top Symptom</div>
+                                    <div className="insight-title">Moderate Cycle Variability</div>
+                                    <div className="insight-text">Your cycle shows some irregularity. Monitor for patterns and consider lifestyle factors.</div>
+                                </div>
+                            </div>
+                        )}
+                        {cycleStats && (cycleStats.avgCycleLength < 21 || cycleStats.avgCycleLength > 35) && (
+                            <div className="insight-item warning">
+                                <i className="fas fa-exclamation-circle"></i>
+                                <div>
+                                    <div className="insight-title">Cycle Length Outside Normal Range</div>
                                     <div className="insight-text">
-                                        {formatSymptomName(Object.entries(symptomStats).sort((a, b) => b[1] - a[1])[0][0])} appears most frequently in your logs.
+                                        Your average cycle length ({cycleStats.avgCycleLength} days) is outside the typical 21-35 day range. Consult a healthcare provider if concerned.
                                     </div>
                                 </div>
                             </div>
                         )}
-                        {filterLogsByTimeRange(periodData).length < 3 && (
-                            <div className="insight-item suggestion">
-                                <i className="fas fa-arrow-right"></i>
+                        {cycleStats && (cycleStats.avgPeriodLength < 3 || cycleStats.avgPeriodLength > 7) && (
+                            <div className="insight-item info">
+                                <i className="fas fa-info-circle"></i>
                                 <div>
-                                    <div className="insight-title">Keep Logging</div>
-                                    <div className="insight-text">More data will help improve cycle predictions and insights.</div>
+                                    <div className="insight-title">Period Duration Note</div>
+                                    <div className="insight-text">
+                                        Your average period length ({cycleStats.avgPeriodLength.toFixed(1)} days) is {cycleStats.avgPeriodLength < 3 ? 'shorter' : 'longer'} than typical. Monitor for changes.
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {Object.keys(symptomStats).length >= 6 && (
+                            <div className="insight-item warning">
+                                <i className="fas fa-notes-medical"></i>
+                                <div>
+                                    <div className="insight-title">High Symptom Burden</div>
+                                    <div className="insight-text">
+                                        You're experiencing {Object.keys(symptomStats).length} different types of symptoms regularly. Consider discussing symptom management with a healthcare provider.
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {Object.keys(symptomStats).length > 0 && Object.keys(symptomStats).length < 3 && (
+                            <div className="insight-item success">
+                                <i className="fas fa-check-circle"></i>
+                                <div>
+                                    <div className="insight-title">Minimal Symptoms</div>
+                                    <div className="insight-text">You're experiencing relatively few symptoms, which is a positive health indicator.</div>
+                                </div>
+                            </div>
+                        )}
+                        {(() => {
+                            const negativeMoods = ['sad', 'anxious', 'irritable', 'stressed', 'depressed', 'angry', 'emotional'];
+                            const negativeCount = Object.entries(moodStats).filter(([mood]) =>
+                                negativeMoods.includes(mood.toLowerCase())
+                            ).reduce((sum, [, count]) => sum + count, 0);
+                            const totalMoods = Object.values(moodStats).reduce((sum, count) => sum + count, 0);
+                            const negativePercent = totalMoods > 0 ? (negativeCount / totalMoods) * 100 : 0;
+
+                            if (negativePercent > 60) {
+                                return (
+                                    <div className="insight-item warning">
+                                        <i className="fas fa-brain"></i>
+                                        <div>
+                                            <div className="insight-title">Emotional Health Concern</div>
+                                            <div className="insight-text">
+                                                You're frequently experiencing negative moods ({negativePercent.toFixed(0)}% of logs). Consider stress management techniques or speaking with a mental health professional.
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            } else if (negativePercent < 30 && totalMoods > 0) {
+                                return (
+                                    <div className="insight-item success">
+                                        <i className="fas fa-smile"></i>
+                                        <div>
+                                            <div className="insight-title">Positive Emotional Health</div>
+                                            <div className="insight-text">Your mood logs show predominantly positive emotions, indicating good emotional well-being.</div>
+                                        </div>
+                                    </div>
+                                );
+                            }
+                            return null;
+                        })()}
+                        {wellnessScore >= 85 && (
+                            <div className="insight-item success">
+                                <i className="fas fa-trophy"></i>
+                                <div>
+                                    <div className="insight-title">Excellent Health Status</div>
+                                    <div className="insight-text">Your menstrual health metrics indicate optimal wellness. Keep maintaining your healthy habits!</div>
                                 </div>
                             </div>
                         )}
@@ -530,7 +673,6 @@ export default function Analytics() {
         </div>
     );
 
-    // Helper function to get icon for mood
     function getMoodIcon(mood) {
         const moodIcons = {
             happy: 'smile-beam',
