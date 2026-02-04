@@ -244,14 +244,50 @@ export default function Analytics() {
         );
     }
 
+    // Calculate wellness score
+    const calculateWellnessScore = () => {
+        let score = 50; // Base score
+
+        // Add points for data consistency
+        if (cycleStats && cycleStats.cycleRegularity === 'Regular') score += 15;
+        else if (cycleStats && cycleStats.cycleRegularity === 'Slightly Irregular') score += 10;
+        else if (cycleStats && cycleStats.cycleRegularity === 'Somewhat Irregular') score += 5;
+
+        // Add points for consistent logging
+        const filteredPeriodData = filterLogsByTimeRange(periodData);
+        if (filteredPeriodData.length >= 3) score += 15;
+        else if (filteredPeriodData.length >= 2) score += 10;
+
+        const filteredSymptomData = filterLogsByTimeRange(symptomsData);
+        if (filteredSymptomData.length >= 5) score += 10;
+
+        const filteredMoodData = filterLogsByTimeRange(moodsData);
+        if (filteredMoodData.length >= 5) score += 10;
+
+        return Math.min(score, 100);
+    };
+
+    const getWellnessLevel = (score) => {
+        if (score >= 80) return { level: 'Excellent', color: '#10B981' };
+        if (score >= 60) return { level: 'Good', color: '#3B82F6' };
+        if (score >= 40) return { level: 'Fair', color: '#F59E0B' };
+        return { level: 'Limited', color: '#EF4444' };
+    };
+
+    const wellnessScore = calculateWellnessScore();
+    const wellnessLevel = getWellnessLevel(wellnessScore);
+
     return (
         <div className="analytics-container">
             {error && <Alert type="error" message={error} />}
 
             <div className="analytics-header">
-                <h1>Analytics</h1>
+                <div className="header-content">
+                    <h1>Analytics</h1>
+                    <p className="header-subtitle">Track your menstrual health patterns and insights</p>
+                </div>
                 <div className="time-range-selector">
-                    <label htmlFor="time-range">Time Range: </label>
+                    <label htmlFor="time-range"><i className="fas fa-calendar"></i> Time Range: </label>
                     <select
                         id="time-range"
                         value={timeRange}
@@ -266,25 +302,52 @@ export default function Analytics() {
                 </div>
             </div>
 
+            {/* Wellness Score Card */}
+            <div className="wellness-banner">
+                <div className="wellness-content">
+                    <div className="wellness-score-container">
+                        <div className="wellness-circle" style={{ borderColor: wellnessLevel.color }}>
+                            <div className="wellness-score-value">{wellnessScore}</div>
+                            <div className="wellness-score-label">Score</div>
+                        </div>
+                    </div>
+                    <div className="wellness-info">
+                        <h2>Overall Wellness Status</h2>
+                        <div className="wellness-status" style={{ color: wellnessLevel.color }}>
+                            <i className="fas fa-star"></i>
+                            {wellnessLevel.level}
+                        </div>
+                        <p>Based on your logging consistency and cycle patterns</p>
+                    </div>
+                </div>
+            </div>
+
             <div className="analytics-grid">
+                {/* Key Metrics Section */}
                 {cycleStats && (
                     <div className="statistics-card">
-                        <h2>Cycle Statistics</h2>
+                        <div className="card-header">
+                            <h2><i className="fas fa-heartbeat"></i> Cycle Statistics</h2>
+                        </div>
                         <div className="statistics-grid">
                             <div className="statistic-item">
+                                <div className="statistic-icon"><i className="fas fa-sync-alt"></i></div>
                                 <div className="statistic-value">{cycleStats.avgCycleLength}</div>
-                                <div className="statistic-label">Avg. Cycle Length (days)</div>
+                                <div className="statistic-label">Avg. Cycle<br />Length (days)</div>
                             </div>
                             <div className="statistic-item">
+                                <div className="statistic-icon"><i className="fas fa-arrows-alt-h"></i></div>
                                 <div className="statistic-value">{cycleStats.minCycleLength}-{cycleStats.maxCycleLength}</div>
-                                <div className="statistic-label">Cycle Length Range</div>
+                                <div className="statistic-label">Cycle Length<br />Range</div>
                             </div>
                             <div className="statistic-item">
+                                <div className="statistic-icon"><i className="fas fa-droplet"></i></div>
                                 <div className="statistic-value">{cycleStats.avgPeriodLength}</div>
-                                <div className="statistic-label">Avg. Period Length (days)</div>
+                                <div className="statistic-label">Avg. Period<br />Length (days)</div>
                             </div>
 
                             <div className="cycle-regularity">
+                                <div className="regularity-icon"><i className="fas fa-check-circle"></i></div>
                                 <div className="regularity-value">{cycleStats.cycleRegularity}</div>
                                 <div className="regularity-label">Cycle Regularity</div>
                             </div>
@@ -292,11 +355,17 @@ export default function Analytics() {
                     </div>
                 )}
 
+                {/* Cycle Length Trends */}
                 {cycleStats && cycleStats.cycleLengths.length > 0 && (
                     <div className="chart-card">
-                        <h2>Cycle Length Trends</h2>
+                        <div className="card-header">
+                            <h2><i className="fas fa-chart-bar"></i> Cycle Length Trends</h2>
+                        </div>
+                        {cycleStats.cycleLengths.length > 10 ? (
+                            <p className="chart-info">Showing last 10 cycles</p>
+                        ) : null}
                         <div className="chart-container cycle-chart">
-                            {cycleStats.cycleLengths.map((cycle, index) => (
+                            {cycleStats.cycleLengths.slice(-10).map((cycle, index) => (
                                 <div key={index} className="bar-container">
                                     <div
                                         className="bar"
@@ -319,9 +388,12 @@ export default function Analytics() {
                     </div>
                 )}
 
+                {/* Symptoms Section */}
                 {Object.keys(symptomStats).length > 0 && (
                     <div className="chart-card">
-                        <h2>Most Common Symptoms</h2>
+                        <div className="card-header">
+                            <h2><i className="fas fa-exclamation-circle"></i> Most Common Symptoms</h2>
+                        </div>
                         <div className="chart-container">
                             <div className="symptom-chart">
                                 {Object.entries(symptomStats)
@@ -351,9 +423,12 @@ export default function Analytics() {
                     </div>
                 )}
 
+                {/* Mood Patterns */}
                 {Object.keys(moodStats).length > 0 && (
                     <div className="chart-card">
-                        <h2>Mood Patterns</h2>
+                        <div className="card-header">
+                            <h2><i className="fas fa-laugh"></i> Mood Patterns</h2>
+                        </div>
                         <div className="chart-container">
                             <div className="mood-chart">
                                 {Object.entries(moodStats)
@@ -372,6 +447,85 @@ export default function Analytics() {
                         </div>
                     </div>
                 )}
+
+                {/* Data Summary Card */}
+                <div className="summary-card">
+                    <h2><i className="fas fa-info-circle"></i> Data Summary</h2>
+                    <div className="summary-grid">
+                        <div className="summary-item">
+                            <div className="summary-icon" style={{ background: 'linear-gradient(135deg, #EC4899, #F43F5E)' }}>
+                                <i className="fas fa-calendar-days"></i>
+                            </div>
+                            <div className="summary-text">
+                                <div className="summary-value">{filterLogsByTimeRange(periodData).length}</div>
+                                <div className="summary-label">Period Logs</div>
+                            </div>
+                        </div>
+                        <div className="summary-item">
+                            <div className="summary-icon" style={{ background: 'linear-gradient(135deg, #F59E0B, #FBBF24)' }}>
+                                <i className="fas fa-thermometer"></i>
+                            </div>
+                            <div className="summary-text">
+                                <div className="summary-value">{filterLogsByTimeRange(symptomsData).length}</div>
+                                <div className="summary-label">Symptom Logs</div>
+                            </div>
+                        </div>
+                        <div className="summary-item">
+                            <div className="summary-icon" style={{ background: 'linear-gradient(135deg, #8B5CF6, #A78BFA)' }}>
+                                <i className="fas fa-smile"></i>
+                            </div>
+                            <div className="summary-text">
+                                <div className="summary-value">{filterLogsByTimeRange(moodsData).length}</div>
+                                <div className="summary-label">Mood Logs</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Insights & Recommendations */}
+                <div className="insights-card">
+                    <h2><i className="fas fa-lightbulb"></i> Key Insights</h2>
+                    <div className="insights-list">
+                        {cycleStats && cycleStats.cycleRegularity === 'Regular' && (
+                            <div className="insight-item success">
+                                <i className="fas fa-check-circle"></i>
+                                <div>
+                                    <div className="insight-title">Regular Cycle</div>
+                                    <div className="insight-text">Your cycle pattern is consistent, which is excellent for planning.</div>
+                                </div>
+                            </div>
+                        )}
+                        {cycleStats && (cycleStats.cycleRegularity === 'Somewhat Irregular' || cycleStats.cycleRegularity === 'Highly Irregular') && (
+                            <div className="insight-item warning">
+                                <i className="fas fa-exclamation-triangle"></i>
+                                <div>
+                                    <div className="insight-title">Irregular Pattern</div>
+                                    <div className="insight-text">Your cycle shows variability. Continue logging for better predictions.</div>
+                                </div>
+                            </div>
+                        )}
+                        {Object.keys(symptomStats).length > 0 && (
+                            <div className="insight-item info">
+                                <i className="fas fa-info-circle"></i>
+                                <div>
+                                    <div className="insight-title">Top Symptom</div>
+                                    <div className="insight-text">
+                                        {formatSymptomName(Object.entries(symptomStats).sort((a, b) => b[1] - a[1])[0][0])} appears most frequently in your logs.
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {filterLogsByTimeRange(periodData).length < 3 && (
+                            <div className="insight-item suggestion">
+                                <i className="fas fa-arrow-right"></i>
+                                <div>
+                                    <div className="insight-title">Keep Logging</div>
+                                    <div className="insight-text">More data will help improve cycle predictions and insights.</div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );

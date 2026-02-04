@@ -130,7 +130,7 @@ export function DataProvider({ children }) {
             console.log('Restored developer token');
         } catch (err) {
             console.error('Error loading test data:', err);
-            setError('Failed to load test user data from backend: ' + err.message);
+            setError(`Failed to load test user data from backend: ${err.message}`);
         } finally {
             setLoading(false);
         }
