@@ -5,11 +5,13 @@ This project uses **Prettier** for code formatting and **ESLint** for linting to
 ## Frontend Setup
 
 ### Configuration Files
+
 - `.prettierrc` - Prettier configuration (single quotes, 4-space tabs, 100 char line width)
 - `.prettierignore` - Files/folders excluded from formatting
 - `eslint.config.js` - ESLint configuration with React-specific rules
 
 ### NPM Scripts
+
 ```bash
 # Format all code
 npm run format
@@ -25,6 +27,7 @@ npm run lint:fix
 ```
 
 ### Key Rules
+
 - **Single quotes** for strings
 - **Template literals** preferred over string concatenation
 - **4 spaces** for indentation
@@ -35,11 +38,13 @@ npm run lint:fix
 ## Backend Setup
 
 ### Configuration Files
+
 - `.prettierrc` - Prettier configuration (same as frontend)
 - `.prettierignore` - Files/folders excluded from formatting
 - `.eslintrc.cjs` - ESLint configuration for Node.js
 
 ### NPM Scripts
+
 ```bash
 # Format all code
 npm run format
@@ -55,6 +60,7 @@ npm run lint:fix
 ```
 
 ### Key Rules
+
 - **Single quotes** for strings
 - **Template literals** preferred over string concatenation
 - **4 spaces** for indentation
@@ -65,6 +71,7 @@ npm run lint:fix
 ## Pre-commit Workflow (Recommended)
 
 Before committing code, run:
+
 ```bash
 # Frontend
 cd frontend
@@ -80,11 +87,14 @@ npm run lint:fix
 ## IDE Integration
 
 ### VS Code
+
 Install these extensions for automatic formatting:
+
 - **ESLint** (`dbaeumer.vscode-eslint`)
 - **Prettier** (`esbenp.prettier-vscode`)
 
 Add to `.vscode/settings.json`:
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -98,15 +108,17 @@ Add to `.vscode/settings.json`:
 ## String Conventions
 
 All strings should use **template literals** when:
+
 - Concatenating strings
 - Including variables in strings
 - Multi-line strings
 
 Example:
+
 ```javascript
 // ❌ Avoid
-const message = 'Hello, ' + name + '!';
-const path = baseUrl + '/api/' + endpoint;
+const message = "Hello, " + name + "!";
+const path = baseUrl + "/api/" + endpoint;
 
 // ✅ Preferred
 const message = `Hello, ${name}!`;
@@ -114,6 +126,7 @@ const path = `${baseUrl}/api/${endpoint}`;
 ```
 
 For simple static strings, single quotes are fine:
+
 ```javascript
-const greeting = 'Hello';
+const greeting = "Hello";
 ```

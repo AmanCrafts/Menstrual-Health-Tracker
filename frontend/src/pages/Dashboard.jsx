@@ -275,14 +275,14 @@ export default function Dashboard() {
                             </div>
                             {(cycleInfo.phaseInfo?.isFertile ||
                                 cycleInfo.phaseInfo?.isOvulation) && (
-                                <div className="banner-stat fertile-stat">
-                                    <span className="banner-stat-value">
-                                        <i className="fas fa-heart"></i>
-                                        {cycleInfo.phaseInfo?.isOvulation ? 'Peak' : 'High'}
-                                    </span>
-                                    <span className="banner-stat-label">Fertility</span>
-                                </div>
-                            )}
+                                    <div className="banner-stat fertile-stat">
+                                        <span className="banner-stat-value">
+                                            <i className="fas fa-heart"></i>
+                                            {cycleInfo.phaseInfo?.isOvulation ? 'Peak' : 'High'}
+                                        </span>
+                                        <span className="banner-stat-label">Fertility</span>
+                                    </div>
+                                )}
                         </div>
 
                         {/* Progress Bar */}
@@ -503,12 +503,12 @@ export default function Dashboard() {
                                         {cycleInfo.phaseInfo?.phase === 'period'
                                             ? `${cycleInfo.periodLength} days`
                                             : cycleInfo.phaseInfo?.phase === 'fertile'
-                                              ? '6-7 days'
-                                              : cycleInfo.phaseInfo?.phase === 'ovulation'
-                                                ? '1 day'
-                                                : cycleInfo.phaseInfo?.phase === 'pms'
-                                                  ? '7-10 days'
-                                                  : '7-10 days'}
+                                                ? '6-7 days'
+                                                : cycleInfo.phaseInfo?.phase === 'ovulation'
+                                                    ? '1 day'
+                                                    : cycleInfo.phaseInfo?.phase === 'pms'
+                                                        ? '7-10 days'
+                                                        : '7-10 days'}
                                     </span>
                                 </div>
                             </div>
