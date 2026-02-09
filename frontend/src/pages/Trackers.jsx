@@ -257,16 +257,17 @@ export default function Trackers() {
                     <div className="phase-banner-main">
                         <div className="phase-banner-icon">
                             <i
-                                className={`fas ${phaseInfo.phase === 'period'
+                                className={`fas ${
+                                    phaseInfo.phase === 'period'
                                         ? 'fa-tint'
                                         : phaseInfo.phase === 'ovulation'
-                                            ? 'fa-star'
-                                            : phaseInfo.phase === 'fertile'
-                                                ? 'fa-heart'
-                                                : phaseInfo.phase === 'pms'
-                                                    ? 'fa-cloud'
-                                                    : 'fa-leaf'
-                                    }`}
+                                          ? 'fa-star'
+                                          : phaseInfo.phase === 'fertile'
+                                            ? 'fa-heart'
+                                            : phaseInfo.phase === 'pms'
+                                              ? 'fa-cloud'
+                                              : 'fa-leaf'
+                                }`}
                             ></i>
                         </div>
                         <div className="phase-banner-info">

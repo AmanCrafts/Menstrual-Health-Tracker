@@ -18,6 +18,12 @@ export default function Analytics() {
     const [hasEnoughData, setHasEnoughData] = useState(false);
     const [wellnessScore, setWellnessScore] = useState(0);
     const [wellnessLevel, setWellnessLevel] = useState({ level: 'Limited', color: '#EF4444' });
+    const [healthMetrics, setHealthMetrics] = useState({
+        avgSymptomsPerLog: 0,
+        mostCommonSymptom: null,
+        mostCommonMood: null,
+        negativeEmotionPercentage: 0,
+    });
 
     const filterLogsByTimeRange = useCallback(
         (logs) => {
@@ -356,8 +362,63 @@ export default function Analytics() {
             const score = calculateWellnessScore();
             setWellnessScore(score);
             setWellnessLevel(getWellnessLevel(score));
+
+            // Calculate additional metrics
+            const filteredSymptoms = filterLogsByTimeRange(symptomsData || []);
+            // const filteredMoods = filterLogsByTimeRange(moodsData || []);
+
+            const totalSymptomOccurrences = Object.values(symptomStats).reduce(
+                (sum, count) => sum + count,
+                0
+            );
+            const avgSymptomsPerLog =
+                filteredSymptoms.length > 0
+                    ? (totalSymptomOccurrences / filteredSymptoms.length).toFixed(1)
+                    : 0;
+
+            const mostCommonSymptom =
+                Object.keys(symptomStats).length > 0
+                    ? Object.entries(symptomStats).sort((a, b) => b[1] - a[1])[0]
+                    : null;
+
+            const mostCommonMood =
+                Object.keys(moodStats).length > 0
+                    ? Object.entries(moodStats).sort((a, b) => b[1] - a[1])[0]
+                    : null;
+
+            const negativeMoods = [
+                'sad',
+                'anxious',
+                'irritable',
+                'stressed',
+                'depressed',
+                'angry',
+                'emotional',
+            ];
+            const negativeCount = Object.entries(moodStats)
+                .filter(([mood]) => negativeMoods.includes(mood.toLowerCase()))
+                .reduce((sum, [, count]) => sum + count, 0);
+            const totalMoods = Object.values(moodStats).reduce((sum, count) => sum + count, 0);
+            const negativePercent =
+                totalMoods > 0 ? ((negativeCount / totalMoods) * 100).toFixed(1) : 0;
+
+            setHealthMetrics({
+                avgSymptomsPerLog,
+                mostCommonSymptom,
+                mostCommonMood,
+                negativeEmotionPercentage: negativePercent,
+            });
         }
-    }, [hasEnoughData, calculateWellnessScore, getWellnessLevel]);
+    }, [
+        hasEnoughData,
+        calculateWellnessScore,
+        getWellnessLevel,
+        symptomStats,
+        moodStats,
+        symptomsData,
+        moodsData,
+        filterLogsByTimeRange,
+    ]);
 
     const handleTimeRangeChange = (event) => {
         setTimeRange(event.target.value);
@@ -451,6 +512,64 @@ export default function Analytics() {
             </div>
 
             <div className="analytics-grid">
+                {/* Key Metrics Overview */}
+                <div className="metrics-overview">
+                    <div className="metric-card">
+                        <div
+                            className="metric-icon"
+                            style={{ background: 'linear-gradient(135deg, #EC4899, #F43F5E)' }}
+                        >
+                            <i className="fas fa-calendar-alt"></i>
+                        </div>
+                        <div className="metric-content">
+                            <div className="metric-value">{cycleStats?.avgCycleLength || 28}</div>
+                            <div className="metric-label">Avg Cycle</div>
+                            <div className="metric-unit">days</div>
+                        </div>
+                    </div>
+                    <div className="metric-card">
+                        <div
+                            className="metric-icon"
+                            style={{ background: 'linear-gradient(135deg, #8B5CF6, #A78BFA)' }}
+                        >
+                            <i className="fas fa-droplet"></i>
+                        </div>
+                        <div className="metric-content">
+                            <div className="metric-value">{cycleStats?.avgPeriodLength || 5}</div>
+                            <div className="metric-label">Avg Period</div>
+                            <div className="metric-unit">days</div>
+                        </div>
+                    </div>
+                    <div className="metric-card">
+                        <div
+                            className="metric-icon"
+                            style={{ background: 'linear-gradient(135deg, #F59E0B, #FBBF24)' }}
+                        >
+                            <i className="fas fa-notes-medical"></i>
+                        </div>
+                        <div className="metric-content">
+                            <div className="metric-value">{healthMetrics.avgSymptomsPerLog}</div>
+                            <div className="metric-label">Symptoms</div>
+                            <div className="metric-unit">per log</div>
+                        </div>
+                    </div>
+                    <div className="metric-card">
+                        <div
+                            className="metric-icon"
+                            style={{ background: 'linear-gradient(135deg, #10B981, #34D399)' }}
+                        >
+                            <i className="fas fa-check-circle"></i>
+                        </div>
+                        <div className="metric-content">
+                            <div className="metric-value">
+                                {cycleStats?.cycleRegularity || 'N/A'}
+                            </div>
+                            <div className="metric-label">Regularity</div>
+                            <div className="metric-unit">&nbsp;</div>
+                        </div>
+                    </div>
+                </div>
+
                 {cycleStats && (
                     <div className="statistics-card">
                         <div className="card-header">
@@ -501,6 +620,43 @@ export default function Analytics() {
                                 </div>
                                 <div className="regularity-value">{cycleStats.cycleRegularity}</div>
                                 <div className="regularity-label">Cycle Regularity</div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {cycleStats && cycleStats.periodLengths.length > 0 && (
+                    <div className="chart-card">
+                        <div className="card-header">
+                            <h2>
+                                <i className="fas fa-chart-line"></i> Period Length Trends
+                            </h2>
+                        </div>
+                        {cycleStats.periodLengths.length > 10 ? (
+                            <p className="chart-info">Showing last 10 periods</p>
+                        ) : null}
+                        <div className="chart-container cycle-chart">
+                            {cycleStats.periodLengths.slice(-10).map((period, index) => (
+                                <div key={index} className="bar-container">
+                                    <div
+                                        className="bar"
+                                        style={{
+                                            height: `${(period.length / 10) * 100}%`,
+                                            backgroundColor: '#EC4899',
+                                        }}
+                                        title={`Period starting ${new Date(period.date).toLocaleDateString()}: ${period.length} days`}
+                                    ></div>
+                                    <div className="bar-label">{period.length}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="chart-legend">
+                            <div className="legend-item">
+                                <div
+                                    className="legend-color"
+                                    style={{ backgroundColor: '#EC4899' }}
+                                ></div>
+                                <span>Period Length (days)</span>
                             </div>
                         </div>
                     </div>
@@ -581,13 +737,13 @@ export default function Analytics() {
                 )}
 
                 {Object.keys(moodStats).length > 0 && (
-                    <div className="chart-card">
+                    <div className="chart-card mood-distribution-card">
                         <div className="card-header">
                             <h2>
                                 <i className="fas fa-laugh"></i> Mood Patterns
                             </h2>
                         </div>
-                        <div className="chart-container">
+                        <div className="chart-container mood-chart-container">
                             <div className="mood-chart">
                                 {Object.entries(moodStats)
                                     .sort((a, b) => b[1] - a[1])
@@ -605,52 +761,120 @@ export default function Analytics() {
                     </div>
                 )}
 
-                <div className="summary-card">
-                    <h2>
-                        <i className="fas fa-info-circle"></i> Data Summary
-                    </h2>
-                    <div className="summary-grid">
-                        <div className="summary-item">
-                            <div
-                                className="summary-icon"
-                                style={{ background: 'linear-gradient(135deg, #EC4899, #F43F5E)' }}
-                            >
-                                <i className="fas fa-calendar-days"></i>
-                            </div>
-                            <div className="summary-text">
-                                <div className="summary-value">
-                                    {filterLogsByTimeRange(periodData).length}
-                                </div>
-                                <div className="summary-label">Period Logs</div>
-                            </div>
-                        </div>
-                        <div className="summary-item">
-                            <div
-                                className="summary-icon"
-                                style={{ background: 'linear-gradient(135deg, #F59E0B, #FBBF24)' }}
-                            >
-                                <i className="fas fa-thermometer"></i>
-                            </div>
-                            <div className="summary-text">
-                                <div className="summary-value">
-                                    {filterLogsByTimeRange(symptomsData).length}
-                                </div>
-                                <div className="summary-label">Symptom Logs</div>
+                {/* Comparison Cards */}
+                <div className="comparison-card">
+                    <div className="card-header">
+                        <h2>
+                            <i className="fas fa-balance-scale"></i> Quick Comparisons
+                        </h2>
+                    </div>
+                    <div className="comparison-grid">
+                        <div className="comparison-item">
+                            <div className="comparison-label">Most Common Mood</div>
+                            <div className="comparison-value">
+                                {healthMetrics.mostCommonMood ? (
+                                    <>
+                                        <i
+                                            className={`fas fa-${getMoodIcon(healthMetrics.mostCommonMood[0])}`}
+                                        ></i>
+                                        <span>{healthMetrics.mostCommonMood[0]}</span>
+                                        <span className="comparison-count">
+                                            ({healthMetrics.mostCommonMood[1]}x)
+                                        </span>
+                                    </>
+                                ) : (
+                                    'N/A'
+                                )}
                             </div>
                         </div>
-                        <div className="summary-item">
+                        <div className="comparison-item">
+                            <div className="comparison-label">Most Common Symptom</div>
+                            <div className="comparison-value">
+                                {healthMetrics.mostCommonSymptom ? (
+                                    <>
+                                        <span>
+                                            {formatSymptomName(healthMetrics.mostCommonSymptom[0])}
+                                        </span>
+                                        <span className="comparison-count">
+                                            ({healthMetrics.mostCommonSymptom[1]}x)
+                                        </span>
+                                    </>
+                                ) : (
+                                    'N/A'
+                                )}
+                            </div>
+                        </div>
+                        <div className="comparison-item">
+                            <div className="comparison-label">Cycle Range</div>
+                            <div className="comparison-value">
+                                {cycleStats ? (
+                                    <>
+                                        <span>
+                                            {cycleStats.minCycleLength}-{cycleStats.maxCycleLength}{' '}
+                                            days
+                                        </span>
+                                        <span className="comparison-count">
+                                            ({cycleStats.maxCycleLength - cycleStats.minCycleLength}{' '}
+                                            variation)
+                                        </span>
+                                    </>
+                                ) : (
+                                    'N/A'
+                                )}
+                            </div>
+                        </div>
+                        <div className="comparison-item">
+                            <div className="comparison-label">Negative Emotions</div>
                             <div
-                                className="summary-icon"
-                                style={{ background: 'linear-gradient(135deg, #8B5CF6, #A78BFA)' }}
+                                className="comparison-value"
+                                style={{
+                                    color:
+                                        healthMetrics.negativeEmotionPercentage > 50
+                                            ? '#EF4444'
+                                            : '#10B981',
+                                }}
                             >
-                                <i className="fas fa-smile"></i>
+                                <span>{healthMetrics.negativeEmotionPercentage}%</span>
+                                <span className="comparison-count">of moods</span>
                             </div>
-                            <div className="summary-text">
-                                <div className="summary-value">
-                                    {filterLogsByTimeRange(moodsData).length}
-                                </div>
-                                <div className="summary-label">Mood Logs</div>
-                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Activity Summary */}
+                <div className="activity-summary">
+                    <div className="activity-item">
+                        <div className="activity-number">
+                            {filterLogsByTimeRange(periodData).length}
+                        </div>
+                        <div className="activity-label">Period Logs</div>
+                        <div className="activity-icon" style={{ color: '#EC4899' }}>
+                            <i className="fas fa-calendar-days"></i>
+                        </div>
+                    </div>
+                    <div className="activity-item">
+                        <div className="activity-number">
+                            {filterLogsByTimeRange(symptomsData).length}
+                        </div>
+                        <div className="activity-label">Symptom Logs</div>
+                        <div className="activity-icon" style={{ color: '#F59E0B' }}>
+                            <i className="fas fa-notes-medical"></i>
+                        </div>
+                    </div>
+                    <div className="activity-item">
+                        <div className="activity-number">
+                            {filterLogsByTimeRange(moodsData).length}
+                        </div>
+                        <div className="activity-label">Mood Logs</div>
+                        <div className="activity-icon" style={{ color: '#8B5CF6' }}>
+                            <i className="fas fa-smile"></i>
+                        </div>
+                    </div>
+                    <div className="activity-item">
+                        <div className="activity-number">{Object.keys(symptomStats).length}</div>
+                        <div className="activity-label">Unique Symptoms</div>
+                        <div className="activity-icon" style={{ color: '#EF4444' }}>
+                            <i className="fas fa-vials"></i>
                         </div>
                     </div>
                 </div>
@@ -660,166 +884,228 @@ export default function Analytics() {
                         <i className="fas fa-lightbulb"></i> Health Insights
                     </h2>
                     <div className="insights-list">
-                        {cycleStats && cycleStats.cycleRegularity === 'Regular' && (
-                            <div className="insight-item success">
-                                <i className="fas fa-check-circle"></i>
-                                <div>
-                                    <div className="insight-title">Healthy Cycle Regularity</div>
-                                    <div className="insight-text">
-                                        Your consistent cycle pattern indicates good hormonal
-                                        balance.
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        {cycleStats && cycleStats.cycleRegularity === 'Highly Irregular' && (
-                            <div className="insight-item warning">
-                                <i className="fas fa-exclamation-triangle"></i>
-                                <div>
-                                    <div className="insight-title">Irregular Cycle Detected</div>
-                                    <div className="insight-text">
-                                        Highly irregular cycles may indicate hormonal imbalance.
-                                        Consider consulting a healthcare provider.
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        {cycleStats && cycleStats.cycleRegularity === 'Somewhat Irregular' && (
-                            <div className="insight-item info">
-                                <i className="fas fa-info-circle"></i>
-                                <div>
-                                    <div className="insight-title">Moderate Cycle Variability</div>
-                                    <div className="insight-text">
-                                        Your cycle shows some irregularity. Monitor for patterns and
-                                        consider lifestyle factors.
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        {cycleStats &&
-                            (cycleStats.avgCycleLength < 21 || cycleStats.avgCycleLength > 35) && (
-                                <div className="insight-item warning">
-                                    <i className="fas fa-exclamation-circle"></i>
-                                    <div>
-                                        <div className="insight-title">
-                                            Cycle Length Outside Normal Range
-                                        </div>
-                                        <div className="insight-text">
-                                            Your average cycle length ({cycleStats.avgCycleLength}{' '}
-                                            days) is outside the typical 21-35 day range. Consult a
-                                            healthcare provider if concerned.
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        {cycleStats &&
-                            (cycleStats.avgPeriodLength < 3 || cycleStats.avgPeriodLength > 7) && (
-                                <div className="insight-item info">
-                                    <i className="fas fa-info-circle"></i>
-                                    <div>
-                                        <div className="insight-title">Period Duration Note</div>
-                                        <div className="insight-text">
-                                            Your average period length (
-                                            {cycleStats.avgPeriodLength.toFixed(1)} days) is{' '}
-                                            {cycleStats.avgPeriodLength < 3 ? 'shorter' : 'longer'}{' '}
-                                            than typical. Monitor for changes.
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        {Object.keys(symptomStats).length >= 6 && (
-                            <div className="insight-item warning">
-                                <i className="fas fa-notes-medical"></i>
-                                <div>
-                                    <div className="insight-title">High Symptom Burden</div>
-                                    <div className="insight-text">
-                                        You're experiencing {Object.keys(symptomStats).length}{' '}
-                                        different types of symptoms regularly. Consider discussing
-                                        symptom management with a healthcare provider.
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        {Object.keys(symptomStats).length > 0 &&
-                            Object.keys(symptomStats).length < 3 && (
-                                <div className="insight-item success">
-                                    <i className="fas fa-check-circle"></i>
-                                    <div>
-                                        <div className="insight-title">Minimal Symptoms</div>
-                                        <div className="insight-text">
-                                            You're experiencing relatively few symptoms, which is a
-                                            positive health indicator.
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
                         {(() => {
-                            const negativeMoods = [
-                                'sad',
-                                'anxious',
-                                'irritable',
-                                'stressed',
-                                'depressed',
-                                'angry',
-                                'emotional',
-                            ];
-                            const negativeCount = Object.entries(moodStats)
-                                .filter(([mood]) => negativeMoods.includes(mood.toLowerCase()))
-                                .reduce((sum, [, count]) => sum + count, 0);
-                            const totalMoods = Object.values(moodStats).reduce(
-                                (sum, count) => sum + count,
-                                0
-                            );
-                            const negativePercent =
-                                totalMoods > 0 ? (negativeCount / totalMoods) * 100 : 0;
+                            const insights = [];
+                            const addedInsightTypes = new Set();
 
-                            if (negativePercent > 60) {
-                                return (
-                                    <div className="insight-item warning">
-                                        <i className="fas fa-brain"></i>
-                                        <div>
-                                            <div className="insight-title">
-                                                Emotional Health Concern
-                                            </div>
-                                            <div className="insight-text">
-                                                You're frequently experiencing negative moods (
-                                                {negativePercent.toFixed(0)}% of logs). Consider
-                                                stress management techniques or speaking with a
-                                                mental health professional.
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            } else if (negativePercent < 30 && totalMoods > 0) {
-                                return (
-                                    <div className="insight-item success">
-                                        <i className="fas fa-smile"></i>
-                                        <div>
-                                            <div className="insight-title">
-                                                Positive Emotional Health
-                                            </div>
-                                            <div className="insight-text">
-                                                Your mood logs show predominantly positive emotions,
-                                                indicating good emotional well-being.
+                            // Only show ONE regularity insight
+                            if (cycleStats && !addedInsightTypes.has('regularity')) {
+                                if (cycleStats.cycleRegularity === 'Regular') {
+                                    insights.push(
+                                        <div key="regular" className="insight-item success">
+                                            <i className="fas fa-check-circle"></i>
+                                            <div>
+                                                <div className="insight-title">
+                                                    Healthy Cycle Regularity
+                                                </div>
+                                                <div className="insight-text">
+                                                    Your consistent cycle pattern indicates good
+                                                    hormonal balance.
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                );
+                                    );
+                                } else if (cycleStats.cycleRegularity === 'Highly Irregular') {
+                                    insights.push(
+                                        <div key="irregular" className="insight-item warning">
+                                            <i className="fas fa-exclamation-triangle"></i>
+                                            <div>
+                                                <div className="insight-title">
+                                                    Irregular Cycle Detected
+                                                </div>
+                                                <div className="insight-text">
+                                                    Highly irregular cycles may indicate hormonal
+                                                    imbalance. Consider consulting a healthcare
+                                                    provider.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                } else if (cycleStats.cycleRegularity === 'Somewhat Irregular') {
+                                    insights.push(
+                                        <div key="moderate" className="insight-item info">
+                                            <i className="fas fa-info-circle"></i>
+                                            <div>
+                                                <div className="insight-title">
+                                                    Moderate Cycle Variability
+                                                </div>
+                                                <div className="insight-text">
+                                                    Your cycle shows some irregularity. Monitor for
+                                                    patterns and consider lifestyle factors.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                addedInsightTypes.add('regularity');
                             }
-                            return null;
-                        })()}
-                        {wellnessScore >= 85 && (
-                            <div className="insight-item success">
-                                <i className="fas fa-trophy"></i>
-                                <div>
-                                    <div className="insight-title">Excellent Health Status</div>
-                                    <div className="insight-text">
-                                        Your menstrual health metrics indicate optimal wellness.
-                                        Keep maintaining your healthy habits!
+
+                            // Cycle length insight
+                            if (
+                                cycleStats &&
+                                (cycleStats.avgCycleLength < 21 ||
+                                    cycleStats.avgCycleLength > 35) &&
+                                !addedInsightTypes.has('cycle-length')
+                            ) {
+                                insights.push(
+                                    <div key="cycle-length" className="insight-item warning">
+                                        <i className="fas fa-exclamation-circle"></i>
+                                        <div>
+                                            <div className="insight-title">
+                                                Cycle Length Outside Normal Range
+                                            </div>
+                                            <div className="insight-text">
+                                                Your average cycle length (
+                                                {cycleStats.avgCycleLength} days) is outside the
+                                                typical 21-35 day range.
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        )}
+                                );
+                                addedInsightTypes.add('cycle-length');
+                            }
+
+                            // Period duration insight
+                            if (
+                                cycleStats &&
+                                (cycleStats.avgPeriodLength < 3 ||
+                                    cycleStats.avgPeriodLength > 7) &&
+                                !addedInsightTypes.has('period-length')
+                            ) {
+                                insights.push(
+                                    <div key="period-length" className="insight-item info">
+                                        <i className="fas fa-info-circle"></i>
+                                        <div>
+                                            <div className="insight-title">
+                                                Period Duration Note
+                                            </div>
+                                            <div className="insight-text">
+                                                Your average period length (
+                                                {cycleStats.avgPeriodLength.toFixed(1)} days) is{' '}
+                                                {cycleStats.avgPeriodLength < 3
+                                                    ? 'shorter'
+                                                    : 'longer'}{' '}
+                                                than typical.
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                                addedInsightTypes.add('period-length');
+                            }
+
+                            // Only show ONE symptom insight
+                            if (!addedInsightTypes.has('symptoms')) {
+                                if (Object.keys(symptomStats).length >= 6) {
+                                    insights.push(
+                                        <div key="high-symptoms" className="insight-item warning">
+                                            <i className="fas fa-notes-medical"></i>
+                                            <div>
+                                                <div className="insight-title">
+                                                    High Symptom Burden
+                                                </div>
+                                                <div className="insight-text">
+                                                    You're experiencing{' '}
+                                                    {Object.keys(symptomStats).length} different
+                                                    types of symptoms regularly.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                } else if (
+                                    Object.keys(symptomStats).length > 0 &&
+                                    Object.keys(symptomStats).length < 3
+                                ) {
+                                    insights.push(
+                                        <div
+                                            key="minimal-symptoms"
+                                            className="insight-item success"
+                                        >
+                                            <i className="fas fa-check-circle"></i>
+                                            <div>
+                                                <div className="insight-title">
+                                                    Minimal Symptoms
+                                                </div>
+                                                <div className="insight-text">
+                                                    You're experiencing relatively few symptoms,
+                                                    which is a positive health indicator.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                addedInsightTypes.add('symptoms');
+                            }
+
+                            // Only show ONE emotional health insight
+                            if (!addedInsightTypes.has('emotions')) {
+                                const negativePercent = parseFloat(
+                                    healthMetrics.negativeEmotionPercentage
+                                );
+
+                                if (negativePercent > 60) {
+                                    insights.push(
+                                        <div
+                                            key="negative-emotions"
+                                            className="insight-item warning"
+                                        >
+                                            <i className="fas fa-brain"></i>
+                                            <div>
+                                                <div className="insight-title">
+                                                    Emotional Health Concern
+                                                </div>
+                                                <div className="insight-text">
+                                                    You're frequently experiencing negative moods (
+                                                    {negativePercent.toFixed(0)}% of logs).
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                } else if (
+                                    negativePercent < 30 &&
+                                    Object.values(moodStats).length > 0
+                                ) {
+                                    insights.push(
+                                        <div
+                                            key="positive-emotions"
+                                            className="insight-item success"
+                                        >
+                                            <i className="fas fa-smile"></i>
+                                            <div>
+                                                <div className="insight-title">
+                                                    Positive Emotional Health
+                                                </div>
+                                                <div className="insight-text">
+                                                    Your mood logs show predominantly positive
+                                                    emotions, indicating good emotional well-being.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                addedInsightTypes.add('emotions');
+                            }
+
+                            // Wellness score insight
+                            if (wellnessScore >= 85 && !addedInsightTypes.has('wellness')) {
+                                insights.push(
+                                    <div key="wellness" className="insight-item success">
+                                        <i className="fas fa-trophy"></i>
+                                        <div>
+                                            <div className="insight-title">
+                                                Excellent Health Status
+                                            </div>
+                                            <div className="insight-text">
+                                                Your menstrual health metrics indicate optimal
+                                                wellness. Keep it up!
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                                addedInsightTypes.add('wellness');
+                            }
+
+                            return insights;
+                        })()}
                     </div>
                 </div>
             </div>
